@@ -14,4 +14,6 @@ export const config = {
   predictServerUrl: process.env.PREDICT_SERVER_URL ?? PREDICT_SERVER_URL,
   keeperPrivateKey: process.env.KEEPER_PRIVATE_KEY ?? "",
   pollIntervalMs: Number(process.env.KEEPER_POLL_INTERVAL_MS ?? 5000),
+  eventPollLimit: Number(process.env.KEEPER_EVENT_POLL_LIMIT ?? 50),
+  bootstrapSettlements: Number(process.env.KEEPER_BOOTSTRAP_SETTLEMENTS ?? 100),
 };
