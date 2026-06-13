@@ -1,0 +1,10 @@
+{
+  "name": "Sentinel — BTC Crash Insurance",
+  "short_name": "Sentinel",
+  "description": "One-hour parametric crash insurance for BTC",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0b0d12",
+  "theme_color": "#0b0d12",
+  "icons": []
+}
