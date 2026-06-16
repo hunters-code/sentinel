@@ -16,4 +16,5 @@ export const config = {
   pollIntervalMs: Number(process.env.KEEPER_POLL_INTERVAL_MS ?? 5000),
   eventPollLimit: Number(process.env.KEEPER_EVENT_POLL_LIMIT ?? 50),
   bootstrapSettlements: Number(process.env.KEEPER_BOOTSTRAP_SETTLEMENTS ?? 100),
+  apiPort: Number(process.env.KEEPER_API_PORT ?? 8787),
 };

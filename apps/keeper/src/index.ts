@@ -2,9 +2,11 @@ import { config } from "./config.js";
 import { OracleSettledWatcher } from "./events.js";
 import { healthCheck, redeemOracleSettlement } from "./redeem.js";
 import { loadKeeperKeypair } from "./ptb.js";
+import { startApiServer, type KeeperStats } from "./server.js";
 import { suiClient } from "./sui.js";
 
-async function tick(watcher: OracleSettledWatcher): Promise<void> {
+async function tick(watcher: OracleSettledWatcher, stats: KeeperStats): Promise<void> {
+  stats.lastPollAt = Date.now();
   const settlements = await watcher.poll();
   if (settlements.length === 0) return;
 
@@ -13,12 +15,14 @@ async function tick(watcher: OracleSettledWatcher): Promise<void> {
     console.log(
       `[keeper] OracleSettled ${settlement.oracleId} @ ${settlement.settlementPrice}`,
     );
-    await redeemOracleSettlement(
+    const claimed = await redeemOracleSettlement(
       suiClient,
       keypair,
       settlement.oracleId,
       settlement.settlementPrice,
     );
+    stats.settlementsProcessed += 1;
+    stats.claimsSubmitted += claimed;
   }
 }
 
@@ -34,24 +38,40 @@ async function main(): Promise<void> {
     console.log(`[keeper] executor ${keypair.toSuiAddress()}`);
   }
 
-  await healthCheck();
+  const stats: KeeperStats = {
+    startedAt: Date.now(),
+    executor: keypair?.toSuiAddress() ?? null,
+    dryRun: !keypair,
+    lastPollAt: null,
+    settlementsProcessed: 0,
+    claimsSubmitted: 0,
+  };
+
+  startApiServer(stats);
 
   const watcher = new OracleSettledWatcher(suiClient);
-  const bootstrap = await watcher.bootstrap(config.bootstrapSettlements);
-  console.log(`[keeper] bootstrapped ${bootstrap.length} recent settlement(s)`);
+  try {
+    await healthCheck();
+    const bootstrap = await watcher.bootstrap(config.bootstrapSettlements);
+    console.log(`[keeper] bootstrapped ${bootstrap.length} recent settlement(s)`);
 
-  for (const settlement of bootstrap) {
-    await redeemOracleSettlement(
-      suiClient,
-      keypair,
-      settlement.oracleId,
-      settlement.settlementPrice,
-    );
+    for (const settlement of bootstrap) {
+      const claimed = await redeemOracleSettlement(
+        suiClient,
+        keypair,
+        settlement.oracleId,
+        settlement.settlementPrice,
+      );
+      stats.settlementsProcessed += 1;
+      stats.claimsSubmitted += claimed;
+    }
+  } catch (err) {
+    console.error("[keeper] bootstrap failed — API stays up, will retry", err);
   }
 
   for (;;) {
     try {
-      await tick(watcher);
+      await tick(watcher, stats);
       await healthCheck();
     } catch (err) {
       console.error("[keeper] tick failed", err);

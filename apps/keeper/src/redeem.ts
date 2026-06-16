@@ -9,11 +9,11 @@ export async function redeemOracleSettlement(
   keypair: Ed25519Keypair | null,
   oracleId: string,
   settlementPrice: number,
-): Promise<void> {
+): Promise<number> {
   const claimable = await findClaimablePositions(oracleId, settlementPrice);
   if (claimable.length === 0) {
     console.log(`[keeper] oracle ${oracleId} — no claimable DOWN positions`);
-    return;
+    return 0;
   }
 
   const groups = await groupByManager(claimable);
@@ -21,9 +21,11 @@ export async function redeemOracleSettlement(
     `[keeper] oracle ${oracleId} — ${claimable.length} claimable position(s) across ${groups.size} manager(s)`,
   );
 
+  let claimed = 0;
   for (const [managerId, positions] of groups) {
-    await redeemManagerPositions(client, keypair, managerId, positions);
+    claimed += await redeemManagerPositions(client, keypair, managerId, positions);
   }
+  return claimed;
 }
 
 async function redeemManagerPositions(
@@ -31,14 +33,14 @@ async function redeemManagerPositions(
   keypair: Ed25519Keypair | null,
   managerId: string,
   positions: Awaited<ReturnType<typeof findClaimablePositions>>,
-): Promise<void> {
+): Promise<number> {
   const tx = buildRedeemPtb(positions);
 
   if (!keypair) {
     console.log(
       `[keeper] dry-run: would redeem ${positions.length} position(s) for manager ${managerId}`,
     );
-    return;
+    return 0;
   }
 
   const result = await client.signAndExecuteTransaction({
@@ -52,13 +54,14 @@ async function redeemManagerPositions(
     console.log(
       `[keeper] redeemed ${positions.length} position(s) for manager ${managerId} — digest ${result.digest}`,
     );
-    return;
+    return positions.length;
   }
 
   const error = result.effects?.status.error ?? "unknown error";
   console.error(
     `[keeper] redeem failed for manager ${managerId} — ${error} (digest ${result.digest})`,
   );
+  return 0;
 }
 
 export async function healthCheck(): Promise<void> {
