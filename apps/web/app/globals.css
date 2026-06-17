@@ -1,100 +1,153 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+/* ------------------------------------------------------------------ */
+/* Low-fidelity wireframe baseline.                                    */
+/* No brand identity, no color, no motion. Grayscale boxes only.       */
+/* Rebuild the design system on top of this.                          */
+/* ------------------------------------------------------------------ */
 
-:root {
-  --border-radius: 5px;
-  --box-shadow-x: 4px;
-  --box-shadow-y: 4px;
-  --reverse-box-shadow-x: -4px;
-  --reverse-box-shadow-y: -4px;
-
-  --heading-font-weight: 700;
-  --base-font-weight: 500;
-
-  /* neo-brutalism-ui-library palette */
-  --background: #ffffff;
-  --secondary-background: #ffffff;
-  --foreground: #000000;
-  --main-foreground: #000000;
-
-  --main: #a6faff;
-  --main-hover: #79f7ff;
-  --main-active: #53f2fc;
-
-  --border: #000000;
-  --ring: #000000;
-
-  --shadow: 4px 4px 0px rgba(0, 0, 0, 1);
-
-  --violet-200: #a8a6ff;
-  --pink-200: #ffa6f6;
-  --red-300: #fa7a7a;
-  --orange-300: #ff965b;
-  --yellow-200: #fff59f;
-  --yellow-300: #fff066;
-  --lime-100: #c6fab4;
-  --lime-200: #b8ff9f;
-  --lime-300: #9dfc7c;
-  --cyan-200: #a6faff;
-  --cyan-300: #79f7ff;
-
-  --chart-1: var(--violet-200);
-  --chart-2: var(--red-300);
-  --chart-3: var(--yellow-300);
-  --chart-4: var(--lime-300);
-  --chart-5: var(--pink-200);
-
-  --surface-lime: var(--lime-100);
-  --surface-yellow: var(--yellow-200);
-  --surface-cyan: var(--cyan-200);
-  --surface-pink: var(--pink-200);
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
 }
 
-@layer base {
-  *,
-  *::before,
-  *::after {
-    box-sizing: border-box;
-  }
+html,
+body {
+  margin: 0;
+  padding: 0;
+}
 
-  html {
-    scroll-behavior: smooth;
-  }
+body {
+  font-family: system-ui, -apple-system, sans-serif;
+  font-size: 16px;
+  line-height: 1.5;
+  color: #111;
+  background: #fff;
+}
 
-  html,
-  body {
-    margin: 0;
-    padding: 0;
-  }
+/* Centered content column */
+.wrap {
+  width: 100%;
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 1rem;
+}
 
-  body {
-    @apply bg-background font-base text-foreground antialiased;
-  }
+.wrap--narrow {
+  max-width: 480px;
+}
 
-  h1,
-  h2,
-  h3,
-  h4,
-  h5,
-  h6 {
-    @apply font-heading;
+/* Sections delineated by a hairline */
+section {
+  padding: 2rem 0;
+  border-bottom: 1px solid #ccc;
+}
+
+/* Generic box — stands in for any card/panel */
+.box {
+  border: 1px solid #999;
+  padding: 1rem;
+}
+
+.box > * + * {
+  margin-top: 0.75rem;
+}
+
+/* Tag / chip / status placeholder */
+.tag {
+  display: inline-block;
+  border: 1px solid #999;
+  padding: 0 0.4rem;
+  font-size: 0.75rem;
+}
+
+/* Input shell */
+.field {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  border: 1px solid #999;
+  padding: 0.5rem 0.75rem;
+}
+
+.field input {
+  flex: 1;
+  min-width: 0;
+  border: 0;
+  padding: 0;
+  font: inherit;
+  background: transparent;
+  outline: none;
+}
+
+/* Buttons — default browser-ish, neutral */
+button,
+.btn {
+  font: inherit;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid #666;
+  background: #eee;
+  color: #111;
+  cursor: pointer;
+}
+
+button:disabled,
+.btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.btn--full {
+  display: block;
+  width: 100%;
+}
+
+/* Layout helpers */
+.row {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.stack > * + * {
+  margin-top: 0.75rem;
+}
+
+.grid {
+  display: grid;
+  gap: 1rem;
+}
+
+@media (min-width: 720px) {
+  .grid--2 {
+    grid-template-columns: 1fr 1fr;
+  }
+  .grid--3 {
+    grid-template-columns: 1fr 1fr 1fr;
   }
 }
 
-@layer utilities {
-  .tnum {
-    font-variant-numeric: tabular-nums lining-nums;
-    font-feature-settings: "tnum" 1, "lnum" 1;
-  }
+.muted {
+  color: #666;
 }
 
-@media (prefers-reduced-motion: reduce) {
-  html {
-    scroll-behavior: auto;
-  }
+hr {
+  border: 0;
+  border-top: 1px solid #ccc;
+  margin: 1rem 0;
+}
 
-  .animate-marquee {
-    animation: none !important;
-  }
+a {
+  color: inherit;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+th,
+td {
+  border: 1px solid #ccc;
+  padding: 0.4rem 0.6rem;
+  text-align: left;
 }

@@ -4,40 +4,13 @@ Product specification, v1.0 (hackathon scope)
 
 Track: DeepBook Predict (Sui Overflow)
 
-## Register
-
-brand
-
 ## Users
 
-BTC holders who are not options traders and feel acute event risk (FOMC minutes, a CPI print, a Friday-night liquidation cascade). They will never open a strike ladder. They arrive anxious, want one clear answer, and decide in seconds. They are also the judges of a hackathon demo who must grasp the whole story in under three minutes.
+BTC holders who are not options traders and feel acute event risk (FOMC minutes, a CPI print, a Friday-night liquidation cascade). They will never open a strike ladder. They arrive anxious, want one clear answer, and decide in seconds.
 
 ## Product Purpose
 
-Turn a deep out-of-the-money DOWN binary on DeepBook Predict into something a normal BTC holder understands instantly: one-hour crash insurance. The user enters how much BTC they hold, gets one premium, presses one button, and gets one receipt — and is paid automatically if BTC settles at or below the trigger before expiry. Success is the full loop (quote → mint → settle → payout) feeling effortless and legible, with the premium math shown rather than asserted.
-
-## Brand Personality
-
-Playful, disarming, plain-spoken. Sentinel takes a frightening topic (your BTC crashing) and makes protecting against it feel light and almost fun — a single confident tap, not a trading desk. The voice is human and direct, never corporate or hypey. It earns belief by showing its work, not by sounding serious.
-
-## Anti-references
-
-- **Legacy insurance corporate.** Stock photos of smiling families, dense legalese, claims-form dread, navy-and-gray trust-by-default. Sentinel is the opposite of a policy PDF.
-- **Degen crypto casino.** Neon gradients, confetti, number-go-up hype, leaderboard dopamine. We are protection, not a bet to win.
-- **Generic DeFi dashboard.** APY cards, glassmorphism, token-soup tables, wallet-first chrome.
-- **AI editorial-slop.** Display-serif-italic + tiny tracked uppercase eyebrows + ruled three-column restraint. Not this lane.
-
-## Design Principles
-
-1. **One decision, not a ladder.** Collapse every option (strike, expiry, quantity) into a single input and a single button. The machinery stays hidden; the user makes exactly one choice.
-2. **Show the work.** The premium is the protocol's own ask, decomposed in plain sight (fair value · spread · floor). Honesty is the hook, never the fine print — disclosures live in-product, not buried.
-3. **Make the scary thing feel light.** Crash anxiety becomes a one-tap reflex. Playful and reassuring beats grave and institutional, without ever trivializing the risk.
-4. **The receipt is the product.** The legible, shareable artifact — status, live trigger line, payout — is what people remember and pass on. Design it like the hero, not an afterthought.
-5. **Trust through disclosure, not reassurance.** Parametric all-or-nothing payout, PLP counterparty, 1% premium floor — state them clearly and early instead of claiming "trusted".
-
-## Accessibility & Inclusion
-
-No formal WCAG target for the hackathon; follow sensible defaults. Body text meets AA contrast (≥4.5:1) against its background, interactive controls are keyboard-operable with visible focus, and all motion respects `prefers-reduced-motion`. Do not rely on color alone for policy status (ACTIVE / PAID / EXPIRED) — pair it with text and shape.
+Turn a deep out-of-the-money DOWN binary on DeepBook Predict into something a normal BTC holder understands instantly: one-hour crash insurance. The user enters how much BTC they hold, gets one premium, presses one button, and gets one receipt — and is paid automatically if BTC settles at or below the trigger before expiry.
 
 ## 1. One-liner
 
@@ -164,7 +137,7 @@ Optional (stretch): "Cancel policy" before expiry via `predict::redeem`, returni
 |---|---|
 | Predict package | `0xf5ea2b3749c65d6e56507cc35388719aadb28f9cab873696a2f8687f5c785138` |
 | Predict object | `0xc8736204d12f0a7277c86388a68bf8a194b0a14c5538ad13f22cbd8e2a38028a` |
-| Quote asset | `e95040085976bfd54a1a07225cd46c8a2b4e8e2b6732f140a0fc49850ba73e1a::dusdc::DUSDC` |
+| Quote asset | `0xe95040085976bfd54a1a07225cd46c8a2b4e8e2b6732f140a0fc49850ba73e1a::dusdc::DUSDC` |
 | Indexer | `https://predict-server.testnet.mystenlabs.com` |
 
 ### 6.2 On-chain calls used

@@ -4,7 +4,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { SuiClientProvider, WalletProvider } from "@mysten/dapp-kit";
 import { getFullnodeUrl } from "@mysten/sui/client";
 import { useState } from "react";
-import "@mysten/dapp-kit/dist/index.css";
+// dapp-kit styles intentionally not imported — keeping the wallet UI low-fidelity.
 
 const networks = {
   testnet: { url: getFullnodeUrl("testnet") },
