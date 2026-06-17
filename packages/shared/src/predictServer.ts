@@ -72,6 +72,22 @@ export interface ManagerPositionSummary {
   status: string;
 }
 
+export interface OraclePriceRecord {
+  oracle_id: string;
+  price: number;
+  timestamp_ms: number;
+}
+
+export interface OracleSviRecord {
+  oracle_id: string;
+  a: number;
+  b: number;
+  rho: number;
+  m: number;
+  sigma: number;
+  updated_at: number;
+}
+
 export interface PredictServerClientOptions {
   baseUrl?: string;
   fetchImpl?: typeof fetch;
@@ -116,6 +132,14 @@ export class PredictServerClient {
 
   async getManagerPositionsSummary(managerId: string): Promise<ManagerPositionSummary[]> {
     return this.getJson(`/managers/${managerId}/positions/summary`);
+  }
+
+  async getOraclePrices(oracleId: string, limit = 1): Promise<OraclePriceRecord[]> {
+    return this.getJson(`/oracles/${oracleId}/prices`, { limit });
+  }
+
+  async getOracleSviLatest(oracleId: string): Promise<OracleSviRecord> {
+    return this.getJson(`/oracles/${oracleId}/svi/latest`);
   }
 
   private async getJson<T>(

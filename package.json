@@ -14,6 +14,11 @@
   "engines": {
     "node": ">=20"
   },
+  "pnpm": {
+    "overrides": {
+      "@mysten/sui": "1.36.1"
+    }
+  },
   "devDependencies": {
     "nanoid": "^5.1.11"
   }

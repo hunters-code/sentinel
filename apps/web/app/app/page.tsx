@@ -20,9 +20,12 @@ import {
   type CoverQuote,
   type OracleOption,
 } from "@/lib/use-cover-quote";
-import { MIN_EXPIRY_LEAD_MS } from "@sentinel/shared";
+import { MIN_EXPIRY_LEAD_MS, QUOTE_FRESHNESS_MS } from "@sentinel/shared";
 import { useWalletBtc } from "@/lib/use-wallet-btc";
 import { useManagerId } from "@/lib/use-manager";
+import { useManagerBalance } from "@/lib/use-manager-balance";
+import { useOracleData } from "@/lib/use-oracle-data";
+import { usePurchase, useWithdraw } from "@/lib/use-purchase";
 import { useKeeperHealth, useManagerPolicies, type KeeperPolicy } from "@/lib/keeper";
 import { cn } from "@/lib/cn";
 
@@ -132,16 +135,38 @@ function QuotePreview({
   );
 }
 
+function QuoteFreshnessBadge({ createdAtMs }: { createdAtMs: number }) {
+  const [stale, setStale] = useState(false);
+
+  useEffect(() => {
+    const check = () => setStale(Date.now() - createdAtMs > QUOTE_FRESHNESS_MS);
+    check();
+    const id = setInterval(check, 1_000);
+    return () => clearInterval(id);
+  }, [createdAtMs]);
+
+  if (!stale) return null;
+  return (
+    <p className="text-xs font-heading text-amber-600">
+      Quote expired — prices may have changed
+    </p>
+  );
+}
+
 function CoverPanel() {
   const { btc: detectedBtc, fromWallet, loading: btcLoading } = useWalletBtc();
   const { options, loading: oracleLoading, defaultOracleId } = useOracleOptions();
+  const { managerId } = useManagerId();
+  const { balance: managerBalanceUsd } = useManagerBalance(managerId);
 
   const [btcInput, setBtcInput] = useState("");
   const [btcTouched, setBtcTouched] = useState(false);
   const [oracleId, setOracleId] = useState<string | null>(null);
   const [pickMode, setPickMode] = useState<PickMode>("list");
   const [customDatetime, setCustomDatetime] = useState("");
-  const [signing, setSigning] = useState(false);
+
+  const { purchase, status, error } = usePurchase();
+  const signing = status === "checking" || status === "signing" || status === "confirming";
 
   useEffect(() => {
     if (detectedBtc != null && !btcTouched) {
@@ -172,9 +197,14 @@ function CoverPanel() {
   const selectedOracle: OracleOption | null =
     pickMode === "custom" ? customOracle : listOracle;
 
+  // Live oracle data (spot price + SVI) for the selected oracle
+  const { spot, svi, spotLive } = useOracleData(selectedOracle?.oracleId ?? null);
+
   const quote = useMemo(
-    () => buildCoverQuote(btcHeld, selectedOracle),
-    [btcHeld, selectedOracle],
+    () => buildCoverQuote(btcHeld, selectedOracle, spot, svi),
+    // Re-compute every time spot or svi changes to keep freshness timer accurate
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [btcHeld, selectedOracle, spot, svi],
   );
   const ready = !btcLoading && !oracleLoading && quote.valid;
   const customSnapped =
@@ -183,6 +213,14 @@ function CoverPanel() {
     customOracle != null &&
     customOracle.expiryMs !== customTarget;
   const pickedLabel = formatPickedLocal(customDatetime);
+
+  const buttonLabel = () => {
+    if (status === "checking") return "Checking price…";
+    if (status === "signing") return "Confirm in wallet…";
+    if (status === "confirming") return "Submitting…";
+    if (status === "success") return "Purchase confirmed!";
+    return `Protect — ${usd(quote.premium)}`;
+  };
 
   return (
     <div className="grid gap-4">
@@ -256,7 +294,7 @@ function CoverPanel() {
                 {options.map((o) => {
                   const active = o.oracleId === listOracle?.oracleId;
                   const { date, time } = formatExpiryUtc(o.expiryMs);
-                  const rowQuote = btcHeld > 0 ? buildCoverQuote(btcHeld, o) : null;
+                  const rowQuote = btcHeld > 0 ? buildCoverQuote(btcHeld, o, spot, svi) : null;
                   return (
                     <button
                       key={o.oracleId}
@@ -301,7 +339,7 @@ function CoverPanel() {
                 />
                 {customOracle && btcHeld > 0 && (
                   <QuotePreview
-                    quote={buildCoverQuote(btcHeld, customOracle)}
+                    quote={buildCoverQuote(btcHeld, customOracle, spot, svi)}
                     subtitle={
                       customSnapped && pickedLabel
                         ? `You picked ${pickedLabel} → nearest window below`
@@ -317,6 +355,9 @@ function CoverPanel() {
 
           {ready && pickMode === "list" && (
             <div className="rounded-base border-2 border-black bg-neutral-50 px-4 py-4 text-center">
+              <p className="text-xs text-neutral-500 mb-2">
+                BTC{spotLive ? "" : " (demo)"} at {usd(quote.spot, 0)}
+              </p>
               <p className="text-sm leading-relaxed text-neutral-700">
                 BTC at or below{" "}
                 <span className="font-heading text-black">{usd(quote.strike, 0)}</span>
@@ -325,24 +366,43 @@ function CoverPanel() {
               </p>
               <p className="mt-3 tnum font-heading text-3xl">{usd(quote.coverage, 0)}</p>
               <p className="mt-1 text-xs text-neutral-500">to you · premium {usd(quote.premium)}</p>
+              {quote.floorBinds && (
+                <p className="mt-1 text-xs text-neutral-400">1% minimum premium applies</p>
+              )}
             </div>
           )}
 
           {ready && (
             <>
-              <Button
-                variant="noShadow"
-                fullWidth
-                className="border-2 border-black bg-black text-white hover:bg-neutral-800 disabled:bg-neutral-300"
-                disabled={signing}
-                onClick={() => {
-                  setSigning(true);
-                  setTimeout(() => setSigning(false), 2000);
-                }}
-              >
-                {signing ? "Confirm in wallet…" : `Protect — ${usd(quote.premium)}`}
-                {!signing && <ArrowRight size={16} strokeWidth={2.5} />}
-              </Button>
+              {status === "error" && error && (
+                <p className="text-xs font-heading text-red-600 bg-red-50 border border-red-200 rounded px-3 py-2">
+                  {error}
+                </p>
+              )}
+
+              {status !== "success" ? (
+                <>
+                  {quote.valid && <QuoteFreshnessBadge createdAtMs={quote.createdAtMs} />}
+                  <Button
+                    variant="noShadow"
+                    fullWidth
+                    className="border-2 border-black bg-black text-white hover:bg-neutral-800 disabled:bg-neutral-300"
+                    disabled={signing}
+                    onClick={() => {
+                      if (!selectedOracle) return;
+                      purchase(quote, selectedOracle, managerId, managerBalanceUsd);
+                    }}
+                  >
+                    {buttonLabel()}
+                    {!signing && <ArrowRight size={16} strokeWidth={2.5} />}
+                  </Button>
+                </>
+              ) : (
+                <div className="flex items-center justify-center gap-2 rounded-base border-2 border-black bg-white py-3 text-sm font-heading">
+                  <Check size={16} />
+                  Purchase confirmed — check History
+                </div>
+              )}
 
               <details>
                 <summary className="flex cursor-pointer list-none items-center justify-center gap-1 text-xs text-neutral-500 [&::-webkit-details-marker]:hidden">
@@ -361,6 +421,11 @@ function CoverPanel() {
                     <span>You pay</span>
                     <span className="tnum">{usd(quote.premium)}</span>
                   </div>
+                  {quote.floorBinds && (
+                    <p className="text-[10px] text-neutral-400 pt-1">
+                      Floor of 1¢/contract applies — parametric payout, not regulated insurance.
+                    </p>
+                  )}
                 </div>
               </details>
             </>
@@ -432,7 +497,6 @@ function HistoryPanel() {
     );
   }
 
-  // No on-chain manager yet (or keeper unreachable) — show sample policies.
   return (
     <div className="grid gap-3">
       <p className="text-sm text-neutral-600">
@@ -465,23 +529,34 @@ function HistoryPanel() {
   );
 }
 
-function WalletPanel({
-  balance,
-  onWithdraw,
-  withdrawing,
-  done,
-}: {
-  balance: number;
-  onWithdraw: () => void;
-  withdrawing: boolean;
-  done: boolean;
-}) {
+function WalletPanel({ managerId }: { managerId: string | null }) {
+  const { balance, loading: balanceLoading, refetch } = useManagerBalance(managerId);
+  const { withdraw, withdrawing, done, error } = useWithdraw();
+
+  if (!managerId) {
+    return (
+      <Card className="border-2 border-black bg-neutral-50 shadow-none" hover={false}>
+        <CardContent className="py-5 text-center">
+          <p className="text-sm text-neutral-500">Buy your first cover to create a manager account.</p>
+        </CardContent>
+      </Card>
+    );
+  }
+
   return (
     <Card className="border-2 border-black bg-neutral-50 shadow-none" hover={false}>
       <CardContent className="py-5">
         <p className="text-xs text-neutral-500">Manager balance</p>
-        <p className="tnum font-heading text-4xl">{usd(balance)}</p>
+        {balanceLoading ? (
+          <p className="tnum font-heading text-4xl text-neutral-400">…</p>
+        ) : (
+          <p className="tnum font-heading text-4xl">{usd(balance)}</p>
+        )}
         <p className="text-sm text-neutral-600">dUSDC ready to withdraw</p>
+
+        {error && (
+          <p className="mt-3 text-xs text-red-600">{error}</p>
+        )}
 
         {done ? (
           <p className="mt-5 flex items-center justify-center gap-2 rounded-base border-2 border-black bg-white py-3 text-sm font-heading">
@@ -493,8 +568,12 @@ function WalletPanel({
             variant="noShadow"
             fullWidth
             className="mt-5 border-2 border-black bg-black text-white hover:bg-neutral-800 disabled:bg-neutral-300"
-            disabled={balance <= 0 || withdrawing}
-            onClick={onWithdraw}
+            disabled={balance <= 0 || withdrawing || balanceLoading}
+            onClick={() => {
+              if (managerId) {
+                withdraw(managerId, balance).then(() => refetch());
+              }
+            }}
           >
             {withdrawing ? "Withdrawing…" : "Withdraw to wallet"}
           </Button>
@@ -508,19 +587,7 @@ export default function AppPage() {
   const account = useCurrentAccount();
   const connected = Boolean(account?.address);
   const [tab, setTab] = useState<Tab>("cover");
-  const [managerBalance, setManagerBalance] = useState(847);
-  const [withdrawing, setWithdrawing] = useState(false);
-  const [withdrawDone, setWithdrawDone] = useState(false);
-
-  const handleWithdraw = () => {
-    if (managerBalance <= 0) return;
-    setWithdrawing(true);
-    setTimeout(() => {
-      setManagerBalance(0);
-      setWithdrawing(false);
-      setWithdrawDone(true);
-    }, 1200);
-  };
+  const { managerId } = useManagerId();
 
   return (
     <div className="min-h-screen bg-white font-base text-black">
@@ -569,14 +636,7 @@ export default function AppPage() {
 
             {tab === "history" && <HistoryPanel />}
 
-            {tab === "wallet" && (
-              <WalletPanel
-                balance={managerBalance}
-                onWithdraw={handleWithdraw}
-                withdrawing={withdrawing}
-                done={withdrawDone}
-              />
-            )}
+            {tab === "wallet" && <WalletPanel managerId={managerId} />}
           </>
         )}
       </Shell>

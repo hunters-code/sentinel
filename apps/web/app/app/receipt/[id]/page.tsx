@@ -9,6 +9,7 @@ import { DEMO_SPOT, getPolicy, type PolicyStatus } from "@/lib/demo-policies";
 import { useManagerId } from "@/lib/use-manager";
 import { useManagerPolicies } from "@/lib/keeper";
 import { formatExpiryUtc } from "@/lib/use-cover-quote";
+import { useSpotPrice } from "@/lib/use-oracle-data";
 import { cn } from "@/lib/cn";
 
 type ReceiptView = {
@@ -85,6 +86,9 @@ export default function ReceiptPage() {
   const { managerId } = useManagerId();
   const { data: keeperPolicies, isLoading } = useManagerPolicies(demo ? null : managerId);
 
+  // Live spot for the price line (oracle id unknown here; use first available)
+  const spotQuery = useSpotPrice(null);
+
   let view: ReceiptView | null = null;
 
   if (demo) {
@@ -152,7 +156,7 @@ export default function ReceiptPage() {
             <div className="mt-4 rounded-base border-2 border-black bg-neutral-50 p-3">
               <div className="flex justify-between text-xs text-neutral-500">
                 <span>BTC now</span>
-                <span className="tnum font-heading text-black">{usd(DEMO_SPOT, 0)}</span>
+                <span className="tnum font-heading text-black">{usd(spotQuery.data ?? DEMO_SPOT, 0)}</span>
               </div>
               <div className="relative mt-2 h-12">
                 <div className="absolute inset-x-0 border-t-2 border-black" style={{ top: "65%" }} />

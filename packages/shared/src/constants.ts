@@ -10,6 +10,14 @@ export const DUSDC_TYPE =
 export const PREDICT_SERVER_URL =
   "https://predict-server.testnet.mystenlabs.com";
 
+// Testnet-only mock BTC for UI testing
+export const TEST_BTC_PACKAGE_ID =
+  "0xb9f705396940e54977b3fcac26e44bf8852e93c1c1a11a9c5beb4c4a39939e85";
+export const TEST_BTC_MINT_CAP_ID =
+  "0x1ad2fccc19865ffca1d494f9a10fd699fed1d342c6cbb95cae5558e2c8809c89";
+export const TEST_BTC_TYPE =
+  "0xb9f705396940e54977b3fcac26e44bf8852e93c1c1a11a9c5beb4c4a39939e85::test_btc::TEST_BTC";
+
 export const DUSDC_DECIMALS = 6;
 export const DUSDC_UNIT = 1_000_000;
 

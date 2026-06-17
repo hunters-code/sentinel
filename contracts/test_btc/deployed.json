@@ -1,0 +1,12 @@
+{
+  "network": "testnet",
+  "packageId": "0xb9f705396940e54977b3fcac26e44bf8852e93c1c1a11a9c5beb4c4a39939e85",
+  "mintCapId": "0x1ad2fccc19865ffca1d494f9a10fd699fed1d342c6cbb95cae5558e2c8809c89",
+  "coinType": "0xb9f705396940e54977b3fcac26e44bf8852e93c1c1a11a9c5beb4c4a39939e85::test_btc::TEST_BTC",
+  "coinMetadataId": "0xb6934e549897e0415eb12c5e6df37fd120f396413f3677f2a197914d6710d314",
+  "decimals": 8,
+  "symbol": "tBTC",
+  "maxMintPerCall": "1000000000",
+  "maxMintPerCallBtc": "10",
+  "txDigest": "FNjeFPfvTm75kDqa4YEdoAz5gfZrZXm25JuByxDFn55A"
+}

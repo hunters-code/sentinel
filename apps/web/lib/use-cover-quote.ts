@@ -11,18 +11,13 @@ import {
   premium as calcPremium,
   spread as calcSpread,
   triggerStrike,
+  fairFromSvi,
   type OracleRecord,
+  type SviRawParams,
 } from "@sentinel/shared";
 import { DEMO_SPOT } from "@/lib/demo-policies";
 
-const DEMO_SVI_FAIR = 0.01;
-/** ~1¢/contract at ~45min; scales with √(time) until SVI per-oracle is wired */
-function fairForExpiry(expiryMs: number): number {
-  const ms = Math.max(expiryMs - Date.now(), MIN_EXPIRY_LEAD_MS);
-  const hours = ms / 3_600_000;
-  const refHours = 0.75;
-  return Math.min(0.05, DEMO_SVI_FAIR * Math.sqrt(hours / refHours));
-}
+const DEMO_SVI: SviRawParams = { a: 0.0004, b: 0.0008, rho: -0.3, m: -0.02, sigma: 0.05 };
 
 export type OracleOption = {
   oracleId: string;
@@ -41,14 +36,20 @@ export type CoverQuote = {
   premium: number;
   fair: number;
   spreadAmt: number;
+  floorBinds: boolean;
   expiryMs: number;
   expiryLabel: string;
   duration: string;
   valid: boolean;
+  createdAtMs: number;
 };
 
-export function buildCoverQuote(btcHeld: number, oracle: OracleOption | null): CoverQuote {
-  const spot = DEMO_SPOT;
+export function buildCoverQuote(
+  btcHeld: number,
+  oracle: OracleOption | null,
+  spot = DEMO_SPOT,
+  svi: SviRawParams = DEMO_SVI,
+): CoverQuote {
   const minStrike = oracle?.minStrikeUsd ?? 90_000;
   const tick = oracle?.tickUsd ?? 100;
   const expiryMs = oracle?.expiryMs ?? Date.now() + 45 * 60 * 1000;
@@ -57,9 +58,10 @@ export function buildCoverQuote(btcHeld: number, oracle: OracleOption | null): C
   const held = Math.max(0, btcHeld);
   const lossPerBtc = spot - strike;
   const coverage = calcCoverage(held, spot, strike);
-  const fairRate = fairForExpiry(expiryMs);
+
+  const fairRate = oracle ? fairFromSvi(spot, strike, expiryMs, svi) : 0.01;
   const spr = calcSpread(fairRate);
-  const { ask } = applyAskFloor(fairRate + spr);
+  const { ask, floorBinds } = applyAskFloor(fairRate + spr);
   const premium = calcPremium(ask, coverage);
   const fair = fairRate * coverage;
   const spreadAmt = spr * coverage;
@@ -73,10 +75,12 @@ export function buildCoverQuote(btcHeld: number, oracle: OracleOption | null): C
     premium,
     fair,
     spreadAmt,
+    floorBinds,
     expiryMs,
     expiryLabel: formatExpiryUtc(expiryMs).full,
     duration: durationLabel(expiryMs),
     valid: held > 0 && coverage > 0 && oracle != null,
+    createdAtMs: Date.now(),
   };
 }
 
@@ -194,8 +198,13 @@ export function useOracleOptions() {
   };
 }
 
-export function useCoverQuote(btcHeld: number, oracle: OracleOption | null) {
-  return buildCoverQuote(btcHeld, oracle);
+export function useCoverQuote(
+  btcHeld: number,
+  oracle: OracleOption | null,
+  spot?: number,
+  svi?: SviRawParams,
+) {
+  return buildCoverQuote(btcHeld, oracle, spot, svi);
 }
 
 /** Format user's datetime-local pick for display */
