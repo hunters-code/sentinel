@@ -2,11 +2,11 @@
 
 import Link from "next/link";
 import { useParams } from "next/navigation";
-import { DEMO_SPOT, getPolicy, type PolicyStatus } from "@/lib/demo-policies";
+import { getPolicy, type PolicyStatus } from "@/lib/demo-policies";
 import { useManagerId } from "@/lib/use-manager";
 import { useManagerPolicies } from "@/lib/keeper";
 import { formatExpiryUtc } from "@/lib/use-cover-quote";
-import { useSpotPrice } from "@/lib/use-oracle-data";
+import { useLiveBtcPrice } from "@/lib/use-oracle-data";
 
 type ReceiptView = {
   id: string;
@@ -54,8 +54,8 @@ export default function ReceiptPage() {
   const { managerId } = useManagerId();
   const { data: keeperPolicies, isLoading } = useManagerPolicies(demo ? null : managerId);
 
-  // Live spot for the price line (oracle id unknown here; use first available)
-  const spotQuery = useSpotPrice(null);
+  // Live spot for the price line — tracks the real BTC market.
+  const spotQuery = useLiveBtcPrice();
 
   let view: ReceiptView | null = null;
 
@@ -119,7 +119,7 @@ export default function ReceiptPage() {
           <div className="box">
             <div className="row">
               <span>BTC now</span>
-              <span>{usd(spotQuery.data ?? DEMO_SPOT, 0)}</span>
+              <span>{usd(spotQuery.data ?? 100_000, 0)}</span>
             </div>
             <div className="row">
               <span>Trigger</span>

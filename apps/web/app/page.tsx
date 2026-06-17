@@ -4,8 +4,9 @@ import { useMemo, useState } from "react";
 import Link from "next/link";
 import { ConnectButton } from "@mysten/dapp-kit";
 import { DEFAULT_TRIGGER_PCT } from "@sentinel/shared";
+import { useLiveBtcPrice } from "@/lib/use-oracle-data";
 
-const DEMO_SPOT = 100_000;
+const FALLBACK_SPOT = 100_000;
 const FAIR_RATE = 0.01;
 const SPREAD_RATE = 0.004;
 const EFFECTIVE_RATE = FAIR_RATE + SPREAD_RATE;
@@ -57,10 +58,13 @@ export default function LandingPage() {
   const [btc, setBtc] = useState("0.5");
   const [ready, setReady] = useState(false);
 
+  const { data: liveBtc } = useLiveBtcPrice();
+  const spot = liveBtc ?? FALLBACK_SPOT;
+
   const quote = useMemo(() => {
     const held = Math.max(0, Number(btc) || 0);
-    const strike = DEMO_SPOT * (1 - DEFAULT_TRIGGER_PCT);
-    const coverage = held * (DEMO_SPOT - strike);
+    const strike = spot * (1 - DEFAULT_TRIGGER_PCT);
+    const coverage = held * (spot - strike);
     const premium = coverage * EFFECTIVE_RATE;
     return {
       held,
@@ -70,7 +74,7 @@ export default function LandingPage() {
       fair: coverage * FAIR_RATE,
       spread: coverage * SPREAD_RATE,
     };
-  }, [btc]);
+  }, [btc, spot]);
 
   const valid = quote.coverage > 0;
 

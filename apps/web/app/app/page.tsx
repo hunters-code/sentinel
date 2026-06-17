@@ -6,21 +6,16 @@ import { ConnectButton, useCurrentAccount } from "@mysten/dapp-kit";
 import { DEMO_POLICIES } from "@/lib/demo-policies";
 import {
   buildCoverQuote,
-  durationLabel,
+  COVER_TERMS,
   formatExpiryUtc,
-  formatPickedLocal,
-  parseDatetimeLocal,
-  snapToOracle,
-  toDatetimeLocalValue,
+  snapTermToOracle,
   useOracleOptions,
-  type CoverQuote,
-  type OracleOption,
 } from "@/lib/use-cover-quote";
-import { MIN_EXPIRY_LEAD_MS, QUOTE_FRESHNESS_MS } from "@sentinel/shared";
+import { QUOTE_FRESHNESS_MS } from "@sentinel/shared";
 import { useWalletBtc } from "@/lib/use-wallet-btc";
 import { useManagerId } from "@/lib/use-manager";
 import { useManagerBalance } from "@/lib/use-manager-balance";
-import { useOracleData } from "@/lib/use-oracle-data";
+import { useOracleData, useOnChainPremium } from "@/lib/use-oracle-data";
 import { usePurchase, useWithdraw } from "@/lib/use-purchase";
 import { useKeeperHealth, useManagerPolicies, type KeeperPolicy } from "@/lib/keeper";
 
@@ -41,12 +36,6 @@ const usd = (n: number, max = 2) =>
 
 const shortAddr = (addr: string) => `${addr.slice(0, 6)}…${addr.slice(-4)}`;
 
-function minsLabel(expiryMs: number) {
-  return durationLabel(expiryMs);
-}
-
-type PickMode = "list" | "custom";
-
 function KeeperBadge() {
   const { data, isLoading, isError } = useKeeperHealth();
   const live = !isLoading && !isError && data?.status === "ok";
@@ -54,27 +43,6 @@ function KeeperBadge() {
     <span className="tag">
       Auto-payout {live ? `live${data?.dryRun ? " (dry-run)" : ""}` : "offline"}
     </span>
-  );
-}
-
-function QuotePreview({ quote, subtitle }: { quote: CoverQuote; subtitle?: string }) {
-  return (
-    <div className="box">
-      {subtitle && <p className="muted">{subtitle}</p>}
-      <div className="row">
-        <span>Payout</span>
-        <span>{usd(quote.coverage, 0)}</span>
-      </div>
-      <div className="row">
-        <span>Premium</span>
-        <span>{usd(quote.premium)}</span>
-      </div>
-      <div className="row muted">
-        <span>Floor {usd(quote.strike, 0)}</span>
-        <span>{quote.duration} window</span>
-      </div>
-      <p className="muted">Settles {quote.expiryLabel}</p>
-    </div>
   );
 }
 
@@ -94,15 +62,13 @@ function QuoteFreshnessBadge({ createdAtMs }: { createdAtMs: number }) {
 
 function CoverPanel() {
   const { btc: detectedBtc, fromWallet, loading: btcLoading } = useWalletBtc();
-  const { options, loading: oracleLoading, defaultOracleId } = useOracleOptions();
+  const { options, loading: oracleLoading } = useOracleOptions();
   const { managerId } = useManagerId();
   const { balance: managerBalanceUsd } = useManagerBalance(managerId);
 
   const [btcInput, setBtcInput] = useState("");
   const [btcTouched, setBtcTouched] = useState(false);
-  const [oracleId, setOracleId] = useState<string | null>(null);
-  const [pickMode, setPickMode] = useState<PickMode>("list");
-  const [customDatetime, setCustomDatetime] = useState("");
+  const [termId, setTermId] = useState<string>(COVER_TERMS[0]!.id);
 
   const { purchase, status, error } = usePurchase();
   const signing = status === "checking" || status === "signing" || status === "confirming";
@@ -113,47 +79,43 @@ function CoverPanel() {
     }
   }, [detectedBtc, btcTouched]);
 
-  useEffect(() => {
-    if (defaultOracleId && oracleId == null) {
-      setOracleId(defaultOracleId);
-    }
-  }, [defaultOracleId, oracleId]);
-
-  useEffect(() => {
-    if (options.length > 0 && !customDatetime) {
-      const first = options[0]!;
-      setCustomDatetime(toDatetimeLocalValue(first.expiryMs));
-    }
-  }, [options, customDatetime]);
-
   const btcHeld = Math.max(0, Number(btcInput) || 0);
 
-  const listOracle = options.find((o) => o.oracleId === oracleId) ?? options[0] ?? null;
-  const customTarget = parseDatetimeLocal(customDatetime);
-  const customOracle = customTarget != null ? snapToOracle(options, customTarget) : listOracle;
+  const selectedTerm = COVER_TERMS.find((t) => t.id === termId) ?? COVER_TERMS[0]!;
+  const { oracle: selectedOracle, capped } = snapTermToOracle(options, selectedTerm);
 
-  const selectedOracle: OracleOption | null = pickMode === "custom" ? customOracle : listOracle;
+  const { spot, svi } = useOracleData(selectedOracle?.oracleId ?? null);
 
-  const { spot, svi, spotLive } = useOracleData(selectedOracle?.oracleId ?? null);
-
-  const quote = useMemo(
+  const baseQuote = useMemo(
     () => buildCoverQuote(btcHeld, selectedOracle, spot, svi),
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [btcHeld, selectedOracle, spot, svi],
   );
+
+  // The protocol's real price for this exact cover (get_trade_amounts). This is
+  // what the user is actually charged; the SVI math is only a fallback while it
+  // loads. Override the displayed/charged premium with it when available.
+  const { premium: livePremium, loading: premiumLoading } = useOnChainPremium({
+    oracleId: selectedOracle?.oracleId ?? null,
+    expiryRaw: selectedOracle?.expiryMs ?? null,
+    strikeUsd: baseQuote.strike,
+    coverageUsd: baseQuote.coverage,
+  });
+  const premiumIsLive = livePremium != null;
+  const quote = useMemo(
+    () => ({ ...baseQuote, premium: livePremium ?? baseQuote.premium }),
+    [baseQuote, livePremium],
+  );
+
+  const demoOracle = Boolean(selectedOracle?.isDemo);
   const ready = !btcLoading && !oracleLoading && quote.valid;
-  const customSnapped =
-    pickMode === "custom" &&
-    customTarget != null &&
-    customOracle != null &&
-    customOracle.expiryMs !== customTarget;
-  const pickedLabel = formatPickedLocal(customDatetime);
 
   const buttonLabel = () => {
     if (status === "checking") return "Checking price…";
     if (status === "signing") return "Confirm in wallet…";
     if (status === "confirming") return "Submitting…";
     if (status === "success") return "Purchase confirmed!";
+    if (premiumLoading && !premiumIsLive) return "Getting price…";
     return `Protect — ${usd(quote.premium)}`;
   };
 
@@ -196,87 +158,40 @@ function CoverPanel() {
       </div>
 
       <div>
-        <p>Cover until</p>
+        <p>Cover for how long?</p>
+        <p className="muted">
+          Your floor is set from today&rsquo;s BTC price. Pick how long it&rsquo;s protected.
+        </p>
         <div>
-          {(
-            [
-              ["list", "Pick a window"],
-              ["custom", "Pick date & time"],
-            ] as const
-          ).map(([mode, label]) => (
+          {COVER_TERMS.map((t) => (
             <button
-              key={mode}
+              key={t.id}
               type="button"
-              onClick={() => setPickMode(mode)}
-              aria-pressed={pickMode === mode}
-              style={{ marginRight: "0.5rem" }}
+              onClick={() => setTermId(t.id)}
+              aria-pressed={t.id === termId}
+              style={{ marginRight: "0.5rem", marginBottom: "0.5rem" }}
             >
-              {label}
+              {t.label}
             </button>
           ))}
         </div>
 
         {oracleLoading ? (
-          <p className="muted">Loading windows…</p>
-        ) : pickMode === "list" ? (
-          <div className="stack" style={{ maxHeight: "13rem", overflowY: "auto" }}>
-            {options.map((o) => {
-              const active = o.oracleId === listOracle?.oracleId;
-              const { date, time } = formatExpiryUtc(o.expiryMs);
-              const rowQuote = btcHeld > 0 ? buildCoverQuote(btcHeld, o, spot, svi) : null;
-              return (
-                <button
-                  key={o.oracleId}
-                  type="button"
-                  onClick={() => setOracleId(o.oracleId)}
-                  aria-pressed={active}
-                  className="btn--full"
-                  style={{ textAlign: "left" }}
-                >
-                  <span className="row">
-                    <span>
-                      {date} · {time} — {minsLabel(o.expiryMs)} from now
-                    </span>
-                    {rowQuote?.valid && <span>{usd(rowQuote.premium)}</span>}
-                  </span>
-                </button>
-              );
-            })}
-          </div>
-        ) : (
-          <div>
-            <label htmlFor="cover-until">When should coverage end?</label>
-            <input
-              id="cover-until"
-              type="datetime-local"
-              className="btn--full"
-              min={toDatetimeLocalValue(Date.now() + MIN_EXPIRY_LEAD_MS)}
-              value={customDatetime}
-              onChange={(e) => setCustomDatetime(e.target.value)}
-            />
-            {customOracle && btcHeld > 0 && (
-              <QuotePreview
-                quote={buildCoverQuote(btcHeld, customOracle, spot, svi)}
-                subtitle={
-                  customSnapped && pickedLabel
-                    ? `You picked ${pickedLabel} → nearest window below`
-                    : pickedLabel
-                      ? `You picked ${pickedLabel}`
-                      : undefined
-                }
-              />
-            )}
-          </div>
-        )}
+          <p className="muted">Loading terms…</p>
+        ) : capped && selectedOracle ? (
+          <p className="muted">
+            On testnet, settlement windows top out at ~3 weeks — this {selectedTerm.label} quote
+            settles on the longest available window ({formatExpiryUtc(selectedOracle.expiryMs).full}).
+          </p>
+        ) : null}
       </div>
 
-      {ready && pickMode === "list" && (
+      {ready && (
         <div className="box">
-          <p className="muted">
-            BTC{spotLive ? "" : " (demo)"} at {usd(quote.spot, 0)}
-          </p>
+          <p className="muted">BTC at {usd(quote.spot, 0)}</p>
           <p>
-            BTC at or below {usd(quote.strike, 0)} by {quote.expiryLabel}
+            If BTC is at or below {usd(quote.strike, 0)} when your {selectedTerm.label} cover settles
+            ({quote.expiryLabel})
           </p>
           <p>{usd(quote.coverage, 0)}</p>
           <p className="muted">to you · premium {usd(quote.premium)}</p>
@@ -291,10 +206,13 @@ function CoverPanel() {
           {status !== "success" ? (
             <>
               {quote.valid && <QuoteFreshnessBadge createdAtMs={quote.createdAtMs} />}
+              {demoOracle && (
+                <p className="muted">No settlement window available right now — try a different term.</p>
+              )}
               <button
                 type="button"
                 className="btn--full"
-                disabled={signing}
+                disabled={signing || demoOracle || !premiumIsLive}
                 onClick={() => {
                   if (!selectedOracle) return;
                   purchase(quote, selectedOracle, managerId, managerBalanceUsd);
@@ -310,22 +228,27 @@ function CoverPanel() {
           <details>
             <summary>How is this priced?</summary>
             <div className="stack">
-              <div className="row">
-                <span>Fair value</span>
-                <span>{usd(quote.fair)}</span>
-              </div>
-              <div className="row">
-                <span>Spread</span>
-                <span>{usd(quote.spreadAmt)}</span>
-              </div>
-              <div className="row">
-                <strong>You pay</strong>
-                <strong>{usd(quote.premium)}</strong>
-              </div>
-              {quote.floorBinds && (
-                <p className="muted">
-                  Floor of 1¢/contract applies — parametric payout, not regulated insurance.
-                </p>
+              {premiumIsLive ? (
+                <>
+                  <div className="row">
+                    <span>Protocol price</span>
+                    <strong>{usd(quote.premium)}</strong>
+                  </div>
+                  <p className="muted">
+                    Live ask from DeepBook Predict for this exact cover — {(
+                      (quote.premium / quote.coverage) * 100
+                    ).toFixed(2)}% of the {usd(quote.coverage, 0)} payout. Parametric payout, not
+                    regulated insurance.
+                  </p>
+                </>
+              ) : (
+                <>
+                  <div className="row">
+                    <span>Estimated price</span>
+                    <strong>{usd(quote.premium)}</strong>
+                  </div>
+                  <p className="muted">Estimate — confirming the live protocol price…</p>
+                </>
               )}
             </div>
           </details>

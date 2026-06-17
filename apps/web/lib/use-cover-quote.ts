@@ -25,6 +25,8 @@ export type OracleOption = {
   expiryLabel: string;
   minStrikeUsd: number;
   tickUsd: number;
+  /** True when oracle data couldn't be fetched — prices are illustrative only */
+  isDemo?: boolean;
 };
 
 export type CoverQuote = {
@@ -157,8 +159,39 @@ function fallbackOracles(): OracleOption[] {
       expiryLabel: formatExpiryUtc(expiryMs).full,
       minStrikeUsd: 90_000,
       tickUsd: 100,
+      isDemo: true,
     };
   });
+}
+
+export type CoverTerm = { id: string; label: string; short: string; ms: number };
+
+/** Insurance-style coverage terms. Strike is set from today's price; these
+ *  pick how long the cover runs. */
+export const COVER_TERMS: CoverTerm[] = [
+  { id: "1d", label: "1 day", short: "1D", ms: 86_400_000 },
+  { id: "1w", label: "1 week", short: "1W", ms: 7 * 86_400_000 },
+  { id: "1m", label: "1 month", short: "1M", ms: 30 * 86_400_000 },
+  { id: "3m", label: "3 months", short: "3M", ms: 90 * 86_400_000 },
+  { id: "6m", label: "6 months", short: "6M", ms: 182 * 86_400_000 },
+];
+
+/**
+ * Resolve a coverage term to the on-chain oracle that settles it. Picks the
+ * nearest oracle at or after the requested term; `capped` is true when no
+ * oracle reaches that far (e.g. multi-month terms on testnet, where the
+ * longest live oracle is only ~3 weeks out) — the mint snaps to the longest
+ * available window and the UI discloses it.
+ */
+export function snapTermToOracle(
+  options: OracleOption[],
+  term: CoverTerm,
+): { oracle: OracleOption | null; capped: boolean } {
+  if (options.length === 0) return { oracle: null, capped: false };
+  const target = Date.now() + term.ms;
+  const oracle = snapToOracle(options, target);
+  const capped = oracle != null && oracle.expiryMs < target;
+  return { oracle, capped };
 }
 
 /** Nearest oracle at or after the user's target (protocol windows only). */

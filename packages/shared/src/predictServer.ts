@@ -72,10 +72,21 @@ export interface ManagerPositionSummary {
   status: string;
 }
 
+export interface ManagerCreatedEvent {
+  digest: string;
+  manager_id: string;
+  owner: string;
+  checkpoint_timestamp_ms: number;
+}
+
 export interface OraclePriceRecord {
   oracle_id: string;
-  price: number;
-  timestamp_ms: number;
+  /** Raw spot price (1e9-scaled) at the time of the event. */
+  spot: number;
+  /** Raw forward price (1e9-scaled). */
+  forward: number;
+  checkpoint_timestamp_ms: number;
+  onchain_timestamp: number;
 }
 
 export interface OracleSviRecord {
@@ -99,7 +110,9 @@ export class PredictServerClient {
 
   constructor(options: PredictServerClientOptions = {}) {
     this.baseUrl = (options.baseUrl ?? PREDICT_SERVER_URL).replace(/\/$/, "");
-    this.fetchImpl = options.fetchImpl ?? fetch;
+    // Bind to globalThis — an unbound `fetch` called as a method throws
+    // "Illegal invocation" in browsers.
+    this.fetchImpl = options.fetchImpl ?? fetch.bind(globalThis);
   }
 
   async getStatus(): Promise<PredictServerStatus> {
@@ -108,6 +121,11 @@ export class PredictServerClient {
 
   async getOracles(predictId: string): Promise<OracleRecord[]> {
     return this.getJson(`/predicts/${predictId}/oracles`);
+  }
+
+  /** ManagerCreated events for an owner, newest first. */
+  async getManagersByOwner(owner: string): Promise<ManagerCreatedEvent[]> {
+    return this.getJson(`/managers`, { owner });
   }
 
   async getOracleState(oracleId: string): Promise<{ oracle: OracleRecord }> {

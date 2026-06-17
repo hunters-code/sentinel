@@ -6,14 +6,16 @@ import { useQueryClient } from "@tanstack/react-query";
 import {
   DUSDC_TYPE,
   DUSDC_UNIT,
-  PREDICT_OBJECT_ID,
-  PREDICT_PACKAGE_ID,
   MAX_SLIPPAGE_PCT,
   QUOTE_FRESHNESS_MS,
-  usdToOraclePrice,
 } from "@sentinel/shared";
-import { buildPurchasePtb, buildWithdrawPtb, SUI_CLOCK_OBJECT_ID } from "@/lib/web-ptb";
-import { Transaction } from "@mysten/sui/transactions";
+import {
+  buildCreateManagerPtb,
+  buildPurchasePtb,
+  buildWithdrawPtb,
+} from "@/lib/web-ptb";
+import { fetchTradeCostUsd } from "@/lib/trade-cost";
+import { cacheManagerId } from "@/lib/use-manager";
 import type { CoverQuote } from "@/lib/use-cover-quote";
 import type { OracleOption } from "@/lib/use-cover-quote";
 
@@ -24,57 +26,6 @@ export type PurchaseStatus =
   | "confirming"
   | "success"
   | "error";
-
-async function devInspectTradeAmounts(
-  client: ReturnType<typeof useSuiClient>,
-  address: string,
-  oracleId: string,
-  expiryRaw: number,
-  strikeUsd: number,
-  quantityUnits: bigint,
-): Promise<number | null> {
-  try {
-    const tx = new Transaction();
-    tx.setSender(address);
-    const marketKey = tx.moveCall({
-      target: `${PREDICT_PACKAGE_ID}::market_key::down`,
-      arguments: [
-        tx.pure.id(oracleId),
-        tx.pure.u64(expiryRaw),
-        tx.pure.u64(usdToOraclePrice(strikeUsd)),
-      ],
-    });
-    tx.moveCall({
-      target: `${PREDICT_PACKAGE_ID}::predict::get_trade_amounts`,
-      typeArguments: [DUSDC_TYPE],
-      arguments: [
-        tx.object(PREDICT_OBJECT_ID),
-        tx.object(oracleId),
-        marketKey,
-        tx.pure.u64(quantityUnits),
-        tx.object(SUI_CLOCK_OBJECT_ID),
-      ],
-    });
-    const result = await client.devInspectTransactionBlock({
-      transactionBlock: await tx.build({ client }),
-      sender: address,
-    });
-    // Extract the last return value (total cost in dUSDC units)
-    const returnVals = result.results?.at(-1)?.returnValues;
-    if (!returnVals || returnVals.length === 0) return null;
-    // Last return value is the total cost; it's BCS-encoded u64
-    const raw = returnVals[returnVals.length - 1];
-    if (!raw || !raw[0]) return null;
-    const bytes = raw[0];
-    let cost = BigInt(0);
-    for (let i = bytes.length - 1; i >= 0; i--) {
-      cost = (cost << BigInt(8)) | BigInt(bytes[i]);
-    }
-    return Number(cost) / DUSDC_UNIT;
-  } catch {
-    return null;
-  }
-}
 
 export function usePurchase() {
   const account = useCurrentAccount();
@@ -113,31 +64,70 @@ export function usePurchase() {
         const address = account.address;
         const quantityUnits = BigInt(Math.floor(quote.coverage * DUSDC_UNIT));
 
-        // Pre-sign slippage re-check via get_trade_amounts devInspect
-        const onChainCost = await devInspectTradeAmounts(
-          client,
-          address,
-          oracle.oracleId,
-          oracle.expiryMs,
-          quote.strike,
-          quantityUnits,
-        );
+        // First-time users have no manager yet. The manager is a shared object
+        // that can't be created and used in the same PTB, so create it in its
+        // own transaction first, then resolve its id for the mint below.
+        let resolvedManagerId = managerId;
+        if (!resolvedManagerId) {
+          setStatus("signing");
+          const createResult = await signAndExecute({
+            transaction: buildCreateManagerPtb(address),
+          });
+          const created = await client.waitForTransaction({
+            digest: createResult.digest,
+            options: { showObjectChanges: true },
+          });
+          const managerChange = created.objectChanges?.find(
+            (c) =>
+              c.type === "created" &&
+              "objectType" in c &&
+              c.objectType.includes("predict_manager::PredictManager"),
+          );
+          if (!managerChange || !("objectId" in managerChange)) {
+            setError("Couldn't create your account — please try again.");
+            setStatus("error");
+            return;
+          }
+          resolvedManagerId = managerChange.objectId;
+          cacheManagerId(address, resolvedManagerId);
+          // Newly created manager has zero balance regardless of prior reads.
+          managerBalanceUsd = 0;
+        }
 
-        if (onChainCost !== null) {
+        setStatus("checking");
+
+        // Pre-sign re-check of the protocol's real cost. quote.premium is the
+        // on-chain price shown to the user (from get_trade_amounts), so this is
+        // a true price-moved check, not an SVI-estimate mismatch.
+        const onChainCost = await fetchTradeCostUsd(client, address, {
+          oracleId: oracle.oracleId,
+          expiryRaw: oracle.expiryMs,
+          strikeUsd: quote.strike,
+          quantityUnits,
+        });
+
+        if (onChainCost !== null && quote.premium > 0) {
           const slippage = (onChainCost - quote.premium) / quote.premium;
           if (slippage > MAX_SLIPPAGE_PCT) {
             setError(
-              `Market moved — cost is ${((slippage * 100)).toFixed(1)}% above your quote. Refresh to get a new quote.`,
+              `Price moved — cost is ${((slippage * 100)).toFixed(1)}% above the quote you saw. Try again to get the current price.`,
             );
             setStatus("error");
             return;
           }
         }
 
-        // Fetch user's dUSDC coins for deposit
-        const depositNeeded = quote.premium - managerBalanceUsd;
+        // The mint withdraws the actual execution cost from the manager's
+        // balance, which can drift slightly above the preview. Fund a buffer
+        // (within the slippage we tolerate) so the withdrawal never comes up
+        // short; any leftover stays withdrawable.
+        const estCost = onChainCost ?? quote.premium;
+        const minNeeded = Math.max(0, estCost - managerBalanceUsd);
+        const bufferedTarget = Math.max(0, estCost * (1 + MAX_SLIPPAGE_PCT) - managerBalanceUsd);
+
         let dusdcCoins: Awaited<ReturnType<typeof client.getCoins>>["data"] = [];
-        if (depositNeeded > 0) {
+        let depositUsd = 0;
+        if (minNeeded > 0) {
           const coinsResp = await client.getCoins({
             owner: address,
             coinType: DUSDC_TYPE,
@@ -147,13 +137,15 @@ export function usePurchase() {
           );
 
           const totalDusdc = dusdcCoins.reduce((s, c) => s + Number(c.balance), 0) / DUSDC_UNIT;
-          if (totalDusdc < depositNeeded) {
+          if (totalDusdc < minNeeded) {
             setError(
-              `Insufficient dUSDC. Need ${depositNeeded.toFixed(2)} dUSDC; wallet has ${totalDusdc.toFixed(2)}.`,
+              `Insufficient dUSDC. Need ${minNeeded.toFixed(2)} dUSDC; wallet has ${totalDusdc.toFixed(2)}.`,
             );
             setStatus("error");
             return;
           }
+          // Deposit the buffered target, capped at what the wallet actually has.
+          depositUsd = Math.min(totalDusdc, bufferedTarget);
         }
 
         setStatus("signing");
@@ -164,9 +156,8 @@ export function usePurchase() {
           expiryRaw: oracle.expiryMs,
           strikeUsd: quote.strike,
           coverageUsd: quote.coverage,
-          premiumUsd: onChainCost ?? quote.premium,
-          managerId,
-          managerBalanceUsd,
+          managerId: resolvedManagerId,
+          depositUsd,
           dusdcCoins,
         });
 

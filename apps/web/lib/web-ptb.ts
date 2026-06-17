@@ -1,14 +1,15 @@
 /**
- * Purchase PTB builder for the Sentinel web app.
+ * Purchase PTB builders for the Sentinel web app.
  *
- * Composes (all in one user signature):
- *   1. predict::create_manager  — first purchase only
- *   2. predict_manager::deposit<DUSDC>  — when manager balance < premium
- *   3. market_key::down  — build the position key
- *   4. predict::mint<DUSDC>  — the actual purchase
+ * PredictManager is a *shared* object created by `predict::create_manager`,
+ * which returns only its ID — a freshly-shared object can't be referenced
+ * later in the same PTB, so first-time setup is its own transaction:
  *
- * NOTE: Function signatures are derived from the keeper's redeem PTB and the
- * CLAUDE.md on-chain call table. Adjust argument order if the chain rejects.
+ *   tx A (first purchase only): predict::create_manager
+ *   tx B (every purchase):      predict_manager::deposit<DUSDC> (if needed)
+ *                               + market_key::down + predict::mint<DUSDC>
+ *
+ * Signatures verified against the on-chain normalized Move ABI.
  */
 
 import { Transaction } from "@mysten/sui/transactions";
@@ -34,14 +35,27 @@ export interface PurchaseParams {
   strikeUsd: number;
   /** Coverage in USD → quantity = coverage * DUSDC_UNIT contracts */
   coverageUsd: number;
-  /** Premium in USD (max cost accepted; caller has already slippage-checked) */
-  premiumUsd: number;
-  /** Existing PredictManager object id; null = create new */
-  managerId: string | null;
-  /** Current manager dUSDC balance in USD (0 if no manager yet) */
-  managerBalanceUsd: number;
+  /** Existing PredictManager (shared) object id — must already exist */
+  managerId: string;
+  /** dUSDC to deposit into the manager before minting (0 = skip deposit) */
+  depositUsd: number;
   /** User's dUSDC coins sorted largest-first */
   dusdcCoins: CoinStruct[];
+}
+
+/**
+ * First-time setup transaction. `create_manager` takes only TxContext (auto-
+ * injected) and shares a new PredictManager, returning its ID. Must be its own
+ * transaction — the shared object can't be used in the same PTB.
+ */
+export function buildCreateManagerPtb(address: string): Transaction {
+  const tx = new Transaction();
+  tx.setSender(address);
+  tx.moveCall({
+    target: `${PREDICT_PACKAGE_ID}::predict::create_manager`,
+    arguments: [],
+  });
+  return tx;
 }
 
 export function buildPurchasePtb(params: PurchaseParams): Transaction {
@@ -51,9 +65,8 @@ export function buildPurchasePtb(params: PurchaseParams): Transaction {
     expiryRaw,
     strikeUsd,
     coverageUsd,
-    premiumUsd,
     managerId,
-    managerBalanceUsd,
+    depositUsd,
     dusdcCoins,
   } = params;
 
@@ -62,28 +75,11 @@ export function buildPurchasePtb(params: PurchaseParams): Transaction {
 
   const strikeRaw = usdToOraclePrice(strikeUsd);
   const quantityUnits = BigInt(Math.floor(coverageUsd * DUSDC_UNIT));
+  const managerArg = tx.object(managerId);
 
-  // Step 1: create manager if needed. create_manager returns a PredictManager
-  // value object that we use in deposit+mint below, then transfer to user at end.
-  // Transaction arg can be either a Result (from moveCall) or an ObjectArg.
-  // We cast via unknown to satisfy both branches.
-  let managerArg: ReturnType<typeof tx.object>;
-  let newManagerResult: ReturnType<typeof tx.moveCall> | null = null;
-
-  if (!managerId) {
-    newManagerResult = tx.moveCall({
-      target: `${PREDICT_PACKAGE_ID}::predict::create_manager`,
-      arguments: [tx.object(PREDICT_OBJECT_ID)],
-    });
-    managerArg = newManagerResult as unknown as ReturnType<typeof tx.object>;
-  } else {
-    managerArg = tx.object(managerId);
-  }
-
-  // Step 2: deposit if manager balance is insufficient
-  const depositNeeded = premiumUsd - managerBalanceUsd;
-  if (depositNeeded > 0 && dusdcCoins.length > 0) {
-    const depositUnits = BigInt(Math.ceil(depositNeeded * DUSDC_UNIT));
+  // Step 1: fund the manager's balance before minting
+  if (depositUsd > 0 && dusdcCoins.length > 0) {
+    const depositUnits = BigInt(Math.ceil(depositUsd * DUSDC_UNIT));
     const [primaryCoin, ...rest] = dusdcCoins;
     const paySource = tx.object(primaryCoin.coinObjectId);
     if (rest.length > 0) {
@@ -100,7 +96,7 @@ export function buildPurchasePtb(params: PurchaseParams): Transaction {
     });
   }
 
-  // Step 3: build market key
+  // Step 2: build market key (down binary)
   const marketKey = tx.moveCall({
     target: `${PREDICT_PACKAGE_ID}::market_key::down`,
     arguments: [
@@ -110,7 +106,7 @@ export function buildPurchasePtb(params: PurchaseParams): Transaction {
     ],
   });
 
-  // Step 4: mint
+  // Step 3: mint
   tx.moveCall({
     target: `${PREDICT_PACKAGE_ID}::predict::mint`,
     typeArguments: [DUSDC_TYPE],
@@ -123,11 +119,6 @@ export function buildPurchasePtb(params: PurchaseParams): Transaction {
       tx.object(SUI_CLOCK_OBJECT_ID),
     ],
   });
-
-  // Transfer newly created manager to user after all uses
-  if (newManagerResult !== null) {
-    tx.transferObjects([newManagerResult], address);
-  }
 
   return tx;
 }
