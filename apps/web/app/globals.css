@@ -1,7 +1,28 @@
+@tailwind components;
+@tailwind utilities;
+
 /* ------------------------------------------------------------------ */
-/* Low-fidelity wireframe baseline.                                    */
-/* No brand identity, no color, no motion. Grayscale boxes only.       */
-/* Rebuild the design system on top of this.                          */
+/* Sui ecosystem tokens (landing)                                      */
+/* ------------------------------------------------------------------ */
+
+:root {
+  --sui-blue: #298dff;
+  --sui-blue-bright: #5ca9ff;
+  --sui-blue-light: #ddf2ff;
+  --sui-blue-dark: #1759c4;
+  --sui-blue-darker: #002e6a;
+  --sui-black: #000000;
+  --sui-steel: #89919f;
+  --sui-steel-dark: #6c7584;
+  --sui-white: #ffffff;
+  --sui-line: rgba(255, 255, 255, 0.12);
+
+  --font-display: var(--font-geologica), system-ui, sans-serif;
+  --font-body: var(--font-manrope), system-ui, sans-serif;
+}
+
+/* ------------------------------------------------------------------ */
+/* Low-fidelity wireframe baseline (app routes)                        */
 /* ------------------------------------------------------------------ */
 
 *,
@@ -24,7 +45,6 @@ body {
   background: #fff;
 }
 
-/* Centered content column */
 .wrap {
   width: 100%;
   max-width: 960px;
@@ -36,13 +56,11 @@ body {
   max-width: 480px;
 }
 
-/* Sections delineated by a hairline */
 section {
   padding: 2rem 0;
   border-bottom: 1px solid #ccc;
 }
 
-/* Generic box — stands in for any card/panel */
 .box {
   border: 1px solid #999;
   padding: 1rem;
@@ -52,7 +70,6 @@ section {
   margin-top: 0.75rem;
 }
 
-/* Tag / chip / status placeholder */
 .tag {
   display: inline-block;
   border: 1px solid #999;
@@ -60,7 +77,6 @@ section {
   font-size: 0.75rem;
 }
 
-/* Input shell */
 .field {
   display: flex;
   align-items: center;
@@ -79,8 +95,8 @@ section {
   outline: none;
 }
 
-/* Buttons — default browser-ish, neutral */
-button,
+.wrap button,
+.box button,
 .btn {
   font: inherit;
   padding: 0.5rem 0.75rem;
@@ -90,7 +106,8 @@ button,
   cursor: pointer;
 }
 
-button:disabled,
+.wrap button:disabled,
+.box button:disabled,
 .btn:disabled {
   opacity: 0.5;
   cursor: not-allowed;
@@ -101,7 +118,6 @@ button:disabled,
   width: 100%;
 }
 
-/* Layout helpers */
 .row {
   display: flex;
   justify-content: space-between;
@@ -150,4 +166,107 @@ td {
   border: 1px solid #ccc;
   padding: 0.4rem 0.6rem;
   text-align: left;
+}
+
+/* ------------------------------------------------------------------ */
+/* Landing page                                                        */
+/* ------------------------------------------------------------------ */
+
+.landing {
+  font-family: var(--font-body);
+  color: var(--sui-white);
+  background: var(--sui-black);
+  -webkit-font-smoothing: antialiased;
+}
+
+.landing h1,
+.landing h2,
+.landing h3 {
+  font-family: var(--font-display);
+  font-weight: 500;
+  letter-spacing: -0.03em;
+  text-wrap: balance;
+}
+
+.landing a:focus-visible,
+.landing button:focus-visible {
+  outline: 2px solid var(--sui-blue-bright);
+  outline-offset: 3px;
+}
+
+.landing-dialog {
+  margin: 0;
+  width: 100%;
+  max-width: 100%;
+  height: 100%;
+  max-height: 100dvh;
+  border: none;
+  padding: 0;
+}
+
+.landing-dialog::backdrop {
+  background: rgba(0, 0, 0, 0.72);
+}
+
+.landing-dialog[open] {
+  animation: landing-dialog-in 0.2s ease-out;
+}
+
+@keyframes landing-dialog-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .landing *,
+  .landing *::before,
+  .landing *::after,
+  .sentinel-app *,
+  .sentinel-app *::before,
+  .sentinel-app *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+
+  .landing-dialog[open] {
+    animation: none;
+  }
+}
+
+/* ------------------------------------------------------------------ */
+/* App shell (quote · history · wallet)                                */
+/* ------------------------------------------------------------------ */
+
+.sentinel-app {
+  font-family: var(--font-body);
+  color: var(--sui-white);
+  background: var(--sui-black);
+  -webkit-font-smoothing: antialiased;
+}
+
+.sentinel-app h1,
+.sentinel-app h2,
+.sentinel-app h3 {
+  font-family: var(--font-display);
+  font-weight: 500;
+  letter-spacing: -0.03em;
+  text-wrap: balance;
+}
+
+.sentinel-app a:focus-visible,
+.sentinel-app button:focus-visible {
+  outline: 2px solid var(--sui-blue-bright);
+  outline-offset: 3px;
+}
+
+/* dapp-kit connected account chip in header */
+.sentinel-app .sentinel-wallet [data-dapp-kit] .Button_buttonVariants_size_lg__x1s81q4 {
+  border-radius: 9999px;
+  min-height: 2.75rem;
+  padding: 0.5rem 1rem;
 }
