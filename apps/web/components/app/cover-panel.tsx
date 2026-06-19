@@ -17,6 +17,9 @@ import {
 import { Panel } from "@/components/app/ui/panel";
 import { Muted } from "@/components/app/ui/muted";
 import { PrimaryButton } from "@/components/app/ui/primary-button";
+import { AssetSelector } from "@/components/app/asset-selector";
+import { AssetLogo } from "@/components/app/asset-logo";
+import { DEFAULT_ASSET, getAsset, type AssetId } from "@/lib/assets";
 import { QuoteFreshness, useQuoteFreshness } from "@/components/app/quote-freshness";
 import { QuoteLiveLine } from "@/components/app/quote-live-line";
 import { PricingBreakdown } from "@/components/app/pricing-breakdown";
@@ -35,6 +38,8 @@ export function CoverPanel({ onViewHistory }: CoverPanelProps) {
   const [btcInput, setBtcInput] = useState("");
   const [btcTouched, setBtcTouched] = useState(false);
   const [termId, setTermId] = useState<string>(COVER_TERMS[0]!.id);
+  const [assetId, setAssetId] = useState<AssetId>(DEFAULT_ASSET.id);
+  const asset = getAsset(assetId);
 
   const { purchase, status, error, txDigest } = usePurchase();
   const signing = status === "checking" || status === "signing" || status === "confirming";
@@ -81,11 +86,39 @@ export function CoverPanel({ onViewHistory }: CoverPanelProps) {
     if (status === "success") return "Purchase confirmed";
     if (!hasAmount) return "Enter BTC amount";
     if (premiumLoading && !premiumIsLive) return "Getting price…";
-    return `Protect my Bitcoin — ${usd(quote.premium)}`;
+    return `Protect my ${asset.symbol} — ${usd(quote.premium)}`;
   };
 
   return (
     <div className="space-y-6">
+      <Panel>
+        <AssetSelector selected={assetId} onSelect={setAssetId} />
+      </Panel>
+
+      {!asset.live ? (
+        <Panel className="text-center">
+          <div className="mb-4 flex justify-center">
+            <AssetLogo id={asset.id} size={48} />
+          </div>
+          <h2 className="mb-2 text-lg" style={{ fontFamily: "var(--font-display)" }}>
+            {asset.name} cover is coming to testnet
+          </h2>
+          <Muted className="mx-auto mb-6 max-w-sm">
+            {asset.symbol} needs a live settlement oracle before we can quote honest premiums. It&apos;s
+            next on the roadmap — {DEFAULT_ASSET.symbol} cover is live right now.
+          </Muted>
+          <button
+            type="button"
+            onClick={() => setAssetId(DEFAULT_ASSET.id)}
+            className="inline-flex min-h-11 items-center gap-2 rounded-full border px-5 py-2.5 text-sm font-medium transition-colors hover:bg-white/5"
+            style={{ borderColor: "var(--sui-line)", color: "var(--sui-white)" }}
+          >
+            <AssetLogo id={DEFAULT_ASSET.id} size={18} />
+            Cover {DEFAULT_ASSET.symbol} instead
+          </button>
+        </Panel>
+      ) : (
+        <>
       <Panel>
         <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
           <label
@@ -93,7 +126,7 @@ export function CoverPanel({ onViewHistory }: CoverPanelProps) {
             className="text-base font-medium"
             style={{ fontFamily: "var(--font-display)" }}
           >
-            How much BTC do you hold?
+            How much {asset.symbol} do you hold?
           </label>
           {fromWallet && detectedBtc != null && (
             <button
@@ -127,7 +160,7 @@ export function CoverPanel({ onViewHistory }: CoverPanelProps) {
             aria-describedby="btc-hint"
           />
           <span className="text-sm font-medium" style={{ color: "var(--sui-steel)" }}>
-            BTC
+            {asset.symbol}
           </span>
         </div>
         <Muted id="btc-hint" className="mt-3">
@@ -145,7 +178,7 @@ export function CoverPanel({ onViewHistory }: CoverPanelProps) {
             Cover for how long?
           </h2>
           <Muted className="mb-5">
-            Trigger is −2% from today&apos;s BTC price. Pick how long the cover runs.
+            Trigger is −2% from today&apos;s {asset.symbol} price. Pick how long the cover runs.
           </Muted>
           <div className="flex flex-wrap gap-2" role="group" aria-label="Coverage term">
             {COVER_TERMS.map((t) => {
@@ -188,8 +221,13 @@ export function CoverPanel({ onViewHistory }: CoverPanelProps) {
 
       {quoteReady && (
         <Panel>
-          <Muted className="mb-3">BTC at {usd(quote.spot, 0)} · trigger −2%</Muted>
-          <QuoteLiveLine strike={quote.strike} expiryMs={quote.expiryMs} coverage={quote.coverage} />
+          <Muted className="mb-3">{asset.symbol} at {usd(quote.spot, 0)} · trigger −2%</Muted>
+          <QuoteLiveLine
+            strike={quote.strike}
+            expiryMs={quote.expiryMs}
+            coverage={quote.coverage}
+            symbol={asset.symbol}
+          />
         </Panel>
       )}
 
@@ -253,6 +291,8 @@ export function CoverPanel({ onViewHistory }: CoverPanelProps) {
           <Muted>Pricing temporarily unavailable — try again in a moment.</Muted>
         </Panel>
       ) : null}
+        </>
+      )}
     </div>
   );
 }

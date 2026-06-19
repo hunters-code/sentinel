@@ -2,6 +2,10 @@
 
 Sentinel's backend is a single Node.js **keeper** service plus shared libraries in `@sentinel/shared`. There is no custom REST API — render data comes from Mysten's public [predict-server](https://predict-server.testnet.mystenlabs.com), and the keeper only submits on-chain payout claims.
 
+## Supported assets
+
+Sentinel currently covers **BTC, ETH, and SUI**. The keeper itself is asset-agnostic — it claims any in-the-money DOWN position on a settled oracle — so adding an asset is a matter of surfacing its oracle in the app, not changing keeper logic.
+
 ## Architecture
 
 ```

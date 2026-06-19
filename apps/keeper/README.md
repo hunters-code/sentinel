@@ -2,6 +2,8 @@
 
 Node service that auto-claims Sentinel crash-insurance payouts after oracle settlement.
 
+Currently covers **BTC, ETH, and SUI**. The keeper is asset-agnostic (it claims any in-the-money DOWN position), so the supported set is defined by which oracles the app surfaces, not by keeper logic.
+
 ## Quick start
 
 ```bash

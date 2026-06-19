@@ -57,9 +57,9 @@ export default function LandingPage() {
                 className="mt-8 max-w-lg text-lg leading-relaxed text-pretty md:text-xl"
                 style={{ color: "var(--sui-steel)" }}
               >
-                How much BTC do you hold? We quote one premium and size your payout if Bitcoin
-                drops to your trigger before expiry. One signature — no strike ladder, no claim to
-                file.
+                Cover BTC, ETH, or SUI. Tell us how much you hold and we quote one premium, sizing
+                your payout if the price drops to your trigger before expiry. One signature — no
+                strike ladder, no claim to file.
               </p>
 
               <div className="mt-10 flex flex-wrap items-center gap-4">

@@ -1,3 +1,4 @@
+@tailwind base;
 @tailwind components;
 @tailwind utilities;
 
@@ -22,7 +23,7 @@
 }
 
 /* ------------------------------------------------------------------ */
-/* Low-fidelity wireframe baseline (app routes)                        */
+/* Base reset                                                          */
 /* ------------------------------------------------------------------ */
 
 *,
@@ -38,134 +39,16 @@ body {
 }
 
 body {
-  font-family: system-ui, -apple-system, sans-serif;
+  font-family: var(--font-body);
   font-size: 16px;
   line-height: 1.5;
-  color: #111;
-  background: #fff;
-}
-
-.wrap {
-  width: 100%;
-  max-width: 960px;
-  margin: 0 auto;
-  padding: 1rem;
-}
-
-.wrap--narrow {
-  max-width: 480px;
-}
-
-section {
-  padding: 2rem 0;
-  border-bottom: 1px solid #ccc;
-}
-
-.box {
-  border: 1px solid #999;
-  padding: 1rem;
-}
-
-.box > * + * {
-  margin-top: 0.75rem;
-}
-
-.tag {
-  display: inline-block;
-  border: 1px solid #999;
-  padding: 0 0.4rem;
-  font-size: 0.75rem;
-}
-
-.field {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  border: 1px solid #999;
-  padding: 0.5rem 0.75rem;
-}
-
-.field input {
-  flex: 1;
-  min-width: 0;
-  border: 0;
-  padding: 0;
-  font: inherit;
-  background: transparent;
-  outline: none;
-}
-
-.wrap button,
-.box button,
-.btn {
-  font: inherit;
-  padding: 0.5rem 0.75rem;
-  border: 1px solid #666;
-  background: #eee;
-  color: #111;
-  cursor: pointer;
-}
-
-.wrap button:disabled,
-.box button:disabled,
-.btn:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
-.btn--full {
-  display: block;
-  width: 100%;
-}
-
-.row {
-  display: flex;
-  justify-content: space-between;
-  gap: 1rem;
-}
-
-.stack > * + * {
-  margin-top: 0.75rem;
-}
-
-.grid {
-  display: grid;
-  gap: 1rem;
-}
-
-@media (min-width: 720px) {
-  .grid--2 {
-    grid-template-columns: 1fr 1fr;
-  }
-  .grid--3 {
-    grid-template-columns: 1fr 1fr 1fr;
-  }
-}
-
-.muted {
-  color: #666;
-}
-
-hr {
-  border: 0;
-  border-top: 1px solid #ccc;
-  margin: 1rem 0;
+  color: var(--sui-white);
+  background: var(--sui-black);
+  -webkit-font-smoothing: antialiased;
 }
 
 a {
   color: inherit;
-}
-
-table {
-  width: 100%;
-  border-collapse: collapse;
-}
-
-th,
-td {
-  border: 1px solid #ccc;
-  padding: 0.4rem 0.6rem;
-  text-align: left;
 }
 
 /* ------------------------------------------------------------------ */

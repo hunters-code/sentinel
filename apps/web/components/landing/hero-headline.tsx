@@ -4,8 +4,8 @@ import { motion, useReducedMotion } from "framer-motion";
 
 const LINES = [
   { text: "Protect your", accent: false },
-  { text: "Bitcoin for", accent: false },
-  { text: "the next hour.", accent: true },
+  { text: "crypto before", accent: false },
+  { text: "the next drop.", accent: true },
 ] as const;
 
 export function HeroHeadline() {
@@ -17,8 +17,8 @@ export function HeroHeadline() {
         className="text-[clamp(2.75rem,8vw,5.5rem)] leading-[1.02]"
         style={{ fontFamily: "var(--font-display)" }}
       >
-        Protect your Bitcoin for{" "}
-        <span style={{ color: "var(--sui-blue-bright)" }}>the next hour.</span>
+        Protect your crypto before{" "}
+        <span style={{ color: "var(--sui-blue-bright)" }}>the next drop.</span>
       </h1>
     );
   }

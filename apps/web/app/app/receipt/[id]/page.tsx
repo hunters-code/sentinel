@@ -7,6 +7,11 @@ import { useManagerId } from "@/lib/use-manager";
 import { useManagerPolicies } from "@/lib/keeper";
 import { formatExpiryUtc } from "@/lib/use-cover-quote";
 import { useLiveBtcPrice } from "@/lib/use-oracle-data";
+import { AppShell } from "@/components/app/app-shell";
+import { Panel } from "@/components/app/ui/panel";
+import { Muted } from "@/components/app/ui/muted";
+import { PrimaryButton } from "@/components/app/ui/primary-button";
+import { StatusChip } from "@/components/app/ui/status-chip";
 
 type ReceiptView = {
   id: string;
@@ -28,20 +33,52 @@ const usd = (n: number, max = 2) =>
   }).format(n);
 
 const STATUS_LABELS: Record<PolicyStatus, string> = {
-  active: "ACTIVE",
-  paid: "PAID",
-  expired: "EXPIRED — NO CLAIM",
+  active: "Active",
+  paid: "Paid",
+  expired: "Expired — no claim",
+};
+
+const STATUS_TONE: Record<PolicyStatus, "active" | "paid" | "expired"> = {
+  active: "active",
+  paid: "paid",
+  expired: "expired",
 };
 
 function Frame({ children }: { children: React.ReactNode }) {
   return (
-    <div>
-      <header style={{ borderBottom: "1px solid #ccc" }}>
-        <div className="wrap wrap--narrow">
-          <Link href="/app">Back</Link>
-        </div>
+    <AppShell>
+      <header
+        className="fixed inset-x-0 top-0 z-50 flex items-center px-6 py-4 md:px-10"
+        style={{ background: "var(--sui-black)", borderBottom: "1px solid var(--sui-line)" }}
+      >
+        <Link
+          href="/app"
+          className="inline-flex min-h-11 items-center gap-2 text-sm no-underline transition-colors hover:text-white"
+          style={{ color: "var(--sui-steel)" }}
+        >
+          <span aria-hidden>←</span> Back
+        </Link>
       </header>
-      <main className="wrap wrap--narrow">{children}</main>
+      <main className="relative mx-auto max-w-lg px-6 pb-16 pt-24 md:px-10 md:pt-28">{children}</main>
+    </AppShell>
+  );
+}
+
+function DetailRow({ label, value, accent }: { label: string; value: string; accent?: boolean }) {
+  return (
+    <div
+      className="flex items-center justify-between gap-4 py-3"
+      style={{ borderTop: "1px solid var(--sui-line)" }}
+    >
+      <span className="text-sm" style={{ color: "var(--sui-steel)" }}>
+        {label}
+      </span>
+      <span
+        className="text-sm font-medium"
+        style={{ color: accent ? "#7df752" : "var(--sui-white)" }}
+      >
+        {value}
+      </span>
     </div>
   );
 }
@@ -67,7 +104,7 @@ export default function ReceiptPage() {
       premium: demo.premium,
       trigger: demo.trigger,
       payout: demo.payout,
-      subtitle: `${demo.btc} BTC · floor ${usd(demo.trigger, 0)}`,
+      subtitle: `${demo.btc} BTC · trigger ${usd(demo.trigger, 0)}`,
       when: demo.date,
       source: "demo",
     };
@@ -82,7 +119,7 @@ export default function ReceiptPage() {
         premium: kp.premium,
         trigger: kp.strike,
         payout: kp.payout,
-        subtitle: `floor ${usd(kp.strike, 0)}`,
+        subtitle: `trigger ${usd(kp.strike, 0)}`,
         when: full,
         source: "keeper",
       };
@@ -93,73 +130,117 @@ export default function ReceiptPage() {
     return (
       <Frame>
         {isLoading ? (
-          <p className="muted">Loading receipt…</p>
+          <Panel aria-busy="true">
+            <div className="space-y-3">
+              <div className="h-4 w-2/3 animate-pulse rounded bg-white/10" />
+              <div className="h-20 animate-pulse rounded-xl bg-white/5" />
+            </div>
+          </Panel>
         ) : (
-          <>
-            <p>Receipt not found.</p>
-            <Link href="/app">Back to app</Link>
-          </>
+          <Panel className="text-center">
+            <h1 className="mb-2 text-lg" style={{ fontFamily: "var(--font-display)" }}>
+              Receipt not found
+            </h1>
+            <Muted className="mb-6">
+              This policy isn&apos;t on record for the connected wallet.
+            </Muted>
+            <Link
+              href="/app"
+              className="inline-flex min-h-11 items-center gap-2 rounded-full border px-6 py-2.5 text-sm font-medium no-underline transition-colors hover:bg-white/5"
+              style={{ borderColor: "var(--sui-line)", color: "var(--sui-white)" }}
+            >
+              Back to app
+            </Link>
+          </Panel>
         )}
       </Frame>
     );
   }
 
+  const isPaidOut = view.status === "paid" && view.payout != null && view.payout > 0;
+
   return (
     <Frame>
-      <div className="box stack">
-        <div className="row">
-          <span className="tag">RECEIPT {view.source === "demo" ? `#${view.id}` : ""}</span>
-          <span className="tag">{STATUS_LABELS[view.status]}</span>
-        </div>
+      <div className="mb-8">
+        <p className="mb-2 text-sm" style={{ color: "var(--sui-blue-bright)" }}>
+          Receipt{view.source === "demo" ? ` · #${view.id}` : ""}
+        </p>
+        <h1 className="text-balance text-[clamp(1.75rem,5vw,2.25rem)] leading-tight">
+          Your cover
+        </h1>
+      </div>
 
-        <p>{usd(view.coverage, 0)}</p>
-        <p className="muted">{view.subtitle}</p>
-
-        {view.status === "active" && (
-          <div className="box">
-            <div className="row">
-              <span>BTC now</span>
-              <span>{usd(spotQuery.data ?? 100_000, 0)}</span>
-            </div>
-            <div className="row">
-              <span>Trigger</span>
-              <span>{usd(view.trigger, 0)}</span>
-            </div>
+      <div className="space-y-6">
+        {/* Coverage summary */}
+        <Panel>
+          <div className="mb-4 flex items-center justify-between gap-3">
+            <Muted>Coverage</Muted>
+            <StatusChip tone={STATUS_TONE[view.status]}>{STATUS_LABELS[view.status]}</StatusChip>
           </div>
+          <p
+            className="text-[clamp(2rem,8vw,2.75rem)] leading-none"
+            style={{ fontFamily: "var(--font-display)", color: "var(--sui-white)" }}
+          >
+            {usd(view.coverage, 0)}
+          </p>
+          <Muted className="mt-3">{view.subtitle}</Muted>
+        </Panel>
+
+        {/* Live price line — only while the policy is open */}
+        {view.status === "active" && (
+          <Panel>
+            <Muted className="mb-4">Live BTC price · settlement at trigger</Muted>
+            <div className="flex items-center justify-between gap-4">
+              <div>
+                <p className="text-xs" style={{ color: "var(--sui-steel)" }}>
+                  BTC now
+                </p>
+                <p
+                  className="text-2xl"
+                  style={{ fontFamily: "var(--font-display)", color: "var(--sui-white)" }}
+                >
+                  {usd(spotQuery.data ?? 100_000, 0)}
+                </p>
+              </div>
+              <span aria-hidden style={{ color: "var(--sui-steel-dark)" }}>
+                →
+              </span>
+              <div className="text-right">
+                <p className="text-xs" style={{ color: "var(--sui-steel)" }}>
+                  Trigger
+                </p>
+                <p
+                  className="text-2xl"
+                  style={{ fontFamily: "var(--font-display)", color: "var(--sui-blue-bright)" }}
+                >
+                  {usd(view.trigger, 0)}
+                </p>
+              </div>
+            </div>
+          </Panel>
         )}
 
-        <table>
-          <tbody>
-            <tr>
-              <td>Premium paid</td>
-              <td>{usd(view.premium)}</td>
-            </tr>
-            <tr>
-              <td>Coverage</td>
-              <td>{usd(view.coverage, 0)}</td>
-            </tr>
-            <tr>
-              <td>Trigger</td>
-              <td>{usd(view.trigger, 0)}</td>
-            </tr>
-            <tr>
-              <td>{view.source === "keeper" ? "Settles" : "Date"}</td>
-              <td>{view.when}</td>
-            </tr>
-            {view.status === "paid" && view.payout != null && view.payout > 0 && (
-              <tr>
-                <td>Payout</td>
-                <td>{usd(view.payout, 0)}</td>
-              </tr>
-            )}
-          </tbody>
-        </table>
+        {/* Detail breakdown */}
+        <Panel>
+          <h2 className="mb-1 text-lg" style={{ fontFamily: "var(--font-display)" }}>
+            Policy details
+          </h2>
+          <div className="mt-3">
+            <DetailRow label="Premium paid" value={usd(view.premium)} />
+            <DetailRow label="Coverage" value={usd(view.coverage, 0)} />
+            <DetailRow label="Trigger" value={usd(view.trigger, 0)} />
+            <DetailRow label={view.source === "keeper" ? "Settles" : "Date"} value={view.when} />
+            {isPaidOut && <DetailRow label="Payout" value={usd(view.payout!, 0)} accent />}
+          </div>
+        </Panel>
 
-        {view.status === "paid" && view.payout != null && view.payout > 0 && (
-          <button type="button" className="btn--full">
-            Withdraw {usd(view.payout, 0)} to wallet
-          </button>
+        {isPaidOut && (
+          <PrimaryButton>Withdraw {usd(view.payout!, 0)} to wallet</PrimaryButton>
         )}
+
+        <Muted>
+          Parametric payout, settled on-chain at the oracle print. Not regulated insurance.
+        </Muted>
       </div>
     </Frame>
   );
