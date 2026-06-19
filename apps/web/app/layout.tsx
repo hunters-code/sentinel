@@ -16,9 +16,9 @@ const manrope = Manrope({
 });
 
 export const metadata: Metadata = {
-  title: "Sentinel — One-hour crash insurance for Bitcoin",
+  title: "Sentinel — Crash insurance for your crypto",
   description:
-    "Protect your BTC for the next hour. One honest price, one tap, paid automatically if Bitcoin crashes. Built on DeepBook Predict · Sui.",
+    "Protect your crypto before the next drop. Cover BTC, ETH, or SUI with one honest price, one tap, paid automatically if the price crashes. Built on DeepBook Predict · Sui.",
   manifest: "/manifest.webmanifest",
 };
 

@@ -3,17 +3,18 @@ import { BtcChartVisual } from "@/components/landing/btc-chart";
 import { LandingHeader } from "@/components/landing/landing-header";
 import { Marquee } from "@/components/landing/marquee";
 import { HeroHeadline } from "@/components/landing/hero-headline";
+import { Reveal } from "@/components/reveal";
 
 const FLOW_STEPS = [
   {
     step: "Quote",
     detail:
-      "Tell us your BTC holdings. We size coverage to your mark-to-market loss down to a −2% trigger and show the protocol ask.",
+      "Tell us how much you hold. We size coverage to your mark-to-market loss down to a −2% trigger and show the protocol ask.",
   },
   {
     step: "Receipt",
     detail:
-      "Live BTC price line with your trigger drawn on it. Status flips from ACTIVE to PAID or EXPIRED the moment the oracle settles.",
+      "Live price line with your trigger drawn on it. Status flips from ACTIVE to PAID or EXPIRED the moment the oracle settles.",
   },
   {
     step: "Payout",
@@ -102,9 +103,9 @@ export default function LandingPage() {
             </h2>
             <div className="space-y-6 text-lg leading-relaxed" style={{ color: "var(--sui-steel)" }}>
               <p>
-                You buy crash insurance the way you expect: one premium, a fixed payout if BTC hits
-                your trigger, and a receipt that tracks settlement. Premium math comes from the live
-                volatility surface — never a black box.
+                You buy crash insurance the way you expect: one premium, a fixed payout if the price
+                hits your trigger, and a receipt that tracks settlement. Premium math comes from the
+                live volatility surface — never a black box.
               </p>
               <p>
                 Only DeepBook Predict on Sui can price arbitrary strikes against a vol surface and
@@ -157,7 +158,7 @@ export default function LandingPage() {
               className="mb-16 max-w-2xl text-[clamp(2rem,4.5vw,3rem)] leading-tight"
               style={{ fontFamily: "var(--font-display)" }}
             >
-              Three screens. One signature. Settled in under an hour.
+              One signature. Settled on-chain. Paid automatically.
             </h2>
 
             <ol className="grid gap-px md:grid-cols-3" style={{ background: "var(--sui-line)" }}>
@@ -169,12 +170,14 @@ export default function LandingPage() {
                     background: i === 1 ? "var(--sui-blue-darker)" : "var(--sui-black)",
                   }}
                 >
-                  <p className="mb-4 text-sm font-medium" style={{ color: "var(--sui-blue)" }}>
-                    {i + 1}. {item.step}
-                  </p>
-                  <p className="leading-relaxed" style={{ color: "var(--sui-steel)" }}>
-                    {item.detail}
-                  </p>
+                  <Reveal style={{ transitionDelay: `${i * 90}ms` }}>
+                    <p className="mb-4 text-sm font-medium" style={{ color: "var(--sui-blue)" }}>
+                      {i + 1}. {item.step}
+                    </p>
+                    <p className="leading-relaxed" style={{ color: "var(--sui-steel)" }}>
+                      {item.detail}
+                    </p>
+                  </Reveal>
                 </li>
               ))}
             </ol>
@@ -203,7 +206,7 @@ export default function LandingPage() {
             <div className="grid gap-10 lg:grid-cols-2 lg:gap-16">
               <div className="space-y-6 text-lg leading-relaxed" style={{ color: "var(--sui-steel)" }}>
                 <p>
-                  A rolling BTC oracle prices sub-hour expiries in real time. Your premium reflects
+                  A rolling price oracle prices every expiry in real time. Your premium reflects
                   fair value from the SVI volatility surface plus the protocol spread — shown before
                   you sign.
                 </p>
@@ -302,16 +305,13 @@ export default function LandingPage() {
           className="px-6 py-24 text-center md:px-10 md:py-32"
           style={{ background: "linear-gradient(180deg, var(--sui-black) 0%, var(--sui-blue-darker) 100%)" }}
         >
-          <p className="mb-4 text-sm" style={{ color: "var(--sui-steel)" }}>
-            Sui Overflow hackathon · testnet only · not financial advice
-          </p>
           <h2
             className="mx-auto max-w-3xl text-[clamp(2.25rem,6vw,4rem)] leading-[1.05]"
             style={{ fontFamily: "var(--font-display)" }}
           >
-            Insure your BTC
+            Insure your crypto
             <br />
-            for the next hour.
+            before the next drop.
           </h2>
           <Link
             href="/app"
@@ -333,7 +333,7 @@ export default function LandingPage() {
               Sentinel
             </p>
             <p className="mt-2 max-w-xs text-sm leading-relaxed" style={{ color: "var(--sui-steel)" }}>
-              One-hour parametric crash insurance for BTC, built on DeepBook Predict.
+              Parametric crash insurance for your crypto, built on DeepBook Predict.
             </p>
           </div>
 

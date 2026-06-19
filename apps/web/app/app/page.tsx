@@ -31,7 +31,7 @@ export default function AppPage() {
             Get a quote
           </p>
           <h1 className="text-balance text-[clamp(1.75rem,5vw,2.25rem)] leading-tight">
-            Protect your Bitcoin
+            Protect your crypto
           </h1>
         </div>
 

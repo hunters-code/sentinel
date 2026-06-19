@@ -189,7 +189,7 @@ export default function ReceiptPage() {
         {/* Live price line — only while the policy is open */}
         {view.status === "active" && (
           <Panel>
-            <Muted className="mb-4">Live BTC price · settlement at trigger</Muted>
+            <Muted className="mb-4">Live price · settlement at trigger</Muted>
             <div className="flex items-center justify-between gap-4">
               <div>
                 <p className="text-xs" style={{ color: "var(--sui-steel)" }}>

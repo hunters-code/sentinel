@@ -1,82 +1,56 @@
 "use client";
 
-// Low-fi: all motion removed. These are plain passthrough wrappers kept so
-// existing imports keep working. Re-introduce animation when rebuilding.
+import { useEffect, useRef, type CSSProperties, type ReactNode } from "react";
 
-import type { ReactNode } from "react";
-
-type DivProps = {
-  children?: ReactNode;
-  className?: string;
-  [key: string]: unknown;
-};
-
-function passthroughDiv(props: DivProps) {
-  const { children, className } = props;
-  return <div className={className}>{children}</div>;
-}
-
-export function Reveal(props: DivProps) {
-  return passthroughDiv(props);
-}
-
-export function HeroReveal(props: DivProps) {
-  return passthroughDiv(props);
-}
-
-export function Stagger({ children, className }: { children: ReactNode; className?: string; stagger?: number }) {
-  return <div className={className}>{children}</div>;
-}
-
-export function StaggerItem({ children, className }: { children: ReactNode; className?: string }) {
-  return <div className={className}>{children}</div>;
-}
-
-export function PopCard({ children, className }: { children: ReactNode; className?: string; delay?: number }) {
-  return <div className={className}>{children}</div>;
-}
-
-export function BarFill({ className, widthPct }: { className?: string; widthPct: number; delay?: number }) {
-  return <div className={className} style={{ width: `${widthPct}%` }} />;
-}
-
-export function MotionNav({ children, className }: { children: ReactNode; className?: string }) {
-  return <header className={className}>{children}</header>;
-}
-
-export function ValuePop({
-  value,
-  className,
-  children,
-}: {
-  value: string | number;
-  className?: string;
-  children?: ReactNode;
-}) {
-  return <span className={className}>{children ?? value}</span>;
-}
-
-export function StampWiggle({ children, className }: { children: ReactNode; className?: string; deg?: number }) {
-  return <span className={className}>{children}</span>;
-}
-
-export function MotionChip({
+/**
+ * Scroll-triggered entrance that enhances an already-visible default.
+ *
+ * Content renders visible. On the client we "arm" the element (hide + offset
+ * via CSS) only when motion is allowed, IntersectionObserver exists, and the
+ * element actually starts below the fold — then reveal it when it scrolls in.
+ * If any of those aren't true, the content simply stays visible, so it never
+ * ships blank on SSR, headless renders, or for reduced-motion users.
+ */
+export function Reveal({
   children,
   className,
-  onClick,
+  style,
 }: {
   children: ReactNode;
   className?: string;
-  onClick?: () => void;
-  active?: boolean;
+  style?: CSSProperties;
 }) {
-  return (
-    <button type="button" className={className} onClick={onClick}>
-      {children}
-    </button>
-  );
-}
+  const ref = useRef<HTMLDivElement>(null);
 
-export function PulseWrap({ children, className }: { children: ReactNode; className?: string }) {
-  return <div className={className}>{children}</div>;
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    if (!("IntersectionObserver" in window)) return;
+
+    // Only animate content that starts below the fold; on-screen content stays
+    // put (avoids a hide-then-show flash on first paint).
+    if (el.getBoundingClientRect().top < window.innerHeight * 0.85) return;
+
+    el.dataset.armed = "true";
+    const io = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          if (entry.isIntersecting) {
+            el.dataset.visible = "true";
+            io.unobserve(el);
+          }
+        }
+      },
+      { threshold: 0.2 },
+    );
+    io.observe(el);
+    return () => io.disconnect();
+  }, []);
+
+  return (
+    <div ref={ref} className={["reveal", className].filter(Boolean).join(" ")} style={style}>
+      {children}
+    </div>
+  );
 }

@@ -104,6 +104,45 @@ a {
   }
 }
 
+/* ------------------------------------------------------------------ */
+/* Entrance motion                                                     */
+/* ------------------------------------------------------------------ */
+
+/* Hero headline: animates from a CSS baseline, so it is fully visible
+   even if JS never hydrates (fill-mode backwards holds the from-state
+   only during the per-line delay). */
+@keyframes sentinel-rise {
+  from {
+    opacity: 0;
+    transform: translateY(1.25rem);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.hero-line {
+  display: block;
+  animation: sentinel-rise 0.6s cubic-bezier(0.22, 1, 0.36, 1) backwards;
+}
+
+/* Scroll reveal: visible by default. JS arms the entrance only when it is
+   supported and the element starts below the fold, so content never hides
+   on SSR, headless renders, or reduced-motion. */
+.reveal[data-armed="true"] {
+  opacity: 0;
+  transform: translateY(1.5rem);
+}
+
+.reveal[data-armed="true"][data-visible="true"] {
+  opacity: 1;
+  transform: translateY(0);
+  transition:
+    opacity 0.6s cubic-bezier(0.22, 1, 0.36, 1),
+    transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
 @media (prefers-reduced-motion: reduce) {
   .landing *,
   .landing *::before,
@@ -118,6 +157,15 @@ a {
 
   .landing-dialog[open] {
     animation: none;
+  }
+
+  .hero-line {
+    animation: none;
+  }
+
+  .reveal[data-armed="true"] {
+    opacity: 1;
+    transform: none;
   }
 }
 
