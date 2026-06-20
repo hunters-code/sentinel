@@ -16,9 +16,27 @@ export function PricingBreakdown({
   const effectivePct = quote.coverage > 0 ? (quote.premium / quote.coverage) * 100 : 0;
 
   return (
-    <details className="rounded-xl border border-card-border bg-card-fill p-5 shadow-[inset_0_1px_0_theme(colors.card.accent)]">
+    <details className="group border-t border-separator pt-4">
       <summary className="cursor-pointer list-none text-sm font-medium text-content-primary [&::-webkit-details-marker]:hidden">
-        How is this priced?
+        <span className="inline-flex items-center gap-2">
+          How is this priced?
+          <svg
+            width="12"
+            height="12"
+            viewBox="0 0 12 12"
+            fill="none"
+            aria-hidden
+            className="opacity-50 transition-transform duration-200 group-open:rotate-180"
+          >
+            <path
+              d="M2 4L6 8L10 4"
+              stroke="currentColor"
+              strokeWidth="1.5"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+          </svg>
+        </span>
       </summary>
       <div className="mt-4 space-y-3">
         <div className="flex items-center justify-between gap-4 text-sm">

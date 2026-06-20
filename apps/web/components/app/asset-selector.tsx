@@ -12,41 +12,37 @@ export function AssetSelector({
   onSelect: (id: AssetId) => void;
 }) {
   return (
-    <div>
-      <div className="mb-3 flex items-center justify-between">
-        <span className="text-sm font-medium text-content-secondary">Which asset?</span>
-        <span className="inline-flex items-center rounded-full border border-border-neutral px-2.5 py-0.5 text-xs font-medium text-content-secondary">
-          Testnet
-        </span>
-      </div>
-
-      <div className="grid grid-cols-3 gap-2" role="group" aria-label="Asset">
+    <div className="flex flex-wrap gap-2" role="group" aria-label="Asset">
         {ASSETS.map((asset) => {
           const active = asset.id === selected;
+          const disabled = !asset.live;
+
           return (
             <button
               key={asset.id}
               type="button"
+              disabled={disabled}
               onClick={() => onSelect(asset.id)}
               aria-pressed={active}
               className={cn(
-                "flex min-h-11 items-center justify-center gap-2 rounded-xl border bg-card-fill px-3 py-2.5 text-sm font-medium text-content-primary transition-colors",
+                "inline-flex min-h-11 items-center gap-2 rounded-full border px-4 py-2 text-sm font-medium transition-colors",
+                disabled && "cursor-not-allowed opacity-55",
                 active
-                  ? "border-sui-blue shadow-[inset_0_1px_0_theme(colors.card.accent)]"
-                  : "border-border-neutral",
+                  ? "border-sui-blue bg-sui-blue/10 text-content-primary shadow-[inset_0_1px_0_theme(colors.card.accent)]"
+                  : "border-border-neutral bg-transparent text-content-primary hover:bg-white/[0.04]",
+                disabled && !active && "hover:bg-transparent",
               )}
             >
-              <AssetLogo id={asset.id} size={20} />
-              <span className="flex items-baseline gap-1.5">
-                {asset.symbol}
-                {!asset.live && (
-                  <span className="text-[11px] font-normal text-content-secondary">soon</span>
-                )}
-              </span>
+              <AssetLogo id={asset.id} size={18} />
+              <span>{asset.symbol}</span>
+              {disabled && (
+                <span className="rounded-full border border-border-neutral px-1.5 py-px text-[10px] font-medium uppercase tracking-wide text-content-tertiary">
+                  Soon
+                </span>
+              )}
             </button>
           );
         })}
-      </div>
     </div>
   );
 }

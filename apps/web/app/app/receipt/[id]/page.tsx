@@ -10,7 +10,7 @@ import { useLiveBtcPrice } from "@/lib/use-oracle-data";
 import { usd as formatUsd } from "@/lib/format";
 import { AppShell } from "@/components/app/app-shell";
 import { AppContentCard } from "@/components/app/app-content-card";
-import type { AppNavId } from "@/components/app/app-tabs";
+import { DEFAULT_NAV, type AppNavId } from "@/components/app/app-tabs";
 import { Panel } from "@/components/app/ui/panel";
 import { Muted } from "@/components/app/ui/muted";
 import { PrimaryButton } from "@/components/app/ui/primary-button";
@@ -45,13 +45,13 @@ function Frame({ children }: { children: React.ReactNode }) {
   const connected = Boolean(account?.address);
 
   const navigateNav = (id: AppNavId) => {
-    router.push(id === "home" ? "/app" : `/app?tab=${id}`);
+    router.push(id === DEFAULT_NAV ? "/app" : `/app?tab=${id}`);
   };
 
   return (
     <AppShell nav="history" onNavChange={navigateNav} connected={connected}>
-      <div className="flex min-h-0 flex-1 flex-col overflow-hidden p-4">
-        <div className="mb-4 px-1">
+      <div className="px-4 py-5 md:px-6 md:py-6">
+        <div className="mb-4">
           <Link
             href="/app?tab=history"
             className="inline-flex min-h-11 items-center gap-2 text-sm text-content-secondary no-underline transition-colors hover:text-content-primary"

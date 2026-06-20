@@ -4,11 +4,8 @@ import { useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useCurrentAccount } from "@mysten/dapp-kit";
 import { AppShell } from "@/components/app/app-shell";
-import { AppBanner } from "@/components/app/app-banner";
-import { AppContentCard } from "@/components/app/app-content-card";
 import { AppEmptyState } from "@/components/app/app-empty-state";
-import { AppHomePanel } from "@/components/app/app-home-panel";
-import { isAppNavId, type AppNavId } from "@/components/app/app-tabs";
+import { DEFAULT_NAV, isAppNavId, type AppNavId } from "@/components/app/app-tabs";
 import { CoverPanel } from "@/components/app/cover-panel";
 import { HistoryPanel } from "@/components/app/history-panel";
 import { WalletPanel } from "@/components/app/wallet-panel";
@@ -16,7 +13,7 @@ import { useManagerId } from "@/lib/use-manager";
 
 function navFromQuery(tab: string | null): AppNavId {
   if (isAppNavId(tab)) return tab;
-  return "home";
+  return DEFAULT_NAV;
 }
 
 export default function AppPageClient() {
@@ -33,36 +30,23 @@ export default function AppPageClient() {
 
   const handleNavChange = (id: AppNavId) => {
     setNav(id);
-    const path = id === "home" ? "/app" : `/app?tab=${id}`;
+    const path = id === DEFAULT_NAV ? "/app" : `/app?tab=${id}`;
     router.replace(path);
   };
 
   return (
-    <AppShell
-      nav={nav}
-      onNavChange={handleNavChange}
-      connected={connected}
-    >
-      {/* <AppBanner /> */}
-
-      <div className="flex min-h-0 flex-1 flex-col overflow-hidden p-4">
-        <AppContentCard>
-          {!connected ? (
-            <div className="min-h-0 flex-1 overflow-auto [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
-              <AppEmptyState />
-            </div>
-          ) : (
-            <div className="min-h-0 flex-1 overflow-auto [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
-              {nav === "home" && <AppHomePanel onGetQuote={() => handleNavChange("cover")} />}
-              {nav === "cover" && (
-                <CoverPanel onViewHistory={() => handleNavChange("history")} />
-              )}
-              {nav === "history" && <HistoryPanel />}
-              {nav === "wallet" && <WalletPanel managerId={managerId} />}
-            </div>
-          )}
-        </AppContentCard>
-      </div>
+    <AppShell nav={nav} onNavChange={handleNavChange} connected={connected}>
+      {!connected ? (
+        <AppEmptyState />
+      ) : (
+        <>
+          <div className="px-4 py-5 md:px-6 md:py-6 bg-sui-root">
+            {nav === "cover" && <CoverPanel onViewHistory={() => handleNavChange("history")} />}
+            {nav === "history" && <HistoryPanel />}
+            {nav === "wallet" && <WalletPanel managerId={managerId} />}
+          </div>
+        </>
+      )}
     </AppShell>
   );
 }

@@ -3,7 +3,7 @@
 import { useReducedMotion } from "framer-motion";
 
 const ITEMS = [
-  "Covers the next hour",
+  "Coverage until oracle expiry",
   "Honest market pricing",
   "Automatic payout",
   "Paid in stablecoins",

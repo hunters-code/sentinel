@@ -53,7 +53,6 @@ export function CoverPanel({ onViewHistory }: CoverPanelProps) {
     }
   }, [detectedBtc, btcTouched]);
 
-  // Switching asset re-detects the new asset's balance into the input.
   useEffect(() => {
     setBtcTouched(false);
   }, [assetId]);
@@ -63,8 +62,6 @@ export function CoverPanel({ onViewHistory }: CoverPanelProps) {
   const { oracle: selectedOracle, capped } = snapTermToOracle(options, selectedTerm);
   const { spot: oracleSpot, svi } = useOracleData(selectedOracle?.oracleId ?? null);
 
-  // BTC settles off its own oracle; other assets price off a third-party feed
-  // (their real market price) on a per-asset strike grid until they get oracles.
   const feedSpot = useSpotPrice(asset.id);
   const spot = asset.id === "btc" ? oracleSpot : feedSpot;
   const quoteOracle = useMemo(() => {
@@ -78,8 +75,6 @@ export function CoverPanel({ onViewHistory }: CoverPanelProps) {
     [btcHeld, quoteOracle, spot, svi],
   );
 
-  // On-chain premium previews against the BTC oracle, so only BTC can use it.
-  // ETH/SUI show the (real-priced) SVI estimate until they get their own oracle.
   const { premium: livePremium, loading: premiumLoading } = useOnChainPremium({
     oracleId: asset.id === "btc" ? (selectedOracle?.oracleId ?? null) : null,
     expiryRaw: selectedOracle?.expiryMs ?? null,
@@ -108,44 +103,71 @@ export function CoverPanel({ onViewHistory }: CoverPanelProps) {
   };
 
   return (
-    <div className="flex flex-col">
-      <div className="sticky top-0 z-[2] -mx-1 mb-0 bg-card-fill pb-2.5">
-        <Panel className="rounded-2xl rounded-b-none border-b border-separator px-[1.125rem] py-4">
-          <AssetSelector selected={assetId} onSelect={setAssetId} />
-        </Panel>
-      </div>
+    <Panel className="flex flex-col gap-8 p-6 md:p-8">
+      <AssetSelector selected={assetId} onSelect={setAssetId} />
 
-      <div className="space-y-5 pt-1">
-        {!asset.live ? (
-        <Panel className="text-center">
-          <div className="mb-4 flex justify-center">
-            <AssetLogo id={asset.id} size={48} />
-          </div>
-          <h2 className="mb-2 font-display text-lg">
-            {asset.name} cover is coming to testnet
-          </h2>
-          <Muted className="mx-auto mb-6 max-w-sm">
-            {asset.symbol} needs a live settlement oracle before we can quote honest premiums. It&apos;s
-            next on the roadmap — {DEFAULT_ASSET.symbol} cover is live right now.
+      {!asset.live ? (
+        <div className="rounded-xl border border-border-neutral bg-black/30 px-5 py-4 text-left">
+          <p className="font-display text-base font-medium text-content-primary">
+            {asset.symbol} cover is coming soon
+          </p>
+          <Muted className="mt-2 max-w-md">
+            We need a live settlement oracle before we can quote honest premiums. BTC is available now.
           </Muted>
           <button
             type="button"
             onClick={() => setAssetId(DEFAULT_ASSET.id)}
-            className="inline-flex min-h-11 items-center gap-2 rounded-full border border-border-neutral px-5 py-2.5 text-sm font-medium text-content-primary transition-colors hover:bg-white/5"
+            className="mt-4 inline-flex min-h-11 items-center gap-2 rounded-full border border-border-neutral px-4 py-2 text-sm font-medium text-content-primary transition-colors hover:bg-white/5"
           >
             <AssetLogo id={DEFAULT_ASSET.id} size={18} />
-            Cover {DEFAULT_ASSET.symbol} instead
+            Quote {DEFAULT_ASSET.symbol}
           </button>
-        </Panel>
+        </div>
+      ) : status === "success" && quoteReady ? (
+        <div className="space-y-4">
+          <p className="font-display text-[clamp(1.25rem,3vw,1.5rem)] font-medium leading-snug text-content-positive">
+            Cover purchased — receipt is in History.
+          </p>
+          {txDigest && (
+            <Muted>
+              Transaction{" "}
+              <a
+                href={`https://suiscan.xyz/testnet/tx/${txDigest}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-sui-blue-bright underline"
+              >
+                {txDigest.slice(0, 10)}…
+              </a>
+            </Muted>
+          )}
+          <PrimaryButton onClick={onViewHistory}>View History</PrimaryButton>
+        </div>
       ) : (
         <>
-          <Panel>
-            <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
-              <label
-                htmlFor="btc"
-                className="font-display text-base font-medium"
-              >
-                How much {asset.symbol} do you hold?
+          <div className="min-h-[4.5rem]">
+            {quoteReady ? (
+              <QuoteLiveLine
+                strike={quote.strike}
+                expiryMs={quote.expiryMs}
+                coverage={quote.coverage}
+                symbol={asset.symbol}
+              />
+            ) : hasAmount && oracleLoading ? (
+              <SettlementWindowsLoading />
+            ) : hasAmount && !oracleLoading && !quote.valid ? (
+              <Muted>Pricing temporarily unavailable — try again in a moment.</Muted>
+            ) : (
+              <Muted className="text-base leading-relaxed">
+                Enter how much {asset.symbol} you hold — your trigger, payout, and premium appear here.
+              </Muted>
+            )}
+          </div>
+
+          <div>
+            <div className="mb-3 flex flex-wrap items-center justify-between gap-3">
+              <label htmlFor="cover-amount" className="text-sm font-medium text-content-secondary">
+                Holdings
               </label>
               {fromWallet && detectedBtc != null && (
                 <button
@@ -156,49 +178,44 @@ export function CoverPanel({ onViewHistory }: CoverPanelProps) {
                     setBtcInput(String(detectedBtc));
                   }}
                 >
-                  Use balance ({detectedBtc.toLocaleString(undefined, { maximumFractionDigits: 4 })})
+                  Use wallet ({detectedBtc.toLocaleString(undefined, { maximumFractionDigits: 4 })})
                 </button>
               )}
             </div>
-            <div
-              className="flex items-center gap-3 rounded-xl border border-border-neutral bg-black/35 px-4 py-3"
-            >
+            <div className="flex items-center gap-3 rounded-xl border border-border-neutral bg-black/35 px-4 py-3">
               <input
-                id="btc"
+                id="cover-amount"
                 inputMode="decimal"
                 value={btcInput}
                 onChange={(e) => {
                   setBtcTouched(true);
                   setBtcInput(e.target.value.replace(/[^0-9.]/g, ""));
                 }}
-                className="min-w-0 flex-1 bg-transparent font-display text-xl font-medium text-content-primary outline-none placeholder:text-content-secondary"
+                className="min-w-0 flex-1 bg-transparent font-display text-2xl font-medium tabular-nums text-content-primary outline-none placeholder:text-content-tertiary"
                 placeholder="0.00"
-                aria-describedby="btc-hint"
+                aria-describedby="cover-amount-hint"
               />
               <span className="text-sm font-medium text-content-secondary">{asset.symbol}</span>
             </div>
-            <Muted id="btc-hint" className="mt-3">
+            <Muted id="cover-amount-hint" className="mt-2">
               {btcLoading
                 ? "Detecting your balance…"
                 : fromWallet
-                  ? "Detected from your wallet — edit anytime"
-                  : "Enter the amount you want to cover"}
+                  ? "From your wallet — edit anytime"
+                  : "Amount you want covered"}
             </Muted>
-          </Panel>
+          </div>
 
           {hasAmount && (
-            <Panel>
-              <h2 className="mb-1 font-display text-lg">Cover for how long?</h2>
-              <Muted className="mb-5">
-                Trigger is −2% from today&apos;s {asset.symbol} price. Pick how long the cover runs.
-              </Muted>
+            <div>
+              <p className="mb-3 text-sm font-medium text-content-secondary">Coverage window</p>
               <div
                 className={cn(
                   "flex flex-wrap gap-2",
                   oracleLoading && "pointer-events-none opacity-55",
                 )}
                 role="group"
-                aria-label="Coverage term"
+                aria-label="Coverage window"
                 aria-busy={oracleLoading}
               >
                 {COVER_TERMS.map((t) => {
@@ -213,7 +230,7 @@ export function CoverPanel({ onViewHistory }: CoverPanelProps) {
                         "min-h-11 rounded-full border px-4 py-2 text-sm font-medium transition-colors",
                         active
                           ? "border-sui-blue bg-sui-blue text-sui-black"
-                          : "border-border-neutral text-content-primary",
+                          : "border-border-neutral text-content-primary hover:bg-white/[0.04]",
                       )}
                     >
                       {t.label}
@@ -221,69 +238,34 @@ export function CoverPanel({ onViewHistory }: CoverPanelProps) {
                   );
                 })}
               </div>
-
-              {oracleLoading ? (
-                <SettlementWindowsLoading />
-              ) : capped && selectedOracle ? (
-                <Muted className="mt-4">
-                  On testnet, windows top out around three weeks — your {selectedTerm.label} quote settles
-                  on the longest available window ({formatExpiry(selectedOracle.expiryMs).full}).
+              {!oracleLoading && capped && selectedOracle ? (
+                <Muted className="mt-3">
+                  Testnet windows cap around three weeks — your {selectedTerm.label} quote settles on{" "}
+                  {formatExpiry(selectedOracle.expiryMs).full}.
                 </Muted>
-              ) : selectedOracle ? (
-                <Muted className="mt-4">Settles {formatExpiry(selectedOracle.expiryMs).full}</Muted>
+              ) : !oracleLoading && selectedOracle ? (
+                <Muted className="mt-3">Settles {formatExpiry(selectedOracle.expiryMs).full}</Muted>
               ) : null}
-            </Panel>
+            </div>
           )}
 
           {quoteReady && (
-            <Panel>
-              <Muted className="mb-3">{asset.symbol} at {usd(quote.spot ?? 0)} · trigger −2%</Muted>
-              <QuoteLiveLine
-                strike={quote.strike}
-                expiryMs={quote.expiryMs}
-                coverage={quote.coverage}
-                symbol={asset.symbol}
-              />
-            </Panel>
-          )}
-
-          {quoteReady && status === "success" ? (
-            <Panel className="space-y-4">
-              <p className="font-medium text-signal-lime">
-                Cover purchased — your receipt is in History.
-              </p>
-              {txDigest && (
-                <Muted>
-                  Transaction{" "}
-                  <a
-                    href={`https://suiscan.xyz/testnet/tx/${txDigest}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-sui-blue-bright underline"
-                  >
-                    {txDigest.slice(0, 10)}…
-                  </a>
-                </Muted>
-              )}
-              <PrimaryButton onClick={onViewHistory}>View History</PrimaryButton>
-            </Panel>
-          ) : quoteReady ? (
-            <div className="space-y-4">
+            <div className="space-y-4 border-t border-separator pt-6">
               {status === "error" && error && (
                 <p className="text-sm text-signal-orange" role="alert">
                   {error}
                 </p>
               )}
 
-              <QuoteFreshness createdAtMs={quote.createdAtMs} />
+              <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-2">
+                <p className="font-display text-2xl font-medium tabular-nums text-content-primary">
+                  {premiumLoading && !premiumIsLive ? "…" : usd(quote.premium)}
+                </p>
+                <QuoteFreshness createdAtMs={quote.createdAtMs} />
+              </div>
 
               <PrimaryButton
-                disabled={
-                  signing ||
-                  !selectedOracle ||
-                  !premiumIsLive ||
-                  quoteStale
-                }
+                disabled={signing || !selectedOracle || !premiumIsLive || quoteStale}
                 onClick={() => {
                   if (!selectedOracle) return;
                   purchase(quote, selectedOracle, managerId, managerBalanceUsd);
@@ -292,17 +274,14 @@ export function CoverPanel({ onViewHistory }: CoverPanelProps) {
                 {buttonLabel()}
               </PrimaryButton>
 
-              <PricingBreakdown quote={quote} live={premiumIsLive} loading={premiumLoading} />
-              <QuoteDisclosures />
+              <div className="space-y-3 pt-1">
+                <PricingBreakdown quote={quote} live={premiumIsLive} loading={premiumLoading} />
+                <QuoteDisclosures />
+              </div>
             </div>
-          ) : hasAmount && !oracleLoading && !quote.valid ? (
-            <Panel>
-              <Muted>Pricing temporarily unavailable — try again in a moment.</Muted>
-            </Panel>
-          ) : null}
+          )}
         </>
       )}
-      </div>
-    </div>
+    </Panel>
   );
 }

@@ -1,23 +1,38 @@
-const STACK_ITEMS = [
+const COVERAGE_POINTS = [
   {
-    label: "Predict package",
-    value: "Live testnet deployment",
-    detail: "DeepBook Predict on Sui testnet — mints and redeems settle on-chain.",
+    label: "What you buy",
+    value: "Crash coverage until expiry",
+    detail: "A fixed stablecoin payout if settlement prints at or below your trigger.",
   },
   {
-    label: "Quote asset",
-    value: "dUSDC only for MVP",
-    detail: "Premiums and payouts denominated in dUSDC; no fiat on-ramp in v1.",
+    label: "Your trigger",
+    value: "Default 2% below spot",
+    detail: "Exact strike and expiry time appear on the quote before you sign.",
   },
   {
-    label: "Settlement source",
-    value: "BTC oracle expiry print",
-    detail: "Parametric payout triggers on the oracle settlement price at expiry.",
+    label: "Your premium",
+    value: "Honest market ask",
+    detail: "Fair value, spread, and any protocol floor — shown before you commit.",
   },
   {
-    label: "Keeper action",
-    value: "Permissionless redeem path",
-    detail: "Payout claims run without Sentinel — verifiable by anyone.",
+    label: "Your payout",
+    value: "Automatic at settlement",
+    detail: "If the trigger hits, payout is claimed for you — no paperwork to file.",
+  },
+] as const;
+
+const BUILDER_DETAILS = [
+  {
+    term: "Pricing source",
+    detail: "Live oracle and vol-surface data from DeepBook Predict on Sui testnet.",
+  },
+  {
+    term: "Settlement asset",
+    detail: "Premiums and payouts in dUSDC on testnet.",
+  },
+  {
+    term: "Payout path",
+    detail: "Permissionless keeper claims after oracle settlement — verifiable on-chain.",
   },
 ] as const;
 
@@ -27,20 +42,19 @@ export function LandingStackSection() {
       <div className="mx-auto w-full max-w-container">
         <div className="grid gap-10 lg:grid-cols-[1fr_1.1fr] lg:items-end">
           <div>
-            <p className="text-sm font-medium text-sui-blue-bright">Built on Sui testnet infrastructure</p>
+            <p className="text-sm font-medium text-sui-blue-bright">Built on Sui</p>
             <h2 className="mt-3 max-w-[16ch] text-[clamp(2rem,5vw,3.1rem)] font-medium leading-[1.04] tracking-[-0.03em] text-balance">
-              On-chain pricing, on-chain settlement, transparent by default.
+              Priced from live markets, settled on-chain.
             </h2>
           </div>
           <p className="max-w-[62ch] text-[1.02rem] leading-[1.7] text-sui-steel text-pretty">
-            Sentinel uses live oracle and SVI data from Predict. Quotes are refreshed before signing,
-            settlement is event-driven, and payout claims are permissionless so the flow remains verifiable
-            end to end.
+            Quotes refresh before you sign. Settlement follows the oracle expiry on your receipt — not a
+            fixed duration from purchase.
           </p>
         </div>
 
         <dl className="mt-10 grid gap-px overflow-hidden rounded-2xl border border-sui-blue-bright/25 bg-sui-blue-bright/25 sm:grid-cols-2">
-          {STACK_ITEMS.map((item, index) => (
+          {COVERAGE_POINTS.map((item, index) => (
             <div
               key={item.label}
               className={`bg-black/40 p-6 md:p-7 ${index === 0 ? "sm:col-span-2 sm:bg-black/55" : ""}`}
@@ -53,6 +67,38 @@ export function LandingStackSection() {
             </div>
           ))}
         </dl>
+
+        <details className="group mt-8 rounded-2xl border border-white/10 bg-black/30 px-6 py-5 open:pb-6">
+          <summary className="cursor-pointer list-none font-display text-base font-medium text-white/90 marker:content-none [&::-webkit-details-marker]:hidden">
+            <span className="inline-flex items-center gap-2">
+              For builders
+              <svg
+                width="12"
+                height="12"
+                viewBox="0 0 12 12"
+                fill="none"
+                aria-hidden
+                className="opacity-60 transition-transform duration-200 group-open:rotate-180"
+              >
+                <path
+                  d="M2 4L6 8L10 4"
+                  stroke="currentColor"
+                  strokeWidth="1.5"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
+            </span>
+          </summary>
+          <dl className="mt-5 grid gap-4 sm:grid-cols-3">
+            {BUILDER_DETAILS.map((item) => (
+              <div key={item.term}>
+                <dt className="text-sm font-medium text-sui-steel">{item.term}</dt>
+                <dd className="mt-2 text-[0.9rem] leading-[1.55] text-white/82">{item.detail}</dd>
+              </div>
+            ))}
+          </dl>
+        </details>
       </div>
     </section>
   );

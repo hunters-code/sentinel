@@ -18,7 +18,7 @@ const manrope = Manrope({
 export const metadata: Metadata = {
   title: "Sentinel — Crash insurance for your crypto",
   description:
-    "Protect your crypto before the next drop. Cover BTC, ETH, or SUI with one honest price, one tap, paid automatically if the price crashes. Built on DeepBook Predict · Sui.",
+    "Quote short-term crash cover for your crypto. BTC live on testnet — honest premium, one signature, automatic payout at oracle settlement. Built on DeepBook Predict · Sui.",
   manifest: "/manifest.webmanifest",
 };
 
@@ -31,7 +31,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="en" suppressHydrationWarning className={`${geologica.variable} ${manrope.variable}`}>
       <body suppressHydrationWarning>
         <Providers>{children}</Providers>
-      </body>
+      {/* impeccable-live-start */}
+<script src="http://localhost:8400/live.js"></script>
+{/* impeccable-live-end */}
+</body>
     </html>
   );
 }

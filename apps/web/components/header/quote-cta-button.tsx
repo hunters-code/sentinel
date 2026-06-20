@@ -8,6 +8,7 @@ type QuoteCtaButtonProps = {
   label?: string;
   className?: string;
   onClick?: () => void;
+  quiet?: boolean;
 };
 
 function LaunchArrowIcon() {
@@ -32,7 +33,24 @@ export function QuoteCtaButton({
   label = "Get a quote",
   className,
   onClick,
+  quiet = false,
 }: QuoteCtaButtonProps) {
+  if (quiet) {
+    return (
+      <Link
+        href={href}
+        className={cn(
+          "group inline-flex min-h-11 items-center justify-center gap-2.5 rounded-[26px] border border-white/22 bg-sui-black px-7 py-3 font-display text-[0.9375rem] font-medium leading-none tracking-[0.045em] text-white no-underline outline-none transition-[border-color,color] duration-200 ease-out hover:border-sui-blue-bright/35 hover:text-sui-blue-bright focus-visible:ring-2 focus-visible:ring-sui-blue-bright focus-visible:ring-offset-2 focus-visible:ring-offset-sui-black active:opacity-90",
+          className,
+        )}
+        onClick={onClick}
+      >
+        <span>{label}</span>
+        <LaunchArrowIcon />
+      </Link>
+    );
+  }
+
   return (
     <Link
       href={href}

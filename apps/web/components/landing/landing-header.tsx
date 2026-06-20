@@ -208,7 +208,7 @@ export function LandingHeader() {
         </nav>
 
         <div className="hidden justify-end text-base md:flex lg:text-lg">
-          <QuoteCtaButton href="/app" />
+          <QuoteCtaButton href="/app" quiet />
         </div>
       </div>
 
@@ -280,7 +280,7 @@ export function LandingHeader() {
             </ul>
           </nav>
           <div className="mt-auto pt-10">
-            <QuoteCtaButton href="/app" className="w-full" onClick={() => setMobileOpen(false)} />
+            <QuoteCtaButton href="/app" quiet className="w-full" onClick={() => setMobileOpen(false)} />
           </div>
         </div>
       </dialog>

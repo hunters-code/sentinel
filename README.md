@@ -1,6 +1,6 @@
 # Sentinel
 
-One-hour parametric crash insurance for BTC, built on [DeepBook Predict](https://deepbook.tech) (Sui).
+Short-term parametric crash insurance for BTC, built on [DeepBook Predict](https://deepbook.tech) (Sui). Coverage runs until the selected oracle expiry — not a fixed duration from purchase.
 
 Enter how much BTC you hold → get one premium quote → sign one transaction → receive automatic payout if BTC settles at or below your trigger price before the chosen oracle expiry.
 

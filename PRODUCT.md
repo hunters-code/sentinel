@@ -1,6 +1,10 @@
-# Sentinel — One-Hour Crash Insurance for BTC
+# Sentinel — Short-Term Crash Insurance for BTC
 
 Product specification, v1.0
+
+## Register
+
+product
 
 ## Users
 
@@ -8,23 +12,49 @@ BTC holders who are not options traders and feel acute event risk (FOMC minutes,
 
 ## Product Purpose
 
-Turn a deep out-of-the-money DOWN binary on DeepBook Predict into something a normal BTC holder understands instantly: one-hour crash insurance. The user enters how much BTC they hold, gets one premium, presses one button, and gets one receipt — and is paid automatically if BTC settles at or below the trigger before expiry.
+Turn a deep out-of-the-money DOWN binary on DeepBook Predict into something a normal BTC holder understands instantly: short-term parametric crash insurance. The user enters how much BTC they hold, gets one premium, presses one button, and gets one receipt — and is paid automatically if BTC settles at or below the trigger before the oracle expiry shown on the quote.
+
+## Brand Personality
+
+**Calm · Expert · Honest**
+
+Voice is steady under volatility — no panic CTAs, no yield-farm hype. Expert means the UI shows its work (fair value, spread, protocol floor) instead of black-box quotes. Honest means parametric limits and counterparty risk are visible on the quote and receipt, not buried.
+
+**Reference:** [sui.io](https://www.sui.io/) — protocol-native dark surfaces, confident typography, premium motion restraint. Sentinel should feel like it belongs on that stack, not like a third-party skin.
+
+## Anti-references
+
+- **Prediction-market clone.** No Polymarket/Kalshi visual language — event tiles, YES/NO chips, crowd odds, or meme-market energy. Sentinel is insurance framing (premium, coverage, trigger, receipt), not a betting interface.
+
+## Design Principles
+
+1. **Calm under volatility.** Layout and copy stay legible when the user is anxious; status and price updates do the drama, not decorative motion.
+2. **Show the math.** Every premium is decomposable (fair value, spread, floor). Skeptical users can audit the number without leaving the flow.
+3. **One decision per screen.** Quote → receipt → history. No strike ladders, no trader chrome, no parallel paths on MVP screens.
+4. **Native to Sui.** Dark protocol surface (Geologica + Manrope, sui-blue accent) — not generic cream SaaS or exchange-terminal density.
+5. **Motion with purpose.** Animation serves status and hierarchy; hero motion is optional atmosphere. Respect `prefers-reduced-motion` everywhere.
+
+## Accessibility & Inclusion
+
+- **Motion-sensitive:** keep animation minimal beyond status feedback (settlement chips, quote freshness, loading). Hero mesh and staggered reveals are decorative — disable or crossfade under reduced motion (already partially implemented).
+- **Focus and contrast:** maintain visible focus rings on interactive elements; body and muted text must meet WCAG 2.1 AA on dark surfaces.
+- **State without color alone:** payout/settlement outcomes use label + icon/chip text, not hue alone.
 
 ## 1. One-liner
 
-> Insure your BTC for the next hour. Premium: $1.40. Settled on-chain in under 60 minutes.
+> Cover your BTC through the next oracle window. Premium: $1.40. Payout settles automatically at expiry.
 
-Sentinel is a single-purpose consumer app. The user tells us how much BTC they hold, we quote one premium, they press one button, and they get one receipt. If BTC crashes through the trigger price before the hour is up, they get paid automatically. Under the hood it is exactly one well-priced `predict::mint` of a deep out-of-the-money DOWN binary on DeepBook Predict, plus honest premium math derived from the live SVI volatility surface.
+Sentinel is a single-purpose consumer app. The user tells us how much BTC they hold, we quote one premium, they press one button, and they get one receipt. If BTC crashes through the trigger price before the quoted oracle expiry, they get paid automatically. Under the hood it is exactly one well-priced `predict::mint` of a deep out-of-the-money DOWN binary on DeepBook Predict, plus honest premium math derived from the live SVI volatility surface.
 
 ## 2. Why this product
 
 - **Reframing, not invention.** A deep-OTM downside binary *is* parametric crash insurance. Nobody outside of options desks thinks of it that way. We sell the insurance framing: premium, coverage, trigger, payout, receipt.
 - **A primitive only Predict makes possible.** This needs (a) any strike priced against a live vol surface, not hand-listed events, (b) sub-hour rolling expiries, and (c) a vault (PLP) that always takes the other side. Polymarket/Kalshi can do none of the three.
-- **Demo-friendly.** The full user story — buy a policy, watch the hour, get paid (or not) — completes inside a single demo slot.
+- **Demo-friendly.** The full user story — buy a policy, watch through expiry, get paid (or not) — completes inside a single demo slot.
 
 ## 3. Target user
 
-Someone who holds BTC, is not an options trader, and feels event risk (FOMC minutes, CPI print, a cascading liquidation on a Friday night). They will never open a strike ladder. They will press a button that says "Protect my Bitcoin for the next hour — $1.40".
+Someone who holds BTC, is not an options trader, and feels event risk (FOMC minutes, CPI print, a cascading liquidation on a Friday night). They will never open a strike ladder. They will press a button that says "Protect my Bitcoin — $1.40" with the exact expiry time on the quote.
 
 ## 4. Product definition
 
@@ -35,7 +65,7 @@ A Sentinel policy is a fixed-payout (parametric) insurance contract:
 | Term | Definition |
 |---|---|
 | Underlying | BTC/USD, as settled by the Predict BTC oracle |
-| Coverage window | From purchase until the expiry of the selected sub-hour oracle (≈ 30–60 min) |
+| Coverage window | From purchase until the expiry of the selected sub-hour oracle (duration set by oracle schedule, shown on quote and receipt) |
 | Trigger | A strike price `K` below current spot (default: 2% below, snapped to the oracle strike grid) |
 | Payout | Fixed amount `P` in dUSDC, paid if BTC settles **at or below** `K` at expiry |
 | Premium | The on-chain ask cost of minting `P` contracts of the DOWN binary at strike `K` |
@@ -181,7 +211,7 @@ The keeper is a single small Node process: subscribe to `OracleSettled` for the 
 ## 7. Disclosures (shown in-product, not buried)
 
 1. **Parametric, not indemnity.** Payout is fixed and all-or-nothing at the settlement print. A crash deeper than the trigger pays the same fixed amount; a crash that recovers before expiry settlement pays nothing.
-2. **Coverage window is the oracle expiry,** not a literal 60 minutes from purchase. The exact expiry time is on the quote and the receipt.
+2. **Coverage window is the oracle expiry,** not a fixed duration from purchase. The exact expiry time is on the quote and the receipt.
 3. **Counterparty is the PLP vault.** Payouts depend on vault solvency; the protocol caps total exposure at 80% of vault capital, and a mint can be rejected when the vault is at capacity.
 4. **Minimum premium is 1% of coverage** due to the protocol ask floor, even when fair value is lower.
 5. **Not regulated insurance.** It is an on-chain options position presented with insurance framing.
@@ -193,7 +223,7 @@ The keeper is a single small Node process: subscribe to `OracleSettled` for the 
 | Oracle stale (> 30s without price update) | Quote disabled, "Pricing temporarily unavailable" |
 | Trading paused (`ETradingPaused`) | Same as above, with reason |
 | Ask out of bounds (`EAskPriceOutOfBounds`) | Re-quote; if floor-clamped, show floor disclosure |
-| Vault exposure cap hit | "Coverage sold out for this hour — next window at HH:MM" |
+| Vault exposure cap hit | "Coverage sold out for this oracle window — next window at HH:MM" |
 | Executed cost > preview + 5% | Abort before signing, re-quote |
 | Nearest expiry < 15 min | Quote against the next oracle |
 | predict-server lag after tx | Receipt renders from tx effects + direct object read first, server data backfills |
@@ -215,7 +245,7 @@ The keeper is a single small Node process: subscribe to `OracleSettled` for the 
 1. Trigger selector (−1.5% / −2% / −3%) with live premium per option
 2. Early cancel with partial refund
 3. Shareable receipt image
-4. Auto-renew ("keep me covered hour after hour") — recurring mint at each new expiry
+4. Auto-renew ("keep me covered through each new expiry") — recurring mint at each new oracle window
 5. Range-based deductible variant (`mint_range` bear band) for proportional payouts
 
 ### Explicitly out of scope
