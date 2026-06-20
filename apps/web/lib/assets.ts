@@ -1,3 +1,5 @@
+import { TEST_BTC_TYPE, TEST_ETH_TYPE, TEST_SUI_TYPE } from "@sentinel/shared";
+
 export type AssetId = "btc" | "eth" | "sui";
 
 export type Asset = {
@@ -8,18 +10,20 @@ export type Asset = {
   name: string;
   /** Brand tint for the asset mark */
   tint: string;
+  /** On-chain coin type of the (testnet) asset the user holds */
+  coinType: string;
   /**
-   * True when a live testnet oracle prices this asset. Only `live` assets can
-   * be quoted; the others render a "coming soon" state so the UI never offers
-   * cover it can't actually sell.
+   * True when the asset can be quoted and covered. All three share the BTC
+   * settlement oracle on testnet today; flip to `false` to park an asset in the
+   * "coming soon" state until it gets its own oracle.
    */
   live: boolean;
 };
 
 export const ASSETS: Asset[] = [
-  { id: "btc", symbol: "BTC", name: "Bitcoin", tint: "#f7931a", live: true },
-  { id: "eth", symbol: "ETH", name: "Ethereum", tint: "#627eea", live: false },
-  { id: "sui", symbol: "SUI", name: "Sui", tint: "#4da2ff", live: false },
+  { id: "btc", symbol: "BTC", name: "Bitcoin", tint: "#f7931a", coinType: TEST_BTC_TYPE, live: true },
+  { id: "eth", symbol: "ETH", name: "Ethereum", tint: "#627eea", coinType: TEST_ETH_TYPE, live: false },
+  { id: "sui", symbol: "SUI", name: "Sui", tint: "#4da2ff", coinType: TEST_SUI_TYPE, live: false },
 ];
 
 export const DEFAULT_ASSET = ASSETS[0]!;

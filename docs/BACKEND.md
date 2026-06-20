@@ -110,7 +110,7 @@ const minted = await api.getMintedPositions({ oracleId: "0x…" });
 
 Supported endpoints: `/status`, `/predicts/:id/oracles`, `/oracles/:id/state`, `/positions/minted`, `/positions/redeemed`, `/managers/:id/positions/summary`.
 
-## Production notes (hackathon scope)
+## Production notes
 
 - Fund the keeper key with testnet SUI for gas.
 - Run one keeper instance; duplicate instances are safe but waste gas racing the same redeems.

@@ -1,0 +1,12 @@
+{
+  "network": "testnet",
+  "packageId": "0xeed1d11ec44e284eacb8ce840f3898d0240f3b4cb0c614822446a9edabee496c",
+  "mintCapId": "0xd6aa5509b091ff2441bc5a78e372763c3e066e923804ddea8bff71e905eddc3e",
+  "coinType": "0xeed1d11ec44e284eacb8ce840f3898d0240f3b4cb0c614822446a9edabee496c::test_sui::TEST_SUI",
+  "coinMetadataId": "0x8de6ad4977228b5c1f71e95a9d7b1ca6285fc047a6ca460a12cb5c6c9f9b2c7e",
+  "decimals": 9,
+  "symbol": "tSUI",
+  "maxMintPerCall": "100000000000",
+  "maxMintPerCallSui": "100",
+  "txDigest": "8PZUaQ2F3aiQ63LmBv4TVCTEHkTe67WhsGwkXpEs7Y5A"
+}

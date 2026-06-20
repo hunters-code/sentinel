@@ -14,7 +14,6 @@ Under the hood, a policy is exactly one well-priced `predict::mint` of a deep
 out-of-the-money DOWN binary, with premium math derived from the live SVI
 volatility surface.
 
-- Track: DeepBook Predict (Sui Overflow), hackathon scope.
 - Full product spec: `PRODUCT.md` (English) and `PRODUCT.id.md` (Indonesian).
   These are the source of truth — read them before non-trivial changes.
 
@@ -102,7 +101,7 @@ Next.js PWA  (quote · receipt · history)
 | Quote asset | `e95040085976bfd54a1a07225cd46c8a2b4e8e2b6732f140a0fc49850ba73e1a::dusdc::DUSDC` |
 | Indexer | `https://predict-server.testnet.mystenlabs.com` |
 
-## Scope (hackathon)
+## Scope
 
 **MVP (must work end-to-end):** BTC + dUSDC only, one default trigger (−2%),
 nearest valid expiry, quote screen with honest breakdown, single-signature

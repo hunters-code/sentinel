@@ -1,8 +1,6 @@
 # Sentinel — One-Hour Crash Insurance for BTC
 
-Product specification, v1.0 (hackathon scope)
-
-Track: DeepBook Predict (Sui Overflow)
+Product specification, v1.0
 
 ## Users
 
@@ -86,7 +84,7 @@ premium = ask × quantity
 - `spread = max(min_spread, base_spread × √(p(1−p)) × utilization_term)` — defaults: base 2%, floor 0.5%, widening with vault utilization.
 - **Protocol floor:** Predict rejects mints with ask below `min_ask_price = 1¢` per contract (`default_min_ask_price = 10_000_000` at 1e9 scaling). Deep-OTM binaries therefore cost **at least 1% of coverage per policy**, even when the SVI fair value is lower. The premium breakdown screen shows this floor explicitly when it binds: "Fair value: 0.3¢ · Minimum the protocol will sell at: 1¢."
 
-The receipt shows: fair value, spread, effective rate (premium ÷ coverage), and annualized-equivalent cost, so a skeptical user (or judge) can audit the number. This is the "honest premium math from the SVI surface" pillar — we show our work instead of quoting a black-box number.
+The receipt shows: fair value, spread, effective rate (premium ÷ coverage), and annualized-equivalent cost, so a skeptical user can audit the number. This is the "honest premium math from the SVI surface" pillar — we show our work instead of quoting a black-box number.
 
 ### 4.5 Slippage protection
 
@@ -203,7 +201,7 @@ The keeper is a single small Node process: subscribe to `OracleSettled` for the 
 
 ## 9. Scope
 
-### MVP (must work end-to-end for judging)
+### MVP (must work end-to-end)
 
 - BTC only, dUSDC only, one default trigger (−2%), nearest valid expiry
 - Quote screen with live premium and honest breakdown
@@ -226,6 +224,6 @@ The keeper is a single small Node process: subscribe to `OracleSettled` for the 
 
 ## 10. Success criteria
 
-- **Hackathon minimum bar:** integrates the testnet Predict contract; full flow (quote → mint → settle → payout) testable end-to-end by judges.
+- **Minimum bar:** integrates the testnet Predict contract; full flow (quote → mint → settle → payout) testable end-to-end.
 - **Demo script (≤ 3 min):** enter 0.5 BTC → see $14 premium with the math expander open → one signature → receipt with live trigger line → fast-forward to a settled oracle from a pre-purchased policy → payout already claimed by the keeper → withdraw to wallet.
 - **Quality bar:** quoted premium within 5% of executed cost in ≥ 95% of purchases; keeper claims within 60s of `OracleSettled`; zero stranded settled positions over the demo period.

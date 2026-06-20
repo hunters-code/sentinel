@@ -4,7 +4,7 @@ One-hour parametric crash insurance for BTC, built on [DeepBook Predict](https:/
 
 Enter how much BTC you hold → get one premium quote → sign one transaction → receive automatic payout if BTC settles at or below your trigger price before the chosen oracle expiry.
 
-> **Hackathon scope:** Sui testnet only · BTC + dUSDC · single default trigger (−2%) · nearest valid oracle expiry.
+> **Current scope:** Sui testnet only · BTC + dUSDC · single default trigger (−2%) · nearest valid oracle expiry.
 
 ---
 

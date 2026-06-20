@@ -26,7 +26,7 @@ slug: apps-web-app-page-tsx
 
 ## Anti-Patterns Verdict
 
-**LLM assessment:** Moderate-to-strong AI tells. The page avoids the cream SaaS default (good — committed Sui dark + blue is on-brand), but stacks multiple 2024–2026 landing scaffolds: large `01/02/03` step markers in "How it works," a second numbered `01/02/03` set in the stack cards, uppercase tracked micro-labels, a three-column identical card grid with tinted backgrounds, a scrolling tech buzzword marquee, and a blurred glass header. Together these read as "competent Web3 hackathon landing" rather than a distinctive insurance product with a POV. The custom BTC chart SVG is the strongest original element; everything around it feels template-assembled.
+**LLM assessment:** Moderate-to-strong AI tells. The page avoids the cream SaaS default (good — committed Sui dark + blue is on-brand), but stacks multiple 2024–2026 landing scaffolds: large `01/02/03` step markers in "How it works," a second numbered `01/02/03` set in the stack cards, uppercase tracked micro-labels, a three-column identical card grid with tinted backgrounds, a scrolling tech buzzword marquee, and a blurred glass header. Together these read as "competent Web3 landing" rather than a distinctive insurance product with a POV. The custom BTC chart SVG is the strongest original element; everything around it feels template-assembled.
 
 **Deterministic scan:** `detect.mjs` on `apps/web/app/page.tsx` and `apps/web/components/landing/` returned **0 findings** (clean exit). Manual review still flags numbered-section markers, uppercase tracked labels, and glassmorphism in the fixed header — patterns the detector did not catch on this pass.
 

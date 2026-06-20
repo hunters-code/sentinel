@@ -1,8 +1,6 @@
 # Sentinel — Asuransi Crash Satu Jam untuk BTC
 
-Spesifikasi produk, v1.0 (ruang lingkup hackathon)
-
-Track: DeepBook Predict (Sui Overflow)
+Spesifikasi produk, v1.0
 
 ## 1. One-liner
 
@@ -78,7 +76,7 @@ premium = ask × quantity
 - `spread = max(min_spread, base_spread × √(p(1−p)) × utilization_term)` — default: base 2%, floor 0,5%, melebar dengan utilisasi vault.
 - **Floor protokol:** Predict menolak mint dengan ask di bawah `min_ask_price = 1¢` per kontrak (`default_min_ask_price = 10_000_000` pada skala 1e9). Binary deep-OTM karenanya biayanya **minimal 1% dari coverage per polis**, meskipun nilai wajar SVI lebih rendah. Layar breakdown premi menampilkan floor ini secara eksplisit saat mengikat: "Nilai wajar: 0,3¢ · Minimum yang protokol jual: 1¢."
 
-Tanda terima menampilkan: nilai wajar, spread, tarif efektif (premi ÷ coverage), dan biaya setara tahunan, sehingga pengguna (atau juri) yang skeptis dapat mengaudit angkanya. Ini adalah pilar "perhitungan premi transparan dari permukaan SVI" — kami menunjukkan perhitungan kami alih-alih mengutip angka black-box.
+Tanda terima menampilkan: nilai wajar, spread, tarif efektif (premi ÷ coverage), dan biaya setara tahunan, sehingga pengguna yang skeptis dapat mengaudit angkanya. Ini adalah pilar "perhitungan premi transparan dari permukaan SVI" — kami menunjukkan perhitungan kami alih-alih mengutip angka black-box.
 
 ### 4.5 Proteksi slippage
 
@@ -195,7 +193,7 @@ Keeper adalah satu proses Node kecil: subscribe ke `OracleSettled` untuk paket P
 
 ## 9. Ruang lingkup
 
-### MVP (harus berfungsi end-to-end untuk penilaian)
+### MVP (harus berfungsi end-to-end)
 
 - BTC saja, dUSDC saja, satu trigger default (−2%), expiry valid terdekat
 - Layar quote dengan premi live dan breakdown transparan
@@ -218,6 +216,6 @@ Keeper adalah satu proses Node kecil: subscribe ke `OracleSettled` untuk paket P
 
 ## 10. Kriteria sukses
 
-- **Batas minimum hackathon:** mengintegrasikan kontrak Predict testnet; alur lengkap (quote → mint → settle → payout) dapat diuji end-to-end oleh juri.
+- **Batas minimum:** mengintegrasikan kontrak Predict testnet; alur lengkap (quote → mint → settle → payout) dapat diuji end-to-end.
 - **Skrip demo (≤ 3 menit):** masukkan 0,5 BTC → lihat premi $14 dengan expander matematika terbuka → satu signature → tanda terima dengan baris trigger live → fast-forward ke oracle yang settle dari polis yang sudah dibeli sebelumnya → payout sudah diklaim keeper → tarik ke wallet.
 - **Batas kualitas:** premi yang dikutip dalam 5% dari biaya eksekusi pada ≥ 95% pembelian; keeper mengklaim dalam 60 detik setelah `OracleSettled`; nol posisi settle yang terlantar selama periode demo.

@@ -1,8 +1,8 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { usd } from "@/lib/format";
-import { useWalletBtc } from "@/lib/use-wallet-btc";
+import { usd, usdAuto } from "@/lib/format";
+import { useWalletAsset } from "@/lib/use-wallet-btc";
 import { useManagerId } from "@/lib/use-manager";
 import { useManagerBalance } from "@/lib/use-manager-balance";
 import { useOracleData, useOnChainPremium } from "@/lib/use-oracle-data";
@@ -20,6 +20,7 @@ import { PrimaryButton } from "@/components/app/ui/primary-button";
 import { AssetSelector } from "@/components/app/asset-selector";
 import { AssetLogo } from "@/components/app/asset-logo";
 import { DEFAULT_ASSET, getAsset, type AssetId } from "@/lib/assets";
+import { useSpotPrice, niceTick } from "@/lib/use-spot-price";
 import { QuoteFreshness, useQuoteFreshness } from "@/components/app/quote-freshness";
 import { QuoteLiveLine } from "@/components/app/quote-live-line";
 import { PricingBreakdown } from "@/components/app/pricing-breakdown";
@@ -30,16 +31,16 @@ type CoverPanelProps = {
 };
 
 export function CoverPanel({ onViewHistory }: CoverPanelProps) {
-  const { btc: detectedBtc, fromWallet, loading: btcLoading } = useWalletBtc();
-  const { options, loading: oracleLoading } = useOracleOptions();
-  const { managerId } = useManagerId();
-  const { balance: managerBalanceUsd } = useManagerBalance(managerId);
-
   const [btcInput, setBtcInput] = useState("");
   const [btcTouched, setBtcTouched] = useState(false);
   const [termId, setTermId] = useState<string>(COVER_TERMS[0]!.id);
   const [assetId, setAssetId] = useState<AssetId>(DEFAULT_ASSET.id);
   const asset = getAsset(assetId);
+
+  const { amount: detectedBtc, fromWallet, loading: btcLoading } = useWalletAsset(asset.coinType);
+  const { options, loading: oracleLoading } = useOracleOptions();
+  const { managerId } = useManagerId();
+  const { balance: managerBalanceUsd } = useManagerBalance(managerId);
 
   const { purchase, status, error, txDigest } = usePurchase();
   const signing = status === "checking" || status === "signing" || status === "confirming";
@@ -50,19 +51,35 @@ export function CoverPanel({ onViewHistory }: CoverPanelProps) {
     }
   }, [detectedBtc, btcTouched]);
 
+  // Switching asset re-detects the new asset's balance into the input.
+  useEffect(() => {
+    setBtcTouched(false);
+  }, [assetId]);
+
   const btcHeld = Math.max(0, Number(btcInput) || 0);
   const selectedTerm = COVER_TERMS.find((t) => t.id === termId) ?? COVER_TERMS[0]!;
   const { oracle: selectedOracle, capped } = snapTermToOracle(options, selectedTerm);
-  const { spot, svi } = useOracleData(selectedOracle?.oracleId ?? null);
+  const { spot: oracleSpot, svi } = useOracleData(selectedOracle?.oracleId ?? null);
+
+  // BTC settles off its own oracle; other assets price off a third-party feed
+  // (their real market price) on a per-asset strike grid until they get oracles.
+  const feedSpot = useSpotPrice(asset.id);
+  const spot = asset.id === "btc" ? oracleSpot : feedSpot;
+  const quoteOracle = useMemo(() => {
+    if (!selectedOracle || asset.id === "btc") return selectedOracle;
+    return { ...selectedOracle, minStrikeUsd: 0, tickUsd: niceTick(spot) };
+  }, [selectedOracle, asset.id, spot]);
 
   const baseQuote = useMemo(
-    () => buildCoverQuote(btcHeld, selectedOracle, spot, svi),
+    () => buildCoverQuote(btcHeld, quoteOracle, spot, svi),
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [btcHeld, selectedOracle, spot, svi],
+    [btcHeld, quoteOracle, spot, svi],
   );
 
+  // On-chain premium previews against the BTC oracle, so only BTC can use it.
+  // ETH/SUI show the (real-priced) SVI estimate until they get their own oracle.
   const { premium: livePremium, loading: premiumLoading } = useOnChainPremium({
-    oracleId: selectedOracle?.oracleId ?? null,
+    oracleId: asset.id === "btc" ? (selectedOracle?.oracleId ?? null) : null,
     expiryRaw: selectedOracle?.expiryMs ?? null,
     strikeUsd: baseQuote.strike,
     coverageUsd: baseQuote.coverage,
@@ -221,7 +238,7 @@ export function CoverPanel({ onViewHistory }: CoverPanelProps) {
 
           {quoteReady && (
             <Panel>
-              <Muted className="mb-3">{asset.symbol} at {usd(quote.spot, 0)} · trigger −2%</Muted>
+              <Muted className="mb-3">{asset.symbol} at {usdAuto(quote.spot)} · trigger −2%</Muted>
               <QuoteLiveLine
                 strike={quote.strike}
                 expiryMs={quote.expiryMs}
@@ -263,6 +280,13 @@ export function CoverPanel({ onViewHistory }: CoverPanelProps) {
               {demoOracle && (
                 <p className="text-sm leading-relaxed" role="alert" style={{ color: "var(--sui-steel)" }}>
                   No settlement window available — try a different term.
+                </p>
+              )}
+
+              {asset.id !== "btc" && (
+                <p className="text-sm leading-relaxed" style={{ color: "var(--sui-steel)" }}>
+                  Priced from {asset.name}&apos;s live market rate. On-chain purchase opens once{" "}
+                  {asset.symbol} has its own settlement oracle — {DEFAULT_ASSET.symbol} is live now.
                 </p>
               )}
 

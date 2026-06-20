@@ -1,0 +1,12 @@
+{
+  "network": "testnet",
+  "packageId": "0x1873fce9ebfa91d0f56ba89378250fa7d748f02e9e2fee8adf0dceb495688b9f",
+  "mintCapId": "0x1b0d7b5e66824d157e1303a2fc550f8f391a7df50bcd7b09d161808ef08619c4",
+  "coinType": "0x1873fce9ebfa91d0f56ba89378250fa7d748f02e9e2fee8adf0dceb495688b9f::test_eth::TEST_ETH",
+  "coinMetadataId": "0x3c70fe8104681d0c98cc40c554ae36622fa7abf2e97ae90439b7326334513dce",
+  "decimals": 8,
+  "symbol": "tETH",
+  "maxMintPerCall": "1000000000",
+  "maxMintPerCallEth": "10",
+  "txDigest": "FVwELf9qMRNWdXeMcjcu35rXPsqHTzLYB8b4JWWKywLW"
+}

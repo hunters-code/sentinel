@@ -3,36 +3,50 @@
 import { useCurrentAccount, useSuiClient } from "@mysten/dapp-kit";
 import { useQuery } from "@tanstack/react-query";
 
-const DEMO_BTC_FALLBACK = 0.5;
+const DEMO_FALLBACK: Record<string, number> = {
+  btc: 0.5,
+  eth: 2,
+  sui: 100,
+};
 
-/** Scans wallet for a coin type containing "btc". Falls back for testnet demos. */
-export function useWalletBtc() {
+function fallbackFor(coinType: string): number {
+  const t = coinType.toLowerCase();
+  if (t.includes("eth")) return DEMO_FALLBACK.eth!;
+  if (t.includes("sui")) return DEMO_FALLBACK.sui!;
+  return DEMO_FALLBACK.btc!;
+}
+
+/**
+ * Reads the connected wallet's balance of a specific (testnet) coin type.
+ * Falls back to a sensible demo amount when the wallet holds none, so the
+ * quote flow is explorable without first minting test tokens.
+ */
+export function useWalletAsset(coinType: string) {
   const account = useCurrentAccount();
   const client = useSuiClient();
   const address = account?.address;
 
   const query = useQuery({
-    queryKey: ["wallet-btc", address],
+    queryKey: ["wallet-asset", address, coinType],
     enabled: Boolean(address),
     staleTime: 30_000,
     queryFn: async () => {
-      const balances = await client.getAllBalances({ owner: address! });
-      const btcCoin = balances.find((b) => b.coinType.toLowerCase().includes("btc"));
+      const balance = await client.getBalance({ owner: address!, coinType });
 
-      if (!btcCoin || btcCoin.totalBalance === "0") {
-        return { amount: DEMO_BTC_FALLBACK, fromWallet: false as const };
+      if (!balance || balance.totalBalance === "0") {
+        return { amount: fallbackFor(coinType), fromWallet: false as const };
       }
 
-      const meta = await client.getCoinMetadata({ coinType: btcCoin.coinType });
+      const meta = await client.getCoinMetadata({ coinType });
       const decimals = meta?.decimals ?? 8;
-      const amount = Number(btcCoin.totalBalance) / 10 ** decimals;
+      const amount = Number(balance.totalBalance) / 10 ** decimals;
 
       return { amount, fromWallet: true as const };
     },
   });
 
   return {
-    btc: query.data?.amount ?? null,
+    amount: query.data?.amount ?? null,
     fromWallet: query.data?.fromWallet ?? false,
     loading: query.isLoading,
     error: query.isError,
