@@ -38,29 +38,37 @@ export function AppSidebarAccountMenu({ address }: { address: string }) {
   }
 
   return (
-    <div ref={rootRef} className="app-sidebar-account-menu">
+    <div ref={rootRef} className="relative w-full">
       <button
         type="button"
-        className="app-sidebar-bottom-account-trigger"
+        className="flex w-full cursor-pointer items-center gap-1.5 border-none bg-transparent p-0 text-xs font-medium leading-[1.2] text-content-persistent-white opacity-[0.92] transition-opacity duration-150 hover:opacity-100"
         title={address}
         aria-expanded={open}
         aria-haspopup="menu"
         onClick={() => setOpen((value) => !value)}
       >
-        <span className="app-sidebar-bottom-account">{shortAddr(address)}</span>
+        <span className="min-w-0 flex-1 overflow-hidden text-ellipsis whitespace-nowrap">
+          {shortAddr(address)}
+        </span>
         <ChevronUp
           size={14}
           strokeWidth={2}
-          className={cn("app-sidebar-account-chevron", open && "app-sidebar-account-chevron-open")}
+          className={cn(
+            "shrink-0 opacity-60 transition-[transform,opacity] duration-150",
+            open && "opacity-90",
+          )}
           aria-hidden
         />
       </button>
       {open ? (
-        <div className="app-sidebar-account-dropdown" role="menu">
+        <div
+          className="absolute inset-x-0 bottom-[calc(100%+0.5rem)] z-20 rounded-xl border border-border-neutral bg-sui-black p-1 shadow-[0_8px_24px_rgba(0,0,0,0.35)]"
+          role="menu"
+        >
           <button
             type="button"
             role="menuitem"
-            className="app-sidebar-account-dropdown-item"
+            className="block w-full cursor-pointer rounded-lg border-none bg-transparent py-2 px-2.5 text-left text-xs font-medium leading-[1.2] text-content-persistent-white transition-colors duration-150 hover:bg-white/[0.08]"
             onClick={handleDisconnect}
           >
             Disconnect

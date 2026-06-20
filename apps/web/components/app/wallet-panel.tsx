@@ -14,9 +14,7 @@ export function WalletPanel({ managerId }: { managerId: string | null }) {
   if (!managerId) {
     return (
       <Panel>
-        <h2 className="mb-2 text-lg" style={{ fontFamily: "var(--font-display)" }}>
-          No manager yet
-        </h2>
+        <h2 className="mb-2 font-display text-lg">No manager yet</h2>
         <Muted>
           Your first cover purchase creates a manager account to hold payouts until you withdraw to
           your wallet.
@@ -28,25 +26,19 @@ export function WalletPanel({ managerId }: { managerId: string | null }) {
   return (
     <Panel className="space-y-4">
       <Muted>Manager balance</Muted>
-      <p
-        className="text-3xl font-medium tabular-nums"
-        style={{ fontFamily: "var(--font-display)" }}
-        aria-live="polite"
-      >
+      <p className="font-display text-3xl font-medium tabular-nums" aria-live="polite">
         {balanceLoading ? "…" : usd(balance)}
       </p>
       <Muted>dUSDC ready to withdraw to your connected wallet</Muted>
 
       {error && (
-        <p className="text-sm" role="alert" style={{ color: "#fa8543" }}>
+        <p className="text-sm text-signal-orange" role="alert">
           {error}
         </p>
       )}
 
       {done ? (
-        <p className="text-sm font-medium" style={{ color: "#7df752" }}>
-          Sent to your wallet
-        </p>
+        <p className="text-sm font-medium text-signal-lime">Sent to your wallet</p>
       ) : (
         <PrimaryButton
           disabled={balance <= 0 || withdrawing || balanceLoading}

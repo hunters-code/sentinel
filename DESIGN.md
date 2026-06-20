@@ -115,7 +115,7 @@ The current shipped landing is **hero-only** — headline, lead, and "Get a quot
 
 The system rejects generic Web3 landing scaffolds (numbered section eyebrows on every block, identical three-card grids, buzzword marquees as the main event), cream SaaS defaults, and options-desk jargon above the fold.
 
-Landing implementation is Tailwind-first: layout, typography, color, spacing, and motion are expressed directly in component utility classes (including arbitrary values for gradients and timing), rather than landing-scoped custom selectors in `globals.css`.
+Landing implementation uses shared design tokens from `globals.css` with component-level utility composition, so landing and app surfaces keep one visual language.
 
 **Key Characteristics:**
 
@@ -245,7 +245,6 @@ Nav dropdown panels use a **functional glass treatment** (28px blur, deep navy f
 Full-viewport centered composition:
 
 1. **Background stack** (all `aria-hidden`): base linear + radial navy layers → five animated mesh blobs (Sui blue ramp + faint lime accent blob) → vignette overlay.
-2. **Copy block:** `HeroHeadline` (two `.hero-line` spans, staggered reveal) → `.landing-hero-lead` (`.hero-reveal`, delay 0.38s) → `.landing-hero-actions` with single `QuoteCtaButton` (`.hero-reveal`, delay 0.58s).
 2. **Copy block:** `HeroHeadline` (staggered `sentinel-rise` animation classes) → hero lead (`sentinel-rise`, delay 0.38s) → hero CTA row (`sentinel-rise`, delay 0.58s) with single `QuoteCtaButton`.
 3. **Illustration slot** (optional): `.landing-hero-visual` below copy — aspect-ratio container with bottom fade mask. Asset convention: `apps/web/components/landing/*-3d-glass.svg` or `apps/web/public/illustrations/` for static SVG; animated compositions as React components alongside `btc-chart.tsx`.
 

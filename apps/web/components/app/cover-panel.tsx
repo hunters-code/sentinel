@@ -108,20 +108,20 @@ export function CoverPanel({ onViewHistory }: CoverPanelProps) {
   };
 
   return (
-    <div className="app-cover-layout">
-      <div className="app-cover-sticky">
-        <Panel className="app-cover-sticky-panel">
+    <div className="flex flex-col">
+      <div className="sticky top-0 z-[2] -mx-1 mb-0 bg-card-fill pb-2.5">
+        <Panel className="rounded-2xl rounded-b-none border-b border-separator px-[1.125rem] py-4">
           <AssetSelector selected={assetId} onSelect={setAssetId} />
         </Panel>
       </div>
 
-      <div className="app-cover-scroll space-y-5">
+      <div className="space-y-5 pt-1">
         {!asset.live ? (
         <Panel className="text-center">
           <div className="mb-4 flex justify-center">
             <AssetLogo id={asset.id} size={48} />
           </div>
-          <h2 className="mb-2 text-lg" style={{ fontFamily: "var(--font-display)" }}>
+          <h2 className="mb-2 font-display text-lg">
             {asset.name} cover is coming to testnet
           </h2>
           <Muted className="mx-auto mb-6 max-w-sm">
@@ -131,8 +131,7 @@ export function CoverPanel({ onViewHistory }: CoverPanelProps) {
           <button
             type="button"
             onClick={() => setAssetId(DEFAULT_ASSET.id)}
-            className="inline-flex min-h-11 items-center gap-2 rounded-full border px-5 py-2.5 text-sm font-medium transition-colors hover:bg-white/5"
-            style={{ borderColor: "var(--sui-line)", color: "var(--sui-white)" }}
+            className="inline-flex min-h-11 items-center gap-2 rounded-full border border-border-neutral px-5 py-2.5 text-sm font-medium text-content-primary transition-colors hover:bg-white/5"
           >
             <AssetLogo id={DEFAULT_ASSET.id} size={18} />
             Cover {DEFAULT_ASSET.symbol} instead
@@ -144,16 +143,14 @@ export function CoverPanel({ onViewHistory }: CoverPanelProps) {
             <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
               <label
                 htmlFor="btc"
-                className="text-base font-medium"
-                style={{ fontFamily: "var(--font-display)" }}
+                className="font-display text-base font-medium"
               >
                 How much {asset.symbol} do you hold?
               </label>
               {fromWallet && detectedBtc != null && (
                 <button
                   type="button"
-                  className="min-h-11 rounded-full border px-3 py-1.5 text-sm transition-colors hover:bg-white/5"
-                  style={{ borderColor: "var(--sui-line)", color: "var(--sui-blue-bright)" }}
+                  className="min-h-11 rounded-full border border-border-neutral px-3 py-1.5 text-sm text-sui-blue-bright transition-colors hover:bg-white/5"
                   onClick={() => {
                     setBtcTouched(true);
                     setBtcInput(String(detectedBtc));
@@ -164,8 +161,7 @@ export function CoverPanel({ onViewHistory }: CoverPanelProps) {
               )}
             </div>
             <div
-              className="flex items-center gap-3 rounded-xl border px-4 py-3"
-              style={{ borderColor: "var(--sui-line)", background: "rgba(0,0,0,0.35)" }}
+              className="flex items-center gap-3 rounded-xl border border-border-neutral bg-black/35 px-4 py-3"
             >
               <input
                 id="btc"
@@ -175,14 +171,11 @@ export function CoverPanel({ onViewHistory }: CoverPanelProps) {
                   setBtcTouched(true);
                   setBtcInput(e.target.value.replace(/[^0-9.]/g, ""));
                 }}
-                className="min-w-0 flex-1 bg-transparent text-xl font-medium outline-none placeholder:text-[var(--sui-steel)]"
-                style={{ fontFamily: "var(--font-display)", color: "var(--sui-white)" }}
+                className="min-w-0 flex-1 bg-transparent font-display text-xl font-medium text-content-primary outline-none placeholder:text-content-secondary"
                 placeholder="0.00"
                 aria-describedby="btc-hint"
               />
-              <span className="text-sm font-medium" style={{ color: "var(--sui-steel)" }}>
-                {asset.symbol}
-              </span>
+              <span className="text-sm font-medium text-content-secondary">{asset.symbol}</span>
             </div>
             <Muted id="btc-hint" className="mt-3">
               {btcLoading
@@ -195,16 +188,14 @@ export function CoverPanel({ onViewHistory }: CoverPanelProps) {
 
           {hasAmount && (
             <Panel>
-              <h2 className="mb-1 text-lg" style={{ fontFamily: "var(--font-display)" }}>
-                Cover for how long?
-              </h2>
+              <h2 className="mb-1 font-display text-lg">Cover for how long?</h2>
               <Muted className="mb-5">
                 Trigger is −2% from today&apos;s {asset.symbol} price. Pick how long the cover runs.
               </Muted>
               <div
                 className={cn(
                   "flex flex-wrap gap-2",
-                  oracleLoading && "app-term-group-loading",
+                  oracleLoading && "pointer-events-none opacity-55",
                 )}
                 role="group"
                 aria-label="Coverage term"
@@ -218,16 +209,12 @@ export function CoverPanel({ onViewHistory }: CoverPanelProps) {
                       type="button"
                       onClick={() => setTermId(t.id)}
                       aria-pressed={active}
-                      className="min-h-11 rounded-full border px-4 py-2 text-sm font-medium transition-colors"
-                      style={
+                      className={cn(
+                        "min-h-11 rounded-full border px-4 py-2 text-sm font-medium transition-colors",
                         active
-                          ? {
-                            background: "var(--sui-blue)",
-                            color: "#000",
-                            borderColor: "var(--sui-blue)",
-                          }
-                          : { borderColor: "var(--sui-line)", color: "var(--sui-white)" }
-                      }
+                          ? "border-sui-blue bg-sui-blue text-sui-black"
+                          : "border-border-neutral text-content-primary",
+                      )}
                     >
                       {t.label}
                     </button>
@@ -262,7 +249,7 @@ export function CoverPanel({ onViewHistory }: CoverPanelProps) {
 
           {quoteReady && status === "success" ? (
             <Panel className="space-y-4">
-              <p className="font-medium" style={{ color: "#7df752" }}>
+              <p className="font-medium text-signal-lime">
                 Cover purchased — your receipt is in History.
               </p>
               {txDigest && (
@@ -272,8 +259,7 @@ export function CoverPanel({ onViewHistory }: CoverPanelProps) {
                     href={`https://suiscan.xyz/testnet/tx/${txDigest}`}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="underline"
-                    style={{ color: "var(--sui-blue-bright)" }}
+                    className="text-sui-blue-bright underline"
                   >
                     {txDigest.slice(0, 10)}…
                   </a>
@@ -284,7 +270,7 @@ export function CoverPanel({ onViewHistory }: CoverPanelProps) {
           ) : quoteReady ? (
             <div className="space-y-4">
               {status === "error" && error && (
-                <p className="text-sm" role="alert" style={{ color: "#fa8543" }}>
+                <p className="text-sm text-signal-orange" role="alert">
                   {error}
                 </p>
               )}

@@ -39,13 +39,11 @@ function PolicyRow({
     <Link
       href={href}
       className={cn(
-        "flex flex-wrap items-center justify-between gap-3 px-6 py-4 no-underline transition-colors hover:bg-white/[0.03] md:px-8",
-        bordered && "app-divider-top",
+        "flex flex-wrap items-center justify-between gap-3 px-6 py-4 text-sm text-content-primary no-underline transition-colors hover:bg-white/[0.03] md:px-8",
+        bordered && "border-t border-separator",
       )}
     >
-      <span className="text-sm" style={{ color: "var(--sui-white)" }}>
-        {label}
-      </span>
+      <span>{label}</span>
       <StatusChip tone={statusTone(status)}>{statusLabel(status, payout)}</StatusChip>
     </Link>
   );
@@ -60,15 +58,15 @@ export function HistoryPanel() {
 
   if (managerLoading || (managerId && isLoading)) {
     return (
-      <div className="app-skeleton-list" aria-busy="true" aria-label="Loading policies">
+      <div className="flex w-full flex-col gap-[0.35rem]" aria-busy="true" aria-label="Loading policies">
         {[0, 1, 2].map((i) => (
-          <div key={i} className="app-skeleton-row">
-            <div className="app-skeleton-circle" />
-            <div className="app-skeleton-lines">
-              <div className="app-skeleton-line app-skeleton-line-lg" />
-              <div className="app-skeleton-line app-skeleton-line-sm" />
+          <div key={i} className="flex items-center gap-3 py-[0.85rem]">
+            <div className="h-11 w-11 shrink-0 animate-skeleton-pulse rounded-full bg-white/[0.08]" />
+            <div className="flex min-w-0 flex-1 flex-col gap-[0.45rem]">
+              <div className="h-[0.45rem] w-[58%] animate-skeleton-pulse rounded-full bg-white/[0.08]" />
+              <div className="h-[0.45rem] w-[38%] animate-skeleton-pulse rounded-full bg-white/[0.08]" />
             </div>
-            <div className="app-skeleton-line app-skeleton-line-xs" />
+            <div className="h-[0.45rem] w-10 shrink-0 animate-skeleton-pulse rounded-full bg-white/[0.08]" />
           </div>
         ))}
       </div>
@@ -103,9 +101,7 @@ export function HistoryPanel() {
   if (managerId && !isError) {
     return (
       <Panel>
-        <h2 className="mb-2 text-lg" style={{ fontFamily: "var(--font-display)" }}>
-          No policies yet
-        </h2>
+        <h2 className="mb-2 font-display text-lg">No policies yet</h2>
         <Muted>
           Buy cover on the Cover tab. After your purchase confirms, policies appear here with live
           settlement status.
@@ -117,9 +113,7 @@ export function HistoryPanel() {
   if (managerId && isError) {
     return (
       <Panel>
-        <h2 className="mb-2 text-lg" style={{ fontFamily: "var(--font-display)" }}>
-          History unavailable
-        </h2>
+        <h2 className="mb-2 font-display text-lg">History unavailable</h2>
         <Muted>
           Keeper is offline — policy history couldn&apos;t be loaded. Try again shortly.
         </Muted>
@@ -129,9 +123,7 @@ export function HistoryPanel() {
 
   return (
     <Panel>
-      <h2 className="mb-2 text-lg" style={{ fontFamily: "var(--font-display)" }}>
-        No policies yet
-      </h2>
+      <h2 className="mb-2 font-display text-lg">No policies yet</h2>
       <Muted>
         Connect your wallet and buy cover on the Cover tab. After your purchase confirms,
         policies appear here with live settlement status.

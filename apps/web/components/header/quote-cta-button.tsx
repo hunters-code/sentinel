@@ -37,19 +37,19 @@ export function QuoteCtaButton({
     <Link
       href={href}
       className={cn(
-        "group relative inline-flex min-h-11 items-center justify-center overflow-hidden rounded-[26px] border border-white/20 p-[1px] no-underline outline-none transition-transform duration-200 ease-out hover:-translate-y-0.5 active:translate-y-0 focus-visible:ring-2 focus-visible:ring-[#5ca9ff] focus-visible:ring-offset-2 focus-visible:ring-offset-black",
+        "group relative inline-flex min-h-11 items-center justify-center overflow-hidden rounded-[26px] border border-white/20 p-px no-underline outline-none transition-transform duration-200 ease-out hover:-translate-y-0.5 active:translate-y-0 focus-visible:ring-2 focus-visible:ring-sui-blue-bright focus-visible:ring-offset-2 focus-visible:ring-offset-sui-black",
         className,
       )}
       onClick={onClick}
     >
       <span className="pointer-events-none absolute inset-0 overflow-hidden rounded-[inherit]" aria-hidden>
-        <span className="absolute -inset-[42%] animate-[spin_4s_linear_infinite] bg-[conic-gradient(from_0deg,rgba(92,169,255,0),rgba(92,169,255,0.85),rgba(92,169,255,0.25),rgba(92,169,255,0))]" />
+        <span className="absolute -inset-[42%] motion-safe:animate-[spin_4s_linear_infinite] motion-reduce:animate-none bg-[conic-gradient(from_0deg,rgba(92,169,255,0),rgba(92,169,255,0.85),rgba(92,169,255,0.25),rgba(92,169,255,0))]" />
       </span>
       <span
-        className="pointer-events-none absolute inset-[1px] rounded-[calc(26px-1px)] border border-white/35 opacity-70 transition-opacity duration-200 group-hover:opacity-100"
+        className="pointer-events-none absolute inset-px rounded-[calc(26px-1px)] border border-white/35 opacity-70 transition-opacity duration-200 group-hover:opacity-100"
         aria-hidden
       />
-      <span className="relative z-[1] inline-flex min-h-[calc(44px-2px)] w-full items-center justify-center gap-2.5 rounded-[calc(26px-1px)] bg-black px-7 py-3 font-[var(--font-display)] text-[0.9375rem] font-medium leading-none tracking-[0.045em] text-white transition-colors duration-200 group-hover:text-[#5ca9ff]">
+      <span className="relative z-[1] inline-flex min-h-[calc(44px-2px)] w-full items-center justify-center gap-2.5 rounded-[calc(26px-1px)] bg-sui-black px-7 py-3 font-display text-[0.9375rem] font-medium leading-none tracking-[0.045em] text-white transition-colors duration-200 group-hover:text-sui-blue-bright">
         <span>{label}</span>
         <LaunchArrowIcon />
       </span>

@@ -1,6 +1,7 @@
 import { cn } from "@/lib/cn";
 
-const cardClass = "app-panel rounded-2xl p-6 md:p-8";
+const cardClass =
+  "rounded-2xl border border-card-border bg-card-fill p-6 shadow-[inset_0_1px_0_theme(colors.card-accent)] md:p-8";
 
 export function Panel({
   children,

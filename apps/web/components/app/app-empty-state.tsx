@@ -20,14 +20,16 @@ const STEPS = [
 
 export function AppEmptyState() {
   return (
-    <div className="app-empty-state">
+    <div className="flex min-h-0 flex-1 flex-col items-center text-center">
       <AppHeroIcon />
-      <h1 className="app-empty-title">Connect wallet to buy cover</h1>
-      <p className="app-empty-lede">
+      <h1 className="mb-3 mt-0 max-w-[22rem] text-balance text-[clamp(1.125rem,3.5vw,1.375rem)] font-semibold leading-[1.25] tracking-[-0.02em] text-content-primary">
+        Connect wallet to buy cover
+      </h1>
+      <p className="mb-5 mt-0 max-w-[22rem] text-pretty text-sm leading-normal text-content-secondary">
         Link your wallet to quote cover and receive payouts.
       </p>
       <AppFeatureCards items={STEPS} />
-      <SentinelConnectButton className="app-empty-cta" label="Connect wallet" />
+      <SentinelConnectButton className="w-full max-w-[16rem]" label="Connect wallet" />
     </div>
   );
 }

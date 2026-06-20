@@ -2,40 +2,30 @@ import { Muted } from "@/components/app/ui/muted";
 
 export function QuoteDisclosures() {
   return (
-    <details
-      className="rounded-xl border p-5"
-      style={{
-        borderColor: "var(--color-card-border, rgba(77, 162, 255, 0.3))",
-        background: "var(--color-card-fill, #000000)",
-        boxShadow: "inset 0 1px 0 var(--color-card-accent, rgba(77, 162, 255, 0.14))",
-      }}
-    >
-      <summary
-        className="cursor-pointer text-sm font-medium list-none [&::-webkit-details-marker]:hidden"
-        style={{ color: "var(--sui-steel)" }}
-      >
+    <details className="rounded-xl border border-card-border bg-card-fill p-5 shadow-[inset_0_1px_0_theme(colors.card.accent)]">
+      <summary className="cursor-pointer list-none text-sm font-medium text-content-secondary [&::-webkit-details-marker]:hidden">
         Important disclosures
       </summary>
-      <ul className="mt-4 space-y-3 text-sm leading-relaxed" style={{ color: "var(--sui-steel)" }}>
+      <ul className="mt-4 space-y-3 text-sm leading-relaxed text-content-secondary">
         <li>
-          <strong style={{ color: "var(--sui-white)" }}>Parametric, not indemnity.</strong> Payout is
+          <strong className="text-content-primary">Parametric, not indemnity.</strong> Payout is
           fixed at settlement. A crash deeper than the trigger pays the same amount; a dip that recovers
           before expiry pays nothing.
         </li>
         <li>
-          <strong style={{ color: "var(--sui-white)" }}>Coverage window</strong> is the oracle expiry
+          <strong className="text-content-primary">Coverage window</strong> is the oracle expiry
           shown on your quote — not a rolling hour from purchase.
         </li>
         <li>
-          <strong style={{ color: "var(--sui-white)" }}>Counterparty</strong> is the PLP vault. Payouts
+          <strong className="text-content-primary">Counterparty</strong> is the PLP vault. Payouts
           depend on vault solvency; mints can be rejected at capacity.
         </li>
         <li>
-          <strong style={{ color: "var(--sui-white)" }}>Minimum premium</strong> is 1% of coverage when
+          <strong className="text-content-primary">Minimum premium</strong> is 1% of coverage when
           the protocol ask floor binds, even if fair value is lower.
         </li>
         <li>
-          <strong style={{ color: "var(--sui-white)" }}>Not regulated insurance.</strong> This is an
+          <strong className="text-content-primary">Not regulated insurance.</strong> This is an
           on-chain options position with insurance-style framing.
         </li>
       </ul>

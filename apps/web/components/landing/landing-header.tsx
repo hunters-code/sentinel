@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useRef, useState, useCallback } from "react";
+import { cn } from "@/lib/cn";
 import { QuoteCtaButton } from "@/components/header/quote-cta-button";
 import { SentinelLogo } from "@/components/sentinel-logo";
 
@@ -39,7 +40,6 @@ export function LandingHeader() {
   const [openDropdown, setOpenDropdown] = useState<NavItemId | null>(null);
   const closeTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  // Active section via IntersectionObserver
   useEffect(() => {
     const sections = NAV_ITEMS.map((item) => document.getElementById(item.id)).filter(Boolean);
     if (sections.length === 0) return;
@@ -58,13 +58,21 @@ export function LandingHeader() {
     return () => observer.disconnect();
   }, []);
 
-  // Mobile dialog open/close
   useEffect(() => {
     const dialog = dialogRef.current;
     if (!dialog) return;
     if (mobileOpen && !dialog.open) dialog.showModal();
     else if (!mobileOpen && dialog.open) dialog.close();
   }, [mobileOpen]);
+
+  useEffect(() => {
+    if (!openDropdown) return;
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") setOpenDropdown(null);
+    };
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, [openDropdown]);
 
   const openNav = useCallback((id: NavItemId) => {
     if (closeTimeout.current) clearTimeout(closeTimeout.current);
@@ -86,16 +94,15 @@ export function LandingHeader() {
   }));
 
   return (
-    <header className="fixed inset-x-0 top-0 z-50 bg-black">
-      {/* Desktop layout: 3-col grid */}
-      <div className="relative mx-auto hidden max-w-[1140px] items-center gap-6 px-8 py-4 lg:grid lg:grid-cols-[1fr_auto_1fr]">
-        {/* Left — logo */}
-        <Link href="/" className="flex items-center gap-3 text-white no-underline justify-self-start">
+    <header className="fixed inset-x-0 top-0 z-50 bg-sui-black">
+      <div className="relative mx-auto hidden max-w-container items-center gap-6 px-8 py-4 lg:grid lg:grid-cols-[1fr_auto_1fr]">
+        <Link href="/" className="flex items-center gap-3 justify-self-start text-white no-underline">
           <SentinelLogo size={38} />
-          <span className="font-[var(--font-display)] text-[1.25rem] font-medium leading-none tracking-[-0.02em]">Sentinel</span>
+          <span className="font-display text-[1.25rem] font-medium leading-none tracking-[-0.02em]">
+            Sentinel
+          </span>
         </Link>
 
-        {/* Center — nav with dropdowns */}
         <nav aria-label="Primary" className="relative flex items-center gap-0.5">
           {NAV_ITEMS.map((item) => {
             const isOpen = openDropdown === item.id;
@@ -105,11 +112,28 @@ export function LandingHeader() {
                 className="relative"
                 onMouseEnter={() => openNav(item.id)}
                 onMouseLeave={scheduleClose}
+                onFocus={() => openNav(item.id)}
+                onBlur={(event) => {
+                  if (!event.currentTarget.contains(event.relatedTarget as Node)) scheduleClose();
+                }}
               >
                 <a
                   href={item.href}
-                  className={`inline-flex min-h-11 items-center gap-2 rounded-full px-4 py-2 font-[var(--font-display)] text-base font-medium leading-none tracking-[-0.015em] no-underline transition-colors duration-200 ${isOpen ? "bg-white/[0.06] text-[#5ca9ff]" : "text-white/86 hover:bg-white/[0.04] hover:text-[#5ca9ff]"}`}
+                  className={cn(
+                    "inline-flex min-h-11 items-center gap-2 rounded-full px-4 py-2 font-display text-base font-medium leading-none tracking-[-0.015em] no-underline transition-colors duration-200",
+                    isOpen
+                      ? "bg-white/[0.06] text-sui-blue-bright"
+                      : "text-white/86 hover:bg-white/[0.04] hover:text-sui-blue-bright",
+                  )}
                   aria-expanded={isOpen}
+                  aria-haspopup="true"
+                  onFocus={() => openNav(item.id)}
+                  onKeyDown={(event) => {
+                    if (event.key === "Escape") {
+                      event.preventDefault();
+                      setOpenDropdown(null);
+                    }
+                  }}
                 >
                   {item.label}
                   <svg
@@ -118,7 +142,7 @@ export function LandingHeader() {
                     viewBox="0 0 12 12"
                     fill="none"
                     aria-hidden
-                    style={{ opacity: 0.55 }}
+                    className="opacity-55"
                   >
                     <path
                       d="M2 4L6 8L10 4"
@@ -130,15 +154,19 @@ export function LandingHeader() {
                   </svg>
                 </a>
 
-                {/* Dropdown panel */}
                 <div
-                  className={`pointer-events-none absolute left-1/2 top-[calc(100%+0.85rem)] z-[60] grid w-[min(92vw,560px)] -translate-x-1/2 grid-cols-[1fr_auto] gap-3 rounded-[1.25rem] border border-white/15 bg-[rgba(0,20,44,0.86)] p-3 text-white shadow-[0_24px_60px_rgba(0,0,0,0.5)] backdrop-blur-[26px] opacity-0 transition-all duration-180 ${isOpen ? "pointer-events-auto translate-y-0 opacity-100" : "translate-y-1.5"}`}
+                  className={cn(
+                    "pointer-events-none absolute left-1/2 top-[calc(100%+0.85rem)] z-[60] grid w-[min(92vw,560px)] -translate-x-1/2 grid-cols-[1fr_auto] gap-3 rounded-[1.25rem] border border-white/15 bg-[rgba(0,20,44,0.86)] p-3 text-white opacity-0 shadow-[0_24px_60px_rgba(0,0,0,0.5)] backdrop-blur-[26px] transition-all duration-200",
+                    isOpen
+                      ? "pointer-events-auto translate-y-0 opacity-100"
+                      : "translate-y-1.5",
+                  )}
                   onMouseEnter={cancelClose}
                   onMouseLeave={scheduleClose}
                   role="region"
                   aria-label={`${item.label} menu`}
+                  hidden={!isOpen}
                 >
-                  {/* Links column */}
                   <ul className="m-0 flex min-w-[220px] list-none flex-col gap-1 p-0">
                     {item.links.map((link) => (
                       <li key={link.label}>
@@ -147,21 +175,27 @@ export function LandingHeader() {
                           className="flex min-h-[52px] flex-col justify-center gap-0.5 rounded-xl px-3 py-2.5 no-underline transition-colors duration-150 hover:bg-white/[0.06]"
                           onClick={() => setOpenDropdown(null)}
                         >
-                          <span className="font-[var(--font-display)] text-[0.9375rem] font-medium leading-tight text-white">{link.label}</span>
-                          <span className="text-[0.8125rem] leading-[1.35] text-[#89919f]">{link.desc}</span>
+                          <span className="font-display text-[0.9375rem] font-medium leading-tight text-white">
+                            {link.label}
+                          </span>
+                          <span className="text-[0.8125rem] leading-[1.35] text-sui-steel">{link.desc}</span>
                         </a>
                       </li>
                     ))}
                   </ul>
 
-                  {/* Feature card */}
-                  <div className="relative min-w-[180px] rounded-[1rem] border border-[#5ca9ff]/35 bg-[linear-gradient(180deg,rgba(5,37,84,0.88)_0%,rgba(1,17,42,0.88)_100%)] p-3.5">
-                    <div className="pointer-events-none absolute inset-0 rounded-[inherit] bg-[radial-gradient(ellipse_at_top,rgba(92,169,255,0.24)_0%,rgba(92,169,255,0)_72%)]" aria-hidden />
-                    <p className="relative font-[var(--font-display)] text-sm font-medium leading-tight text-white">{item.card.label}</p>
-                    <p className="relative mt-1 text-[0.75rem] leading-[1.4] text-[#89919f]">{item.card.hint}</p>
+                  <div className="relative min-w-[180px] rounded-2xl border border-sui-blue-bright/35 bg-[linear-gradient(180deg,rgba(5,37,84,0.88)_0%,rgba(1,17,42,0.88)_100%)] p-3.5">
+                    <div
+                      className="pointer-events-none absolute inset-0 rounded-[inherit] bg-[radial-gradient(ellipse_at_top,rgba(92,169,255,0.24)_0%,rgba(92,169,255,0)_72%)]"
+                      aria-hidden
+                    />
+                    <p className="relative font-display text-sm font-medium leading-tight text-white">
+                      {item.card.label}
+                    </p>
+                    <p className="relative mt-1 text-[0.75rem] leading-[1.4] text-sui-steel">{item.card.hint}</p>
                     <a
                       href="/app"
-                      className="relative mt-3 inline-flex text-[0.8125rem] font-medium text-[#5ca9ff] no-underline transition-colors duration-150 hover:text-white"
+                      className="relative mt-3 inline-flex text-[0.8125rem] font-medium text-sui-blue-bright no-underline transition-colors duration-150 hover:text-white"
                       onClick={() => setOpenDropdown(null)}
                     >
                       Get a quote →
@@ -173,55 +207,51 @@ export function LandingHeader() {
           })}
         </nav>
 
-        {/* Right — CTA */}
         <div className="hidden justify-end text-base md:flex lg:text-lg">
           <QuoteCtaButton href="/app" />
         </div>
       </div>
 
-      {/* Mobile layout */}
       <div className="flex items-center justify-between px-5 py-4 lg:hidden">
         <Link href="/" className="flex items-center gap-3 text-white no-underline">
           <SentinelLogo size={34} />
-          <span className="font-[var(--font-display)] text-[1.125rem] font-medium leading-none tracking-[-0.02em]">Sentinel</span>
+          <span className="font-display text-[1.125rem] font-medium leading-none tracking-[-0.02em]">
+            Sentinel
+          </span>
         </Link>
 
-        <div className="flex items-center gap-2">
-          <button
-            type="button"
-            className="flex h-10 w-10 items-center justify-center rounded-lg border"
-            style={{ borderColor: "var(--sui-line)", color: "var(--sui-white)" }}
-            aria-expanded={mobileOpen}
-            aria-controls="mobile-nav"
-            aria-label={mobileOpen ? "Close menu" : "Open menu"}
-            onClick={() => setMobileOpen((prev) => !prev)}
-          >
-            <svg width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden>
-              {mobileOpen ? (
-                <path
-                  d="M4 4L14 14M14 4L4 14"
-                  stroke="currentColor"
-                  strokeWidth="1.5"
-                  strokeLinecap="round"
-                />
-              ) : (
-                <path
-                  d="M2 5h14M2 9h14M2 13h14"
-                  stroke="currentColor"
-                  strokeWidth="1.5"
-                  strokeLinecap="round"
-                />
-              )}
-            </svg>
-          </button>
-        </div>
+        <button
+          type="button"
+          className="flex min-h-11 min-w-11 items-center justify-center rounded-lg border border-sui-line text-sui-white"
+          aria-expanded={mobileOpen}
+          aria-controls="mobile-nav"
+          aria-label={mobileOpen ? "Close menu" : "Open menu"}
+          onClick={() => setMobileOpen((prev) => !prev)}
+        >
+          <svg width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden>
+            {mobileOpen ? (
+              <path
+                d="M4 4L14 14M14 4L4 14"
+                stroke="currentColor"
+                strokeWidth="1.5"
+                strokeLinecap="round"
+              />
+            ) : (
+              <path
+                d="M2 5h14M2 9h14M2 13h14"
+                stroke="currentColor"
+                strokeWidth="1.5"
+                strokeLinecap="round"
+              />
+            )}
+          </svg>
+        </button>
       </div>
 
-      {/* Mobile nav dialog */}
       <dialog
         ref={dialogRef}
         id="mobile-nav"
-        className="m-0 h-full w-full max-w-none border-0 bg-black p-0 text-white lg:hidden [&::backdrop]:bg-black/80 [&::backdrop]:backdrop-blur-sm"
+        className="m-0 h-full w-full max-w-none border-0 bg-sui-black p-0 text-white lg:hidden [&::backdrop]:bg-black/80 [&::backdrop]:backdrop-blur-sm"
         onClose={() => setMobileOpen(false)}
         onClick={(event) => {
           if (event.target === dialogRef.current) setMobileOpen(false);
@@ -234,7 +264,12 @@ export function LandingHeader() {
                 <li key={item.href}>
                   <a
                     href={item.href}
-                    className={`inline-flex min-h-11 w-full items-center rounded-xl px-4 py-2 text-base no-underline transition-colors duration-150 ${item.active ? "bg-white/[0.08] text-white" : "text-[#89919f] hover:bg-white/[0.05] hover:text-white"}`}
+                    className={cn(
+                      "inline-flex min-h-11 w-full items-center rounded-xl px-4 py-2 text-base no-underline transition-colors duration-150",
+                      item.active
+                        ? "bg-white/[0.08] text-white"
+                        : "text-sui-steel hover:bg-white/[0.05] hover:text-white",
+                    )}
                     onClick={() => setMobileOpen(false)}
                     aria-current={item.active ? "true" : undefined}
                   >
@@ -245,11 +280,7 @@ export function LandingHeader() {
             </ul>
           </nav>
           <div className="mt-auto pt-10">
-            <QuoteCtaButton
-              href="/app"
-              className="w-full"
-              onClick={() => setMobileOpen(false)}
-            />
+            <QuoteCtaButton href="/app" className="w-full" onClick={() => setMobileOpen(false)} />
           </div>
         </div>
       </dialog>

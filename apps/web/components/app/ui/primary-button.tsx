@@ -9,7 +9,7 @@ export function PrimaryButton({
     <button
       type="button"
       className={cn(
-        "sentinel-primary-btn inline-flex min-h-11 w-full items-center justify-center rounded-full px-7 py-3.5 text-base font-medium transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-40",
+        "inline-flex min-h-11 w-full items-center justify-center rounded-full bg-action-primary px-7 py-3.5 text-base font-medium text-content-persistent-black transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-40",
         className,
       )}
       {...props}

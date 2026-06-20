@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { cn } from "@/lib/cn";
 import { QUOTE_FRESHNESS_MS } from "@sentinel/shared";
 
 export function useQuoteFreshness(createdAtMs: number) {
@@ -24,14 +25,11 @@ export function QuoteFreshness({ createdAtMs }: { createdAtMs: number }) {
 
   return (
     <p
-      className="text-sm tabular-nums"
-      style={{ color: stale ? "#fa8543" : "var(--sui-steel)" }}
+      className={cn("text-sm tabular-nums", stale ? "text-signal-orange" : "text-content-secondary")}
       role="status"
       aria-live="polite"
     >
-      {stale
-        ? "Quote expired — edit your amount to refresh"
-        : `Price valid for ${seconds}s`}
+      {stale ? "Quote expired — edit your amount to refresh" : `Price valid for ${seconds}s`}
     </p>
   );
 }

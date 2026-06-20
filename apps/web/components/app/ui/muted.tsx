@@ -10,7 +10,7 @@ export function Muted({
   id?: string;
 }) {
   return (
-    <p id={id} className={cn("text-sm leading-relaxed", className)} style={{ color: "var(--sui-steel)" }}>
+    <p id={id} className={cn("text-sm leading-relaxed text-content-secondary", className)}>
       {children}
     </p>
   );

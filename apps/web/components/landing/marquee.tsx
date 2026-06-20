@@ -16,13 +16,10 @@ export function Marquee() {
 
   if (reduce) {
     return (
-      <div
-        className="border-y px-6 py-4 md:px-10"
-        style={{ borderColor: "var(--sui-line)", background: "rgba(255,255,255,0.02)" }}
-      >
+      <div className="border-y border-sui-line bg-white/[0.02] px-6 py-4 md:px-10">
         <ul className="mx-auto flex max-w-container flex-wrap justify-center gap-x-6 gap-y-2">
           {ITEMS.map((item) => (
-            <li key={item} className="text-sm" style={{ color: "var(--sui-steel)" }}>
+            <li key={item} className="text-sm text-sui-steel">
               {item}
             </li>
           ))}
@@ -35,17 +32,16 @@ export function Marquee() {
 
   return (
     <div
-      className="overflow-hidden border-y py-4"
-      style={{ borderColor: "var(--sui-line)", background: "rgba(255,255,255,0.02)" }}
+      className="overflow-hidden border-y border-sui-line bg-white/[0.02] py-4"
       aria-hidden
     >
       <div className="flex animate-marquee whitespace-nowrap">
         {track.map((item, i) => (
           <span key={`${item}-${i}`} className="mx-8 inline-flex items-center gap-3 text-sm">
-            <span style={{ color: "var(--sui-blue)" }} aria-hidden>
+            <span className="text-sui-blue" aria-hidden>
               →
             </span>
-            <span style={{ color: "var(--sui-steel)" }}>{item}</span>
+            <span className="text-sui-steel">{item}</span>
           </span>
         ))}
       </div>

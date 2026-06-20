@@ -45,14 +45,14 @@ export default function AppPageClient() {
     >
       {/* <AppBanner /> */}
 
-      <div className="app-main-body">
+      <div className="flex min-h-0 flex-1 flex-col overflow-hidden p-4">
         <AppContentCard>
           {!connected ? (
-            <div className="app-panel-region">
+            <div className="min-h-0 flex-1 overflow-auto [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
               <AppEmptyState />
             </div>
           ) : (
-            <div className="app-panel-region">
+            <div className="min-h-0 flex-1 overflow-auto [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
               {nav === "home" && <AppHomePanel onGetQuote={() => handleNavChange("cover")} />}
               {nav === "cover" && (
                 <CoverPanel onViewHistory={() => handleNavChange("history")} />
