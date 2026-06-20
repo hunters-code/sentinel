@@ -3,12 +3,12 @@
 import { useReducedMotion } from "framer-motion";
 
 const ITEMS = [
-  "One-hour coverage",
-  "Honest protocol pricing",
+  "Covers the next hour",
+  "Honest market pricing",
   "Automatic payout",
-  "dUSDC settlement",
-  "One signature",
-  "Sub-hour expiry",
+  "Paid in stablecoins",
+  "One tap to buy",
+  "No claims to file",
 ];
 
 export function Marquee() {

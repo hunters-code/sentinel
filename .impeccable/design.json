@@ -1,6 +1,6 @@
 {
   "schemaVersion": 2,
-  "generatedAt": "2026-06-19T14:30:00.000Z",
+  "generatedAt": "2026-06-20T12:00:00.000Z",
   "title": "Design System: Sentinel",
   "extensions": {
     "colorMeta": {
@@ -17,6 +17,21 @@
           "oklch(62% 0.19 252)",
           "oklch(70% 0.16 252)",
           "oklch(92% 0.06 252)"
+        ]
+      },
+      "mesh-navy": {
+        "role": "neutral",
+        "displayName": "Mesh Navy",
+        "canonical": "oklch(18% 0.06 252)",
+        "tonalRamp": [
+          "oklch(8% 0.04 252)",
+          "oklch(12% 0.05 252)",
+          "oklch(18% 0.06 252)",
+          "oklch(24% 0.08 252)",
+          "oklch(32% 0.10 252)",
+          "oklch(40% 0.12 252)",
+          "oklch(52% 0.14 252)",
+          "oklch(65% 0.12 252)"
         ]
       },
       "sui-black": {
@@ -68,37 +83,53 @@
     "typographyMeta": {
       "display": {
         "displayName": "Display",
-        "purpose": "Landing hero and large quote amounts only."
+        "purpose": "Landing hero headline — two-line stack, accent on payoff line."
       },
       "headline": {
         "displayName": "Headline",
-        "purpose": "App page titles and section headings."
+        "purpose": "App page titles and lower landing section headings."
       },
       "body": {
         "displayName": "Body",
-        "purpose": "Prose, disclosures, helper copy. Max 65–75ch."
+        "purpose": "Hero lead, prose, disclosures. Max 65–75ch."
       },
       "label": {
         "displayName": "Label",
-        "purpose": "Eyebrows, chips, metadata. Sentence case."
+        "purpose": "Nav dropdown descriptions, chips, metadata. Sentence case."
       }
     },
-    "shadows": [],
+    "shadows": [
+      {
+        "name": "nav-dropdown",
+        "value": "0 4px 6px rgba(0,0,0,0.2), 0 20px 60px rgba(0,0,0,0.5), 0 0 0 1px rgba(92,169,255,0.05) inset",
+        "purpose": "Desktop nav hover dropdown float — functional only, not card default."
+      }
+    ],
     "motion": [
       {
         "name": "ease-out-standard",
         "value": "cubic-bezier(0.22, 1, 0.36, 1)",
-        "purpose": "Hero headline stagger and dialog entrance."
+        "purpose": "Hero sentinel-rise reveal and dialog entrance."
+      },
+      {
+        "name": "hero-reveal-duration",
+        "value": "0.75s",
+        "purpose": "Headline lines, lead, and CTA stagger (0.12s / 0.26s / 0.38s / 0.58s delays)."
+      },
+      {
+        "name": "mesh-blob-drift",
+        "value": "20s–32s ease-in-out infinite alternate",
+        "purpose": "Landing hero mesh blob translate+scale loops."
+      },
+      {
+        "name": "glow-border-spin",
+        "value": "4s linear infinite",
+        "purpose": "QuoteCtaButton conic border rotation; static gradient when prefers-reduced-motion."
       },
       {
         "name": "marquee-duration",
         "value": "18s linear infinite",
-        "purpose": "Landing trust strip; replaced with static wrap when prefers-reduced-motion."
-      },
-      {
-        "name": "transition-opacity",
-        "value": "opacity 150ms ease-out",
-        "purpose": "Primary button hover and CTA feedback."
+        "purpose": "Landing trust strip when enabled; static wrap under reduced motion."
       }
     ],
     "breakpoints": [
@@ -108,44 +139,44 @@
   },
   "components": [
     {
+      "name": "Glow CTA — Get a quote",
+      "kind": "button",
+      "refersTo": "button-glow-cta",
+      "description": "Landing header, hero, and mobile drawer primary conversion control.",
+      "html": "<a href=\"/app\" class=\"ds-glow-cta\"><span class=\"ds-glow-cta-border\" aria-hidden=\"true\"></span><span class=\"ds-glow-cta-inner\">Get a quote <svg width=\"13\" height=\"13\" viewBox=\"0 0 13 13\" fill=\"none\" aria-hidden=\"true\"><path d=\"M11.52 5.66L5.86 0L5.16 0.71L10.31 5.86H0V6.86H10.31L5.16 12.02L5.86 12.73L11.52 7.07L12.23 6.36L11.52 5.66Z\" fill=\"currentColor\"/></svg></span></a>",
+      "css": ".ds-glow-cta { position: relative; display: inline-flex; align-items: center; justify-content: center; overflow: hidden; border-radius: 26px; padding: 14px 30px; min-height: 44px; font-family: Geologica, system-ui, sans-serif; font-size: 16px; font-weight: 500; letter-spacing: 0.045em; color: #fff; text-decoration: none; transition: color 200ms ease-out, opacity 200ms ease-out; } .ds-glow-cta-border { position: absolute; inset: 0; border-radius: 26px; border: 2px solid rgba(255,255,255,0.1); pointer-events: none; transition: border-color 200ms ease-out; } .ds-glow-cta-inner { position: relative; z-index: 1; display: flex; align-items: center; gap: 10px; } .ds-glow-cta:hover, .ds-glow-cta:focus-visible { color: #5ca9ff; outline: none; } .ds-glow-cta:hover .ds-glow-cta-border, .ds-glow-cta:focus-visible .ds-glow-cta-border { border-color: rgba(92,169,255,0.28); } .ds-glow-cta:active { opacity: 0.88; }"
+    },
+    {
       "name": "Primary Button",
       "kind": "button",
       "refersTo": "button-primary",
-      "description": "Main conversion action — quote, protect, connect.",
+      "description": "App conversion actions — protect, connect, inline section CTAs.",
       "html": "<button type=\"button\" class=\"ds-btn-primary\">Get a quote <span aria-hidden=\"true\">→</span></button>",
       "css": ".ds-btn-primary { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 44px; padding: 14px 28px; border: none; border-radius: 9999px; background: #298dff; color: #000; font-family: Manrope, system-ui, sans-serif; font-size: 16px; font-weight: 500; cursor: pointer; transition: opacity 150ms ease-out; } .ds-btn-primary:hover { opacity: 0.9; } .ds-btn-primary:focus-visible { outline: 2px solid #5ca9ff; outline-offset: 3px; } .ds-btn-primary:disabled { opacity: 0.4; cursor: not-allowed; }"
     },
     {
-      "name": "Secondary Button",
-      "kind": "button",
-      "refersTo": "button-secondary",
-      "description": "Ghost outline actions — How it works, See the flow.",
-      "html": "<button type=\"button\" class=\"ds-btn-secondary\">How it works</button>",
-      "css": ".ds-btn-secondary { display: inline-flex; align-items: center; justify-content: center; min-height: 44px; padding: 14px 28px; border: 1px solid rgba(255,255,255,0.12); border-radius: 9999px; background: transparent; color: #fff; font-family: Manrope, system-ui, sans-serif; font-size: 16px; font-weight: 400; cursor: pointer; transition: background 150ms ease-out; } .ds-btn-secondary:hover { background: rgba(255,255,255,0.05); } .ds-btn-secondary:focus-visible { outline: 2px solid #5ca9ff; outline-offset: 3px; }"
+      "name": "Landing Hero Headline",
+      "kind": "custom",
+      "refersTo": "button-glow-cta",
+      "description": "Two-line centered display with accent on payoff line.",
+      "html": "<h1 class=\"ds-hero-headline\"><span class=\"ds-hero-line\">When the market drops</span><span class=\"ds-hero-line ds-hero-accent\">you're covered.</span></h1>",
+      "css": ".ds-hero-headline { margin: 0; text-align: center; font-family: Geologica, system-ui, sans-serif; font-size: clamp(2.75rem, 7vw, 5.5rem); font-weight: 500; line-height: 1.02; letter-spacing: -0.03em; text-wrap: balance; color: #fff; } .ds-hero-line { display: block; } .ds-hero-accent { color: #5ca9ff; }"
+    },
+    {
+      "name": "Landing Header",
+      "kind": "nav",
+      "refersTo": "button-glow-cta",
+      "description": "Fixed black bar — logo, nav triggers, glow CTA. No bottom border.",
+      "html": "<header class=\"ds-landing-header\"><a href=\"/\" class=\"ds-landing-brand\"><span class=\"ds-landing-mark\">S</span><span class=\"ds-landing-name\">Sentinel</span></a><nav class=\"ds-landing-nav\" aria-label=\"Primary\"><a href=\"#how\" class=\"ds-nav-trigger\">How it works</a></nav><a href=\"/app\" class=\"ds-glow-cta ds-glow-cta-compact\">Get a quote</a></header>",
+      "css": ".ds-landing-header { display: flex; align-items: center; justify-content: space-between; padding: 16px 32px; background: #000; font-family: Geologica, system-ui, sans-serif; } .ds-landing-brand { display: flex; align-items: center; gap: 12px; text-decoration: none; color: #fff; } .ds-landing-mark { display: flex; align-items: center; justify-content: center; width: 38px; height: 38px; border-radius: 8px; background: #298dff; color: #000; font-size: 14px; font-weight: 600; } .ds-landing-name { font-size: 18px; font-weight: 500; letter-spacing: -0.02em; } .ds-nav-trigger { padding: 9px 15px; border-radius: 9999px; font-size: 16px; font-weight: 500; color: rgba(255,255,255,0.82); text-decoration: none; transition: background 180ms ease-out, color 180ms ease-out; } .ds-nav-trigger:hover { background: rgba(255,255,255,0.07); color: #fff; } .ds-glow-cta-compact { font-size: 16px; padding: 14px 28px; }"
     },
     {
       "name": "Panel Card",
       "kind": "card",
       "refersTo": "panel",
       "description": "Quote sections, connect wallet state, history rows container.",
-      "html": "<div class=\"ds-panel\"><p class=\"ds-panel-label\">Example at BTC $100,000 · trigger −2%</p><p class=\"ds-panel-quote\">If BTC drops below <strong>$98,000</strong> before expiry, you get <strong>$1,000</strong>.</p></div>",
+      "html": "<div class=\"ds-panel\"><p class=\"ds-panel-label\">Example · trigger −2%</p><p class=\"ds-panel-quote\">If price settles below <strong>$98,000</strong>, you get <strong>$1,000</strong>.</p></div>",
       "css": ".ds-panel { padding: 24px; border-radius: 16px; border: 1px solid rgba(255,255,255,0.12); background: rgba(255,255,255,0.04); color: #fff; font-family: Manrope, system-ui, sans-serif; } .ds-panel-label { margin: 0 0 8px; font-size: 14px; color: #89919f; } .ds-panel-quote { margin: 0; font-family: Geologica, system-ui, sans-serif; font-size: clamp(1.25rem, 3.5vw, 1.75rem); line-height: 1.2; font-weight: 500; } .ds-panel-quote strong { color: #5ca9ff; font-weight: 500; }"
-    },
-    {
-      "name": "BTC Input Field",
-      "kind": "input",
-      "refersTo": "panel",
-      "description": "Single numeric input for BTC holdings on quote screen.",
-      "html": "<div class=\"ds-field\"><input class=\"ds-field-input\" inputmode=\"decimal\" placeholder=\"0.00\" aria-label=\"BTC amount\" /><span class=\"ds-field-suffix\">BTC</span></div>",
-      "css": ".ds-field { display: flex; align-items: center; gap: 12px; padding: 12px 16px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.12); background: rgba(0,0,0,0.35); } .ds-field-input { flex: 1; min-width: 0; border: 0; outline: none; background: transparent; color: #fff; font-family: Geologica, system-ui, sans-serif; font-size: 20px; font-weight: 500; } .ds-field-input::placeholder { color: #6c7584; } .ds-field-input:focus-visible { outline: none; } .ds-field:focus-within { outline: 2px solid #5ca9ff; outline-offset: 3px; } .ds-field-suffix { font-size: 14px; font-weight: 500; color: #89919f; }"
-    },
-    {
-      "name": "Status Chip — Active",
-      "kind": "chip",
-      "refersTo": "chip-active",
-      "description": "Policy ACTIVE or keeper live state.",
-      "html": "<span class=\"ds-chip ds-chip-active\">ACTIVE</span>",
-      "css": ".ds-chip { display: inline-flex; align-items: center; padding: 2px 10px; border-radius: 9999px; border: 1px solid; font-family: Manrope, system-ui, sans-serif; font-size: 12px; font-weight: 500; } .ds-chip-active { color: #5ca9ff; border-color: rgba(92,169,255,0.35); background: transparent; }"
     },
     {
       "name": "Status Chip — Paid",
@@ -162,72 +193,77 @@
       "description": "Segmented Cover / History / Wallet control.",
       "html": "<nav class=\"ds-tabs\" aria-label=\"App menu\"><button type=\"button\" class=\"ds-tab ds-tab-active\" aria-current=\"page\">Cover</button><button type=\"button\" class=\"ds-tab\">History</button><button type=\"button\" class=\"ds-tab\">Wallet</button></nav>",
       "css": ".ds-tabs { display: flex; gap: 4px; padding: 4px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.12); background: rgba(255,255,255,0.03); } .ds-tab { flex: 1; min-height: 40px; padding: 8px 12px; border: none; border-radius: 8px; background: transparent; color: #89919f; font-family: Manrope, system-ui, sans-serif; font-size: 14px; font-weight: 500; cursor: pointer; transition: background 150ms ease-out, color 150ms ease-out; } .ds-tab:hover { color: #fff; } .ds-tab-active { background: #002e6a; color: #fff; } .ds-tab:focus-visible { outline: 2px solid #5ca9ff; outline-offset: 2px; }"
-    },
-    {
-      "name": "App Header",
-      "kind": "nav",
-      "refersTo": "button-primary",
-      "description": "Fixed top bar with logo and wallet connect.",
-      "html": "<header class=\"ds-header\"><a href=\"/\" class=\"ds-header-brand\"><span class=\"ds-header-mark\" aria-hidden=\"true\">S</span><span class=\"ds-header-name\">Sentinel</span></a><button type=\"button\" class=\"ds-btn-primary ds-btn-compact\">Connect wallet</button></header>",
-      "css": ".ds-header { display: flex; align-items: center; justify-content: space-between; padding: 16px 24px; background: #000; border-bottom: 1px solid rgba(255,255,255,0.12); font-family: Manrope, system-ui, sans-serif; } .ds-header-brand { display: flex; align-items: center; gap: 10px; text-decoration: none; color: #fff; } .ds-header-mark { display: flex; align-items: center; justify-content: center; width: 32px; height: 32px; border-radius: 8px; background: #298dff; color: #000; font-size: 14px; font-weight: 600; } .ds-header-name { font-family: Geologica, system-ui, sans-serif; font-size: 15px; font-weight: 500; letter-spacing: -0.02em; } .ds-btn-primary { display: inline-flex; align-items: center; justify-content: center; border: none; border-radius: 9999px; background: #298dff; color: #000; font-size: 14px; font-weight: 500; cursor: pointer; transition: opacity 150ms ease-out; } .ds-btn-compact { min-height: 44px; padding: 8px 20px; } .ds-btn-primary:hover { opacity: 0.9; }"
     }
   ],
   "narrative": {
     "northStar": "The Honest Quote",
-    "overview": "Sentinel looks like a trading terminal after hours: black field, one Sui-blue accent, numbers you can audit. The anxious BTC holder arrives before a macro event — they need one premium, one button, one receipt. Visual noise is the enemy. Insurance language leads; protocol plumbing hides behind expanders.\n\nSurfaces are flat and tonal. Depth comes from radial blue gradients and panel tints, not drop shadows. Geometric Geologica headlines carry institutional weight; Manrope keeps disclosures readable.",
+    "overview": "Sentinel's landing page is a single full-viewport moment: centered copy over a living blue mesh, one glow CTA, no secondary actions competing for attention. The holder arrives anxious before a volatility event — they need coverage language, not a protocol tour.\n\nThe current shipped landing is hero-only. The app shell keeps the flat terminal aesthetic: bordered panels, steel body copy, pill blue buttons. Geometric Geologica headlines carry institutional weight; Manrope keeps disclosures readable.",
     "keyCharacteristics": [
-      "Committed dark mode on void black with Sui blue as sole saturated accent",
-      "Geologica display + Manrope body pairing",
-      "Pill primary actions at 44px minimum touch height",
-      "Quote numbers in bright blue; supporting copy in steel",
-      "Flat bordered panels — no card shadows",
-      "Status via lime/orange/steel chips only"
+      "Full-viewport hero with vertically centered copy block",
+      "Animated multi-blob mesh atmosphere on landing hero only",
+      "Staggered CSS sentinel-rise reveal on headline, lead, and CTA",
+      "Glow CTA as landing conversion control — Get a quote",
+      "Flat app surfaces — bordered panels, no card shadows",
+      "Crypto-wide landing copy — not BTC-only, not fixed one hour"
     ],
     "rules": [
       {
         "name": "The One Accent Rule",
-        "body": "Sui blue carries conversion and emphasis. Lime and orange appear only for status semantics — never as decorative gradients or section backgrounds.",
+        "body": "Sui blue carries conversion and hero atmosphere. Lime and orange appear only for status semantics — never as decorative section backgrounds.",
+        "section": "colors"
+      },
+      {
+        "name": "The Mesh-Hero-Only Rule",
+        "body": "Animated multi-blob mesh gradients live on .landing-hero-bg only. The app shell and lower landing sections stay flat and tonal.",
         "section": "colors"
       },
       {
         "name": "The Steel-on-Black Rule",
-        "body": "Body text uses steel muted, not lighter gray. If contrast is borderline at text-xs, bump toward white or restrict steel to darker band backgrounds.",
+        "body": "Body text uses steel muted. Hero lead uses white at 84% opacity; strong bumps to full white.",
         "section": "colors"
       },
       {
         "name": "The Insurance-First Rule",
-        "body": "Headlines say Protect your Bitcoin and Get a quote. Protocol terms live in details expanders only.",
+        "body": "Landing hero says you're covered and Get a quote. Protocol terms live in details expanders only on lower sections.",
         "section": "typography"
       },
       {
-        "name": "The Display Cap Rule",
-        "body": "Hero clamp max stays at 5.5rem. Letter-spacing floor −0.03em on display headings.",
+        "name": "The No-Fixed-Duration Rule",
+        "body": "Never promise a literal one hour on consumer-facing copy. Coverage window is oracle expiry.",
         "section": "typography"
       },
       {
         "name": "The Flat-By-Default Rule",
-        "body": "No drop shadows on cards, buttons, or nav. Emphasis via color, size, or border.",
+        "body": "No drop shadows on cards, app buttons, or the landing header. Emphasis via color, size, or border.",
         "section": "elevation"
       },
       {
-        "name": "The Gradient-Depth Rule",
-        "body": "Hero and app shells may use one or two radial blue ellipses on black. Never full-bleed mesh gradients.",
+        "name": "The Vignette-Over-Mesh Rule",
+        "body": "Every mesh hero ships with a radial + linear vignette so white headline copy stays readable.",
+        "section": "elevation"
+      },
+      {
+        "name": "The Motion-Enhancement Rule",
+        "body": "Hero text is fully visible before animation runs. prefers-reduced-motion disables mesh drift, glow spin, and reveal blur.",
         "section": "elevation"
       }
     ],
     "dos": [
-      "Do lead every screen with insurance language — premium, coverage, trigger, payout, receipt.",
-      "Do show plain disclosures in-product.",
-      "Do use sui-blue pill buttons for every primary conversion path with 44px minimum touch targets.",
-      "Do hide protocol implementation details in For builders or How is this priced expanders.",
-      "Do respect prefers-reduced-motion with static fallbacks."
+      "Do lead the landing hero with insurance language — covered, trigger, paid automatically, one tap.",
+      "Do use a single primary CTA on the hero — glow Get a quote only.",
+      "Do keep mesh animation and text reveal as CSS enhancements with reduced-motion fallbacks.",
+      "Do show plain disclosures when lower landing sections are enabled.",
+      "Do use sui-blue pill buttons on app conversion paths with 44px minimum touch targets.",
+      "Do hide protocol implementation details in For builders expanders."
     ],
     "donts": [
       "Don't use cream, sand, or warm off-white page backgrounds.",
+      "Don't promise a fixed one hour of coverage on marketing copy.",
+      "Don't frame the product as BTC-only on the landing hero.",
       "Don't stack numbered section markers or identical three-card grids across multiple sections.",
-      "Don't use glassmorphism, gradient text, or side-stripe colored borders on cards.",
+      "Don't use gradient text, side-stripe colored borders on cards, or decorative glassmorphism on panels.",
+      "Don't extend mesh gradients beyond the landing hero background.",
       "Don't show dUSDC, strike ladders, or vol-surface jargon above the fold.",
-      "Don't promise live data on decorative static visuals.",
       "Don't ship new surfaces in the legacy wireframe style (.wrap, .box, #ccc borders)."
     ]
   }

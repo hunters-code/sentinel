@@ -2,14 +2,20 @@
 
 import { motion, useReducedMotion } from "framer-motion";
 
-export function BtcChartVisual() {
+export function BtcChartVisual({ hero = false }: { hero?: boolean }) {
   const reduce = useReducedMotion();
 
   return (
-    <figure className="relative aspect-[4/3] w-full max-w-xl">
+    <figure
+      className={
+        hero
+          ? "landing-hero-chart relative mx-auto w-full max-w-3xl"
+          : "relative aspect-[4/3] w-full max-w-xl"
+      }
+    >
       <figcaption className="sr-only">
-        Illustrative BTC price chart with a dashed trigger line at $98,000. If price settles at or
-        below the trigger before expiry, the policy pays out.
+        Illustrative BTC price chart with a dashed floor line at $98,000. If price settles at or
+        below the floor before expiry, the policy pays out.
       </figcaption>
       <div
         className="absolute inset-0 rounded-2xl"
@@ -53,7 +59,7 @@ export function BtcChartVisual() {
           strokeDasharray="6 5"
         />
         <text x="372" y="199" fill="#7df752" fontSize="10" fontFamily="system-ui">
-          trigger
+          −2% floor
         </text>
 
         <path
@@ -85,7 +91,7 @@ export function BtcChartVisual() {
           BTC/USD · example
         </text>
         <text x="44" y="58" fill="#fff" fontSize="13" fontWeight="600" fontFamily="system-ui">
-          $98,000 trigger
+          $98,000 floor
         </text>
       </svg>
     </figure>

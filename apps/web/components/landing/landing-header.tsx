@@ -1,98 +1,203 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useCallback } from "react";
 import { QuoteCtaButton } from "@/components/header/quote-cta-button";
-import { SentinelNavMenu } from "@/components/header/sentinel-nav-menu";
 import { SentinelLogo } from "@/components/sentinel-logo";
 
-const NAV_LINKS = [
-  { href: "#how", id: "how", label: "How it works" },
-  { href: "#stack", id: "stack", label: "On Sui" },
-  { href: "#disclosures", id: "disclosures", label: "Disclosures" },
+const NAV_ITEMS = [
+  {
+    label: "How it works",
+    href: "#how",
+    id: "how",
+    links: [
+      { label: "Quote", desc: "Price and size your coverage in seconds." },
+      { label: "Receipt", desc: "Live price tracker with trigger status." },
+      { label: "Payout", desc: "Auto-settle on expiry — no claim needed." },
+    ],
+    card: { label: "One tap, one signature", hint: "No options desk" },
+  },
+  {
+    label: "Built on Sui",
+    href: "#stack",
+    id: "stack",
+    links: [
+      { label: "DeepBook Predict", desc: "Live SVI pricing, market-derived." },
+      { label: "On-chain settlement", desc: "Payouts run without us." },
+      { label: "Keeper network", desc: "Permissionless payout claims." },
+    ],
+    card: { label: "Powered by Sui", hint: "Testnet live" },
+  },
 ] as const;
+
+type NavItemId = (typeof NAV_ITEMS)[number]["id"];
 
 export function LandingHeader() {
   const dialogRef = useRef<HTMLDialogElement>(null);
-  const [open, setOpen] = useState(false);
+  const [mobileOpen, setMobileOpen] = useState(false);
   const [activeSection, setActiveSection] = useState<string | null>(null);
+  const [openDropdown, setOpenDropdown] = useState<NavItemId | null>(null);
+  const closeTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
 
+  // Active section via IntersectionObserver
   useEffect(() => {
-    const dialog = dialogRef.current;
-    if (!dialog) return;
-
-    if (open && !dialog.open) {
-      dialog.showModal();
-    } else if (!open && dialog.open) {
-      dialog.close();
-    }
-  }, [open]);
-
-  useEffect(() => {
-    const sections = NAV_LINKS.map((item) => document.getElementById(item.id)).filter(Boolean);
+    const sections = NAV_ITEMS.map((item) => document.getElementById(item.id)).filter(Boolean);
     if (sections.length === 0) return;
 
     const observer = new IntersectionObserver(
       (entries) => {
         const visible = entries
-          .filter((entry) => entry.isIntersecting)
+          .filter((e) => e.isIntersecting)
           .sort((a, b) => b.intersectionRatio - a.intersectionRatio);
-
-        if (visible[0]?.target.id) {
-          setActiveSection(visible[0].target.id);
-        }
+        if (visible[0]?.target.id) setActiveSection(visible[0].target.id);
       },
       { rootMargin: "-35% 0px -55% 0px", threshold: [0, 0.25, 0.5] },
     );
 
-    for (const section of sections) {
-      observer.observe(section!);
-    }
-
+    for (const section of sections) observer.observe(section!);
     return () => observer.disconnect();
   }, []);
 
-  function closeMenu() {
-    setOpen(false);
-  }
+  // Mobile dialog open/close
+  useEffect(() => {
+    const dialog = dialogRef.current;
+    if (!dialog) return;
+    if (mobileOpen && !dialog.open) dialog.showModal();
+    else if (!mobileOpen && dialog.open) dialog.close();
+  }, [mobileOpen]);
 
-  const navItems = NAV_LINKS.map((item) => ({
+  const openNav = useCallback((id: NavItemId) => {
+    if (closeTimeout.current) clearTimeout(closeTimeout.current);
+    setOpenDropdown(id);
+  }, []);
+
+  const scheduleClose = useCallback(() => {
+    closeTimeout.current = setTimeout(() => setOpenDropdown(null), 140);
+  }, []);
+
+  const cancelClose = useCallback(() => {
+    if (closeTimeout.current) clearTimeout(closeTimeout.current);
+  }, []);
+
+  const navItems = NAV_ITEMS.map((item) => ({
     href: item.href,
     label: item.label,
     active: activeSection === item.id,
   }));
 
   return (
-    <header className="sentinel-header fixed inset-x-0 top-0 z-50">
-      <div className="relative mx-auto flex max-w-[1140px] items-center justify-between gap-4 px-6 py-4 md:px-10">
-        <Link href="/" className="relative z-[1] flex shrink-0 items-center gap-2.5 no-underline">
-          <SentinelLogo size={32} />
-          <span
-            className="text-[15px] font-medium tracking-tight"
-            style={{ fontFamily: "var(--font-display)", color: "var(--sui-white)" }}
-          >
-            Sentinel
-          </span>
+    <header className="fixed inset-x-0 top-0 z-50 bg-black">
+      {/* Desktop layout: 3-col grid */}
+      <div className="relative mx-auto hidden max-w-[1140px] items-center gap-6 px-8 py-4 lg:grid lg:grid-cols-[1fr_auto_1fr]">
+        {/* Left — logo */}
+        <Link href="/" className="flex items-center gap-3 text-white no-underline justify-self-start">
+          <SentinelLogo size={38} />
+          <span className="font-[var(--font-display)] text-[1.25rem] font-medium leading-none tracking-[-0.02em]">Sentinel</span>
         </Link>
 
-        <div className="pointer-events-none absolute inset-x-6 hidden justify-center md:inset-x-10 md:flex">
-          <div className="pointer-events-auto">
-            <SentinelNavMenu items={navItems} />
-          </div>
-        </div>
+        {/* Center — nav with dropdowns */}
+        <nav aria-label="Primary" className="relative flex items-center gap-0.5">
+          {NAV_ITEMS.map((item) => {
+            const isOpen = openDropdown === item.id;
+            return (
+              <div
+                key={item.id}
+                className="relative"
+                onMouseEnter={() => openNav(item.id)}
+                onMouseLeave={scheduleClose}
+              >
+                <a
+                  href={item.href}
+                  className={`inline-flex min-h-11 items-center gap-2 rounded-full px-4 py-2 font-[var(--font-display)] text-base font-medium leading-none tracking-[-0.015em] no-underline transition-colors duration-200 ${isOpen ? "bg-white/[0.06] text-[#5ca9ff]" : "text-white/86 hover:bg-white/[0.04] hover:text-[#5ca9ff]"}`}
+                  aria-expanded={isOpen}
+                >
+                  {item.label}
+                  <svg
+                    width="14"
+                    height="14"
+                    viewBox="0 0 12 12"
+                    fill="none"
+                    aria-hidden
+                    style={{ opacity: 0.55 }}
+                  >
+                    <path
+                      d="M2 4L6 8L10 4"
+                      stroke="currentColor"
+                      strokeWidth="1.5"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
+                  </svg>
+                </a>
 
-        <div className="relative z-[1] ml-auto flex shrink-0 items-center gap-2.5">
+                {/* Dropdown panel */}
+                <div
+                  className={`pointer-events-none absolute left-1/2 top-[calc(100%+0.85rem)] z-[60] grid w-[min(92vw,560px)] -translate-x-1/2 grid-cols-[1fr_auto] gap-3 rounded-[1.25rem] border border-white/15 bg-[rgba(0,20,44,0.86)] p-3 text-white shadow-[0_24px_60px_rgba(0,0,0,0.5)] backdrop-blur-[26px] opacity-0 transition-all duration-180 ${isOpen ? "pointer-events-auto translate-y-0 opacity-100" : "translate-y-1.5"}`}
+                  onMouseEnter={cancelClose}
+                  onMouseLeave={scheduleClose}
+                  role="region"
+                  aria-label={`${item.label} menu`}
+                >
+                  {/* Links column */}
+                  <ul className="m-0 flex min-w-[220px] list-none flex-col gap-1 p-0">
+                    {item.links.map((link) => (
+                      <li key={link.label}>
+                        <a
+                          href={item.href}
+                          className="flex min-h-[52px] flex-col justify-center gap-0.5 rounded-xl px-3 py-2.5 no-underline transition-colors duration-150 hover:bg-white/[0.06]"
+                          onClick={() => setOpenDropdown(null)}
+                        >
+                          <span className="font-[var(--font-display)] text-[0.9375rem] font-medium leading-tight text-white">{link.label}</span>
+                          <span className="text-[0.8125rem] leading-[1.35] text-[#89919f]">{link.desc}</span>
+                        </a>
+                      </li>
+                    ))}
+                  </ul>
+
+                  {/* Feature card */}
+                  <div className="relative min-w-[180px] rounded-[1rem] border border-[#5ca9ff]/35 bg-[linear-gradient(180deg,rgba(5,37,84,0.88)_0%,rgba(1,17,42,0.88)_100%)] p-3.5">
+                    <div className="pointer-events-none absolute inset-0 rounded-[inherit] bg-[radial-gradient(ellipse_at_top,rgba(92,169,255,0.24)_0%,rgba(92,169,255,0)_72%)]" aria-hidden />
+                    <p className="relative font-[var(--font-display)] text-sm font-medium leading-tight text-white">{item.card.label}</p>
+                    <p className="relative mt-1 text-[0.75rem] leading-[1.4] text-[#89919f]">{item.card.hint}</p>
+                    <a
+                      href="/app"
+                      className="relative mt-3 inline-flex text-[0.8125rem] font-medium text-[#5ca9ff] no-underline transition-colors duration-150 hover:text-white"
+                      onClick={() => setOpenDropdown(null)}
+                    >
+                      Get a quote →
+                    </a>
+                  </div>
+                </div>
+              </div>
+            );
+          })}
+        </nav>
+
+        {/* Right — CTA */}
+        <div className="hidden justify-end text-base md:flex lg:text-lg">
+          <QuoteCtaButton href="/app" />
+        </div>
+      </div>
+
+      {/* Mobile layout */}
+      <div className="flex items-center justify-between px-5 py-4 lg:hidden">
+        <Link href="/" className="flex items-center gap-3 text-white no-underline">
+          <SentinelLogo size={34} />
+          <span className="font-[var(--font-display)] text-[1.125rem] font-medium leading-none tracking-[-0.02em]">Sentinel</span>
+        </Link>
+
+        <div className="flex items-center gap-2">
           <button
             type="button"
-            className="flex h-11 w-11 items-center justify-center rounded-lg border md:hidden"
+            className="flex h-10 w-10 items-center justify-center rounded-lg border"
             style={{ borderColor: "var(--sui-line)", color: "var(--sui-white)" }}
-            aria-expanded={open}
+            aria-expanded={mobileOpen}
             aria-controls="mobile-nav"
-            aria-label={open ? "Close menu" : "Open menu"}
-            onClick={() => setOpen((prev) => !prev)}
+            aria-label={mobileOpen ? "Close menu" : "Open menu"}
+            onClick={() => setMobileOpen((prev) => !prev)}
           >
             <svg width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden>
-              {open ? (
+              {mobileOpen ? (
                 <path
                   d="M4 4L14 14M14 4L4 14"
                   stroke="currentColor"
@@ -109,31 +214,42 @@ export function LandingHeader() {
               )}
             </svg>
           </button>
-
-          <QuoteCtaButton href="/app" />
         </div>
       </div>
 
+      {/* Mobile nav dialog */}
       <dialog
         ref={dialogRef}
         id="mobile-nav"
-        className="landing-dialog m-0 w-full max-w-none border-0 p-0 md:hidden"
-        style={{ background: "var(--sui-menu-bg)", color: "var(--sui-white)" }}
-        onClose={() => setOpen(false)}
+        className="m-0 h-full w-full max-w-none border-0 bg-black p-0 text-white lg:hidden [&::backdrop]:bg-black/80 [&::backdrop]:backdrop-blur-sm"
+        onClose={() => setMobileOpen(false)}
         onClick={(event) => {
-          if (event.target === dialogRef.current) closeMenu();
+          if (event.target === dialogRef.current) setMobileOpen(false);
         }}
       >
-        <div className="flex min-h-full flex-col px-6 pb-10 pt-24">
-          <SentinelNavMenu
-            items={navItems}
-            vertical
-            onLinkClick={closeMenu}
-            ariaLabel="Mobile"
-          />
-
+        <div className="flex min-h-full flex-col px-5 pb-10 pt-24">
+          <nav aria-label="Mobile">
+            <ul className="m-0 flex list-none flex-col gap-2 p-0">
+              {navItems.map((item) => (
+                <li key={item.href}>
+                  <a
+                    href={item.href}
+                    className={`inline-flex min-h-11 w-full items-center rounded-xl px-4 py-2 text-base no-underline transition-colors duration-150 ${item.active ? "bg-white/[0.08] text-white" : "text-[#89919f] hover:bg-white/[0.05] hover:text-white"}`}
+                    onClick={() => setMobileOpen(false)}
+                    aria-current={item.active ? "true" : undefined}
+                  >
+                    {item.label}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </nav>
           <div className="mt-auto pt-10">
-            <QuoteCtaButton href="/app" className="w-full [&_.sentinel-quote-cta]:w-full [&_.sentinel-quote-cta]:justify-center" onClick={closeMenu} />
+            <QuoteCtaButton
+              href="/app"
+              className="w-full"
+              onClick={() => setMobileOpen(false)}
+            />
           </div>
         </div>
       </dialog>
