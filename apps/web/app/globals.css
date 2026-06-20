@@ -602,20 +602,6 @@ a {
   padding: 0 0.35rem;
 }
 
-.app-sidebar-logo-mark {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 2.25rem;
-  height: 2.25rem;
-  border-radius: 9999px;
-  background: var(--color-background-persistent-dark);
-  color: var(--color-content-persistent-white);
-  font-family: var(--font-display);
-  font-size: 0.9375rem;
-  font-weight: 600;
-}
-
 .app-sidebar-nav {
   display: flex;
   flex-direction: column;

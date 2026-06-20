@@ -4,6 +4,7 @@ import Link from "next/link";
 import { ConnectButton, useCurrentAccount } from "@mysten/dapp-kit";
 import { SentinelConnectButton } from "@/components/app/sentinel-connect-button";
 import { SentinelNavMenu } from "@/components/header/sentinel-nav-menu";
+import { SentinelLogo } from "@/components/sentinel-logo";
 
 export function AppHeader() {
   const account = useCurrentAccount();
@@ -12,13 +13,7 @@ export function AppHeader() {
     <header className="sentinel-header fixed inset-x-0 top-0 z-50">
       <div className="relative mx-auto flex max-w-[1140px] items-center justify-between gap-4 px-6 py-4 md:px-10">
         <Link href="/" className="relative z-[1] flex shrink-0 items-center gap-2.5 no-underline">
-          <span
-            className="flex h-8 w-8 items-center justify-center rounded-lg text-sm font-semibold"
-            style={{ background: "var(--sui-blue)", color: "#000" }}
-            aria-hidden
-          >
-            S
-          </span>
+          <SentinelLogo size={32} />
           <span
             className="text-[15px] font-medium tracking-tight"
             style={{ fontFamily: "var(--font-display)", color: "var(--sui-white)" }}

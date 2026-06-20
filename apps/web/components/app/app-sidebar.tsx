@@ -6,6 +6,7 @@ import { Home, Shield, Clock, Wallet } from "lucide-react";
 import { cn } from "@/lib/cn";
 import { AppSidebarAccountMenu } from "@/components/app/app-sidebar-account-menu";
 import { SentinelConnectButton } from "@/components/app/sentinel-connect-button";
+import { SentinelLogo } from "@/components/sentinel-logo";
 import type { AppNavId } from "@/components/app/app-tabs";
 
 const NAV: { id: AppNavId; label: string; icon: typeof Home }[] = [
@@ -30,7 +31,7 @@ export function AppSidebar({
     <>
       <aside className="app-sidebar hidden md:flex" aria-label="App navigation">
         <Link href="/app" className="app-sidebar-logo no-underline" aria-label="Sentinel app home">
-          <span className="app-sidebar-logo-mark" aria-hidden>S</span>
+          <SentinelLogo size={36} />
         </Link>
 
         <nav className="app-sidebar-nav">
