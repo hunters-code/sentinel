@@ -4,6 +4,7 @@ import { LandingHeader } from "@/components/landing/landing-header";
 import { Marquee } from "@/components/landing/marquee";
 import { HeroHeadline } from "@/components/landing/hero-headline";
 import { Reveal } from "@/components/reveal";
+import { SentinelLogo } from "@/components/sentinel-logo";
 
 const FLOW_STEPS = [
   {
@@ -329,9 +330,12 @@ export default function LandingPage() {
       >
         <div className="mx-auto grid max-w-container gap-10 md:grid-cols-[1.5fr_1fr_1fr]">
           <div>
-            <p className="text-sm font-medium" style={{ fontFamily: "var(--font-display)" }}>
-              Sentinel
-            </p>
+            <div className="flex items-center gap-2.5">
+              <SentinelLogo size={28} />
+              <p className="text-sm font-medium" style={{ fontFamily: "var(--font-display)" }}>
+                Sentinel
+              </p>
+            </div>
             <p className="mt-2 max-w-xs text-sm leading-relaxed" style={{ color: "var(--sui-steel)" }}>
               Parametric crash insurance for your crypto, built on DeepBook Predict.
             </p>
