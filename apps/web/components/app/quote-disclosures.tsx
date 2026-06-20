@@ -4,7 +4,11 @@ export function QuoteDisclosures() {
   return (
     <details
       className="rounded-xl border p-5"
-      style={{ borderColor: "var(--sui-line)", background: "rgba(255,255,255,0.02)" }}
+      style={{
+        borderColor: "var(--color-card-border, rgba(77, 162, 255, 0.3))",
+        background: "var(--color-card-fill, #000000)",
+        boxShadow: "inset 0 1px 0 var(--color-card-accent, rgba(77, 162, 255, 0.14))",
+      }}
     >
       <summary
         className="cursor-pointer text-sm font-medium list-none [&::-webkit-details-marker]:hidden"

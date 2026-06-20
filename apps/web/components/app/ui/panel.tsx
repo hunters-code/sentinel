@@ -1,10 +1,6 @@
 import { cn } from "@/lib/cn";
 
-const cardClass = "rounded-2xl border p-6 md:p-8";
-const cardStyle = {
-  borderColor: "var(--sui-line)",
-  background: "var(--color-background-tertiary, rgba(255, 255, 255, 0.04))",
-};
+const cardClass = "app-panel rounded-2xl p-6 md:p-8";
 
 export function Panel({
   children,
@@ -13,9 +9,5 @@ export function Panel({
   children: React.ReactNode;
   className?: string;
 }) {
-  return (
-    <div className={cn(cardClass, className)} style={cardStyle}>
-      {children}
-    </div>
-  );
+  return <div className={cn(cardClass, className)}>{children}</div>;
 }

@@ -36,8 +36,17 @@ export function AssetSelector({
               className="flex min-h-11 items-center justify-center gap-2 rounded-xl border px-3 py-2.5 text-sm font-medium transition-colors"
               style={
                 active
-                  ? { borderColor: "var(--sui-blue)", background: "var(--sui-blue-darker)", color: "var(--sui-white)" }
-                  : { borderColor: "var(--sui-line)", color: "var(--sui-white)" }
+                  ? {
+                      borderColor: "var(--sui-blue)",
+                      background: "var(--color-card-fill, #000000)",
+                      color: "var(--sui-white)",
+                      boxShadow: "inset 0 1px 0 var(--color-card-accent, rgba(77, 162, 255, 0.14))",
+                    }
+                  : {
+                      borderColor: "var(--sui-line)",
+                      background: "var(--color-card-fill, #000000)",
+                      color: "var(--sui-white)",
+                    }
               }
             >
               <AssetLogo id={asset.id} size={20} />

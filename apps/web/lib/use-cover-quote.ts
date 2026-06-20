@@ -75,28 +75,36 @@ export function buildCoverQuote(
     spreadAmt,
     floorBinds,
     expiryMs,
-    expiryLabel: expiryMs > 0 ? formatExpiryUtc(expiryMs).full : "",
+    expiryLabel: expiryMs > 0 ? formatExpiry(expiryMs).full : "",
     duration: expiryMs > 0 ? durationLabel(expiryMs) : "",
     valid: held > 0 && coverage > 0 && priced,
     createdAtMs: Date.now(),
   };
 }
 
-export function formatExpiryUtc(ms: number) {
+function localTimeZoneShort(date: Date): string {
+  return (
+    new Intl.DateTimeFormat(undefined, { timeZoneName: "short" })
+      .formatToParts(date)
+      .find((part) => part.type === "timeZoneName")?.value ?? ""
+  );
+}
+
+/** Expiry timestamp formatted in the user's local timezone. */
+export function formatExpiry(ms: number) {
   const d = new Date(ms);
-  const date = d.toLocaleDateString("en-GB", {
+  const date = d.toLocaleDateString(undefined, {
     weekday: "short",
     day: "numeric",
     month: "short",
     year: "numeric",
-    timeZone: "UTC",
   });
-  const time =
-    d.toLocaleTimeString("en-GB", {
-      hour: "2-digit",
-      minute: "2-digit",
-      timeZone: "UTC",
-    }) + " UTC";
+  const clock = d.toLocaleTimeString(undefined, {
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+  const tz = localTimeZoneShort(d);
+  const time = tz ? `${clock} ${tz}` : clock;
   return { date, time, full: `${date} · ${time}` };
 }
 
@@ -130,7 +138,7 @@ function toOracleOption(o: OracleRecord): OracleOption {
   return {
     oracleId: o.oracle_id,
     expiryMs: o.expiry,
-    expiryLabel: formatExpiryUtc(o.expiry).full,
+    expiryLabel: formatExpiry(o.expiry).full,
     minStrikeUsd: oraclePriceToUsd(o.min_strike),
     tickUsd: oraclePriceToUsd(o.tick_size),
   };

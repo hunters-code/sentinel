@@ -11,7 +11,7 @@ import { usePurchase } from "@/lib/use-purchase";
 import {
   buildCoverQuote,
   COVER_TERMS,
-  formatExpiryUtc,
+  formatExpiry,
   snapTermToOracle,
   useOracleOptions,
 } from "@/lib/use-cover-quote";
@@ -223,10 +223,10 @@ export function CoverPanel({ onViewHistory }: CoverPanelProps) {
               ) : capped && selectedOracle ? (
                 <Muted className="mt-4">
                   On testnet, windows top out around three weeks — your {selectedTerm.label} quote settles
-                  on the longest available window ({formatExpiryUtc(selectedOracle.expiryMs).full}).
+                  on the longest available window ({formatExpiry(selectedOracle.expiryMs).full}).
                 </Muted>
               ) : selectedOracle ? (
-                <Muted className="mt-4">Settles {formatExpiryUtc(selectedOracle.expiryMs).full}</Muted>
+                <Muted className="mt-4">Settles {formatExpiry(selectedOracle.expiryMs).full}</Muted>
               ) : null}
             </Panel>
           )}

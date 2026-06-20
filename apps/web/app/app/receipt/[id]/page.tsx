@@ -5,7 +5,7 @@ import { useParams, useRouter } from "next/navigation";
 import { useCurrentAccount } from "@mysten/dapp-kit";
 import { useManagerId } from "@/lib/use-manager";
 import { useManagerPolicies, type KeeperPolicyStatus } from "@/lib/keeper";
-import { formatExpiryUtc } from "@/lib/use-cover-quote";
+import { formatExpiry } from "@/lib/use-cover-quote";
 import { useLiveBtcPrice } from "@/lib/use-oracle-data";
 import { usd as formatUsd } from "@/lib/format";
 import { AppShell } from "@/components/app/app-shell";
@@ -68,10 +68,7 @@ function Frame({ children }: { children: React.ReactNode }) {
 
 function DetailRow({ label, value, accent }: { label: string; value: string; accent?: boolean }) {
   return (
-    <div
-      className="flex items-center justify-between gap-4 py-3"
-      style={{ borderTop: "1px solid var(--sui-line)" }}
-    >
+    <div className="app-divider-top flex items-center justify-between gap-4 py-3">
       <span className="text-sm" style={{ color: "var(--sui-steel)" }}>
         {label}
       </span>
@@ -100,7 +97,7 @@ export default function ReceiptPage() {
   if (keeperPolicies) {
     const kp = keeperPolicies.find((p) => p.id === decodedId);
     if (kp) {
-      const { full } = formatExpiryUtc(kp.expiryMs);
+      const { full } = formatExpiry(kp.expiryMs);
       view = {
         id: kp.id,
         status: kp.status,

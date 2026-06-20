@@ -118,7 +118,7 @@ export function LandingHeader() {
         ref={dialogRef}
         id="mobile-nav"
         className="landing-dialog m-0 w-full max-w-none border-0 p-0 md:hidden"
-        style={{ background: "var(--sui-black)", color: "var(--sui-white)" }}
+        style={{ background: "var(--sui-menu-bg)", color: "var(--sui-white)" }}
         onClose={() => setOpen(false)}
         onClick={(event) => {
           if (event.target === dialogRef.current) closeMenu();

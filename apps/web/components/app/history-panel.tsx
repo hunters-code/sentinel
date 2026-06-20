@@ -1,8 +1,9 @@
 "use client";
 
 import Link from "next/link";
+import { cn } from "@/lib/cn";
 import { usd } from "@/lib/format";
-import { formatExpiryUtc } from "@/lib/use-cover-quote";
+import { formatExpiry } from "@/lib/use-cover-quote";
 import { useManagerId } from "@/lib/use-manager";
 import { useKeeperHealth, useManagerPolicies, type KeeperPolicy } from "@/lib/keeper";
 import { Panel } from "@/components/app/ui/panel";
@@ -37,8 +38,10 @@ function PolicyRow({
   return (
     <Link
       href={href}
-      className="flex flex-wrap items-center justify-between gap-3 px-6 py-4 no-underline transition-colors hover:bg-white/[0.03] md:px-8"
-      style={bordered ? { borderTop: "1px solid var(--sui-line)" } : undefined}
+      className={cn(
+        "flex flex-wrap items-center justify-between gap-3 px-6 py-4 no-underline transition-colors hover:bg-white/[0.03] md:px-8",
+        bordered && "app-divider-top",
+      )}
     >
       <span className="text-sm" style={{ color: "var(--sui-white)" }}>
         {label}
@@ -80,7 +83,7 @@ export function HistoryPanel() {
         </Muted>
         <Panel className="overflow-hidden p-0">
           {keeperPolicies!.map((p: KeeperPolicy, i) => {
-            const { date, time } = formatExpiryUtc(p.expiryMs);
+            const { date, time } = formatExpiry(p.expiryMs);
             return (
               <PolicyRow
                 key={p.id}

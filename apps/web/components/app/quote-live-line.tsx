@@ -1,4 +1,4 @@
-import { formatExpiryUtc } from "@/lib/use-cover-quote";
+import { formatExpiry } from "@/lib/use-cover-quote";
 import { usd } from "@/lib/format";
 
 export function QuoteLiveLine({
@@ -12,7 +12,7 @@ export function QuoteLiveLine({
   coverage: number;
   symbol?: string;
 }) {
-  const { time } = formatExpiryUtc(expiryMs);
+  const { time } = formatExpiry(expiryMs);
 
   return (
     <p
