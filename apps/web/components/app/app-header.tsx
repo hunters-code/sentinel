@@ -16,13 +16,8 @@ export function AppHeader() {
       }}
     >
       <Link href="/" className="flex items-center gap-2.5 no-underline">
-        <span
-          className="flex h-8 w-8 items-center justify-center rounded-lg text-sm font-semibold"
-          style={{ background: "var(--sui-blue)", color: "#000" }}
-          aria-hidden
-        >
-          S
-        </span>
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img src="/logo-mark.svg" alt="" width={28} height={28} className="h-7 w-7" aria-hidden />
         <span
           className="text-[15px] font-medium tracking-tight"
           style={{ fontFamily: "var(--font-display)", color: "var(--sui-white)" }}

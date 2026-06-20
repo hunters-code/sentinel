@@ -1,10 +1,17 @@
 {
-  "name": "Sentinel — BTC Crash Insurance",
+  "name": "Sentinel — Crash insurance for your crypto",
   "short_name": "Sentinel",
-  "description": "One-hour parametric crash insurance for BTC",
+  "description": "Parametric crash insurance for BTC, ETH, and SUI. One honest price, paid automatically.",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#f4f4f0",
-  "theme_color": "#f4f4f0",
-  "icons": []
+  "background_color": "#000000",
+  "theme_color": "#000000",
+  "icons": [
+    {
+      "src": "/logo-mini-dark.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
 }
