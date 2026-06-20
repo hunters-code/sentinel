@@ -3,9 +3,7 @@
 import { useCurrentAccount, useSuiClient } from "@mysten/dapp-kit";
 import { useQuery } from "@tanstack/react-query";
 
-const DEMO_BTC_FALLBACK = 0.5;
-
-/** Scans wallet for a coin type containing "btc". Falls back for testnet demos. */
+/** Scans wallet for a coin type containing "btc". */
 export function useWalletBtc() {
   const account = useCurrentAccount();
   const client = useSuiClient();
@@ -20,7 +18,7 @@ export function useWalletBtc() {
       const btcCoin = balances.find((b) => b.coinType.toLowerCase().includes("btc"));
 
       if (!btcCoin || btcCoin.totalBalance === "0") {
-        return { amount: DEMO_BTC_FALLBACK, fromWallet: false as const };
+        return { amount: 0, fromWallet: false as const };
       }
 
       const meta = await client.getCoinMetadata({ coinType: btcCoin.coinType });

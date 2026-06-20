@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import { cn } from "@/lib/cn";
 import { usd } from "@/lib/format";
 import { useWalletBtc } from "@/lib/use-wallet-btc";
 import { useManagerId } from "@/lib/use-manager";
@@ -24,6 +25,7 @@ import { QuoteFreshness, useQuoteFreshness } from "@/components/app/quote-freshn
 import { QuoteLiveLine } from "@/components/app/quote-live-line";
 import { PricingBreakdown } from "@/components/app/pricing-breakdown";
 import { QuoteDisclosures } from "@/components/app/quote-disclosures";
+import { SettlementWindowsLoading } from "@/components/app/settlement-windows-loading";
 
 type CoverPanelProps = {
   onViewHistory: () => void;
@@ -74,7 +76,6 @@ export function CoverPanel({ onViewHistory }: CoverPanelProps) {
     [baseQuote, livePremium],
   );
 
-  const demoOracle = Boolean(selectedOracle?.isDemo);
   const hasAmount = btcHeld > 0;
   const quoteReady = hasAmount && !btcLoading && !oracleLoading && quote.valid;
   const { stale: quoteStale } = useQuoteFreshness(quote.createdAtMs);
@@ -90,12 +91,15 @@ export function CoverPanel({ onViewHistory }: CoverPanelProps) {
   };
 
   return (
-    <div className="space-y-6">
-      <Panel>
-        <AssetSelector selected={assetId} onSelect={setAssetId} />
-      </Panel>
+    <div className="app-cover-layout">
+      <div className="app-cover-sticky">
+        <Panel className="app-cover-sticky-panel">
+          <AssetSelector selected={assetId} onSelect={setAssetId} />
+        </Panel>
+      </div>
 
-      {!asset.live ? (
+      <div className="app-cover-scroll space-y-5">
+        {!asset.live ? (
         <Panel className="text-center">
           <div className="mb-4 flex justify-center">
             <AssetLogo id={asset.id} size={48} />
@@ -180,7 +184,15 @@ export function CoverPanel({ onViewHistory }: CoverPanelProps) {
               <Muted className="mb-5">
                 Trigger is −2% from today&apos;s {asset.symbol} price. Pick how long the cover runs.
               </Muted>
-              <div className="flex flex-wrap gap-2" role="group" aria-label="Coverage term">
+              <div
+                className={cn(
+                  "flex flex-wrap gap-2",
+                  oracleLoading && "app-term-group-loading",
+                )}
+                role="group"
+                aria-label="Coverage term"
+                aria-busy={oracleLoading}
+              >
                 {COVER_TERMS.map((t) => {
                   const active = t.id === termId;
                   return (
@@ -207,7 +219,7 @@ export function CoverPanel({ onViewHistory }: CoverPanelProps) {
               </div>
 
               {oracleLoading ? (
-                <Muted className="mt-4">Loading settlement windows…</Muted>
+                <SettlementWindowsLoading />
               ) : capped && selectedOracle ? (
                 <Muted className="mt-4">
                   On testnet, windows top out around three weeks — your {selectedTerm.label} quote settles
@@ -260,18 +272,12 @@ export function CoverPanel({ onViewHistory }: CoverPanelProps) {
                 </p>
               )}
 
-              {demoOracle && (
-                <p className="text-sm leading-relaxed" role="alert" style={{ color: "var(--sui-steel)" }}>
-                  No settlement window available — try a different term.
-                </p>
-              )}
-
               <QuoteFreshness createdAtMs={quote.createdAtMs} />
 
               <PrimaryButton
                 disabled={
                   signing ||
-                  demoOracle ||
+                  !selectedOracle ||
                   !premiumIsLive ||
                   quoteStale
                 }
@@ -293,6 +299,7 @@ export function CoverPanel({ onViewHistory }: CoverPanelProps) {
           ) : null}
         </>
       )}
+      </div>
     </div>
   );
 }
