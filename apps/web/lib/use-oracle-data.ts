@@ -11,10 +11,6 @@ import {
 } from "@sentinel/shared";
 import { fetchTradeCostUsd } from "@/lib/trade-cost";
 
-const DEMO_SVI: SviRawParams = { a: 0.0004, b: 0.0008, rho: -0.3, m: -0.02, sigma: 0.05 };
-
-const FALLBACK_BTC_PRICE = 100_000;
-
 /**
  * Live BTC/USD spot for display and quote math. Sourced from the predict-server
  * oracle feed (the same host the rest of the app uses, so it works wherever the
@@ -44,7 +40,7 @@ export function useLiveBtcPrice() {
 export function useSpotPrice(oracleId: string | null) {
   return useQuery({
     queryKey: ["oracle-spot", oracleId],
-    enabled: Boolean(oracleId) && !oracleId!.startsWith("demo-"),
+    enabled: Boolean(oracleId),
     staleTime: 10_000,
     refetchInterval: 15_000,
     queryFn: async (): Promise<number> => {
@@ -72,7 +68,6 @@ export function useOnChainPremium(args: {
   const quantityUnits = Math.floor(coverageUsd * DUSDC_UNIT);
   const enabled =
     Boolean(oracleId) &&
-    !oracleId!.startsWith("demo-") &&
     expiryRaw != null &&
     quantityUnits > 0 &&
     strikeUsd > 0;
@@ -100,7 +95,7 @@ export function useOnChainPremium(args: {
 export function useOracleSvi(oracleId: string | null) {
   return useQuery({
     queryKey: ["oracle-svi", oracleId],
-    enabled: Boolean(oracleId) && !oracleId!.startsWith("demo-"),
+    enabled: Boolean(oracleId),
     staleTime: 30_000,
     queryFn: async (): Promise<SviRawParams> => {
       const client = createPredictServerClient();
@@ -117,11 +112,11 @@ export function useOracleData(oracleId: string | null) {
   const liveBtc = useLiveBtcPrice();
 
   // Prefer the oracle's own price; otherwise track the real BTC market.
-  const spot = spotQuery.data ?? liveBtc.data ?? FALLBACK_BTC_PRICE;
+  const spot = spotQuery.data ?? liveBtc.data;
 
   return {
     spot,
-    svi: sviQuery.data ?? DEMO_SVI,
+    svi: sviQuery.data,
     spotLive: spotQuery.isSuccess || liveBtc.isSuccess,
     sviLive: sviQuery.isSuccess,
     loading: spotQuery.isLoading || sviQuery.isLoading,

@@ -18,10 +18,9 @@ export function SentinelConnectButton({
         <button
           type="button"
           className={cn(
-            "inline-flex min-h-11 items-center justify-center rounded-full px-5 py-2.5 text-sm font-medium transition-opacity hover:opacity-90",
+            "sentinel-primary-btn inline-flex min-h-11 items-center justify-center rounded-full px-5 py-2.5 text-sm font-medium transition-opacity hover:opacity-90",
             className,
           )}
-          style={{ background: "var(--sui-blue)", color: "#000" }}
         >
           {label}
         </button>

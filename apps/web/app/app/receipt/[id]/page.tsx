@@ -1,13 +1,16 @@
 "use client";
 
 import Link from "next/link";
-import { useParams } from "next/navigation";
-import { getPolicy, type PolicyStatus } from "@/lib/demo-policies";
+import { useParams, useRouter } from "next/navigation";
+import { useCurrentAccount } from "@mysten/dapp-kit";
 import { useManagerId } from "@/lib/use-manager";
-import { useManagerPolicies } from "@/lib/keeper";
-import { formatExpiryUtc } from "@/lib/use-cover-quote";
+import { useManagerPolicies, type KeeperPolicyStatus } from "@/lib/keeper";
+import { formatExpiry } from "@/lib/use-cover-quote";
 import { useLiveBtcPrice } from "@/lib/use-oracle-data";
+import { usd as formatUsd } from "@/lib/format";
 import { AppShell } from "@/components/app/app-shell";
+import { AppContentCard } from "@/components/app/app-content-card";
+import type { AppNavId } from "@/components/app/app-tabs";
 import { Panel } from "@/components/app/ui/panel";
 import { Muted } from "@/components/app/ui/muted";
 import { PrimaryButton } from "@/components/app/ui/primary-button";
@@ -15,61 +18,57 @@ import { StatusChip } from "@/components/app/ui/status-chip";
 
 type ReceiptView = {
   id: string;
-  status: PolicyStatus;
+  status: KeeperPolicyStatus;
   coverage: number;
   premium: number;
   trigger: number;
   payout?: number;
   subtitle: string;
   when: string;
-  source: "demo" | "keeper";
 };
 
-const usd = (n: number, max = 2) =>
-  new Intl.NumberFormat("en-US", {
-    style: "currency",
-    currency: "USD",
-    maximumFractionDigits: max,
-  }).format(n);
-
-const STATUS_LABELS: Record<PolicyStatus, string> = {
+const STATUS_LABELS: Record<KeeperPolicyStatus, string> = {
   active: "Active",
   paid: "Paid",
   expired: "Expired — no claim",
 };
 
-const STATUS_TONE: Record<PolicyStatus, "active" | "paid" | "expired"> = {
+const STATUS_TONE: Record<KeeperPolicyStatus, "active" | "paid" | "expired"> = {
   active: "active",
   paid: "paid",
   expired: "expired",
 };
 
 function Frame({ children }: { children: React.ReactNode }) {
+  const router = useRouter();
+  const account = useCurrentAccount();
+  const connected = Boolean(account?.address);
+
+  const navigateNav = (id: AppNavId) => {
+    router.push(id === "home" ? "/app" : `/app?tab=${id}`);
+  };
+
   return (
-    <AppShell>
-      <header
-        className="fixed inset-x-0 top-0 z-50 flex items-center px-6 py-4 md:px-10"
-        style={{ background: "var(--sui-black)", borderBottom: "1px solid var(--sui-line)" }}
-      >
-        <Link
-          href="/app"
-          className="inline-flex min-h-11 items-center gap-2 text-sm no-underline transition-colors hover:text-white"
-          style={{ color: "var(--sui-steel)" }}
-        >
-          <span aria-hidden>←</span> Back
-        </Link>
-      </header>
-      <main className="relative mx-auto max-w-lg px-6 pb-16 pt-24 md:px-10 md:pt-28">{children}</main>
+    <AppShell nav="history" onNavChange={navigateNav} connected={connected}>
+      <div className="app-main-body">
+        <div className="mb-4 px-1">
+          <Link
+            href="/app?tab=history"
+            className="inline-flex min-h-11 items-center gap-2 text-sm no-underline transition-colors hover:text-white"
+            style={{ color: "var(--sui-steel)" }}
+          >
+            <span aria-hidden>←</span> Back to history
+          </Link>
+        </div>
+        <AppContentCard>{children}</AppContentCard>
+      </div>
     </AppShell>
   );
 }
 
 function DetailRow({ label, value, accent }: { label: string; value: string; accent?: boolean }) {
   return (
-    <div
-      className="flex items-center justify-between gap-4 py-3"
-      style={{ borderTop: "1px solid var(--sui-line)" }}
-    >
+    <div className="app-divider-top flex items-center justify-between gap-4 py-3">
       <span className="text-sm" style={{ color: "var(--sui-steel)" }}>
         {label}
       </span>
@@ -87,31 +86,18 @@ export default function ReceiptPage() {
   const { id } = useParams<{ id: string }>();
   const decodedId = decodeURIComponent(id);
 
-  const demo = getPolicy(decodedId);
   const { managerId } = useManagerId();
-  const { data: keeperPolicies, isLoading } = useManagerPolicies(demo ? null : managerId);
+  const { data: keeperPolicies, isLoading } = useManagerPolicies(managerId);
 
   // Live spot for the price line — tracks the real BTC market.
   const spotQuery = useLiveBtcPrice();
 
   let view: ReceiptView | null = null;
 
-  if (demo) {
-    view = {
-      id: demo.id,
-      status: demo.status,
-      coverage: demo.coverage,
-      premium: demo.premium,
-      trigger: demo.trigger,
-      payout: demo.payout,
-      subtitle: `${demo.btc} BTC · trigger ${usd(demo.trigger, 0)}`,
-      when: demo.date,
-      source: "demo",
-    };
-  } else if (keeperPolicies) {
+  if (keeperPolicies) {
     const kp = keeperPolicies.find((p) => p.id === decodedId);
     if (kp) {
-      const { full } = formatExpiryUtc(kp.expiryMs);
+      const { full } = formatExpiry(kp.expiryMs);
       view = {
         id: kp.id,
         status: kp.status,
@@ -119,9 +105,8 @@ export default function ReceiptPage() {
         premium: kp.premium,
         trigger: kp.strike,
         payout: kp.payout,
-        subtitle: `trigger ${usd(kp.strike, 0)}`,
+        subtitle: `trigger ${formatUsd(kp.strike, 0)}`,
         when: full,
-        source: "keeper",
       };
     }
   }
@@ -163,7 +148,7 @@ export default function ReceiptPage() {
     <Frame>
       <div className="mb-8">
         <p className="mb-2 text-sm" style={{ color: "var(--sui-blue-bright)" }}>
-          Receipt{view.source === "demo" ? ` · #${view.id}` : ""}
+          Receipt
         </p>
         <h1 className="text-balance text-[clamp(1.75rem,5vw,2.25rem)] leading-tight">
           Your cover
@@ -181,7 +166,7 @@ export default function ReceiptPage() {
             className="text-[clamp(2rem,8vw,2.75rem)] leading-none"
             style={{ fontFamily: "var(--font-display)", color: "var(--sui-white)" }}
           >
-            {usd(view.coverage, 0)}
+            {formatUsd(view.coverage, 0)}
           </p>
           <Muted className="mt-3">{view.subtitle}</Muted>
         </Panel>
@@ -199,7 +184,7 @@ export default function ReceiptPage() {
                   className="text-2xl"
                   style={{ fontFamily: "var(--font-display)", color: "var(--sui-white)" }}
                 >
-                  {usd(spotQuery.data ?? 100_000, 0)}
+                  {spotQuery.data != null ? formatUsd(spotQuery.data, 0) : "—"}
                 </p>
               </div>
               <span aria-hidden style={{ color: "var(--sui-steel-dark)" }}>
@@ -213,7 +198,7 @@ export default function ReceiptPage() {
                   className="text-2xl"
                   style={{ fontFamily: "var(--font-display)", color: "var(--sui-blue-bright)" }}
                 >
-                  {usd(view.trigger, 0)}
+                  {formatUsd(view.trigger, 0)}
                 </p>
               </div>
             </div>
@@ -226,16 +211,16 @@ export default function ReceiptPage() {
             Policy details
           </h2>
           <div className="mt-3">
-            <DetailRow label="Premium paid" value={usd(view.premium)} />
-            <DetailRow label="Coverage" value={usd(view.coverage, 0)} />
-            <DetailRow label="Trigger" value={usd(view.trigger, 0)} />
-            <DetailRow label={view.source === "keeper" ? "Settles" : "Date"} value={view.when} />
-            {isPaidOut && <DetailRow label="Payout" value={usd(view.payout!, 0)} accent />}
+            <DetailRow label="Premium paid" value={formatUsd(view.premium)} />
+            <DetailRow label="Coverage" value={formatUsd(view.coverage, 0)} />
+            <DetailRow label="Trigger" value={formatUsd(view.trigger, 0)} />
+            <DetailRow label="Settles" value={view.when} />
+            {isPaidOut && <DetailRow label="Payout" value={formatUsd(view.payout!, 0)} accent />}
           </div>
         </Panel>
 
         {isPaidOut && (
-          <PrimaryButton>Withdraw {usd(view.payout!, 0)} to wallet</PrimaryButton>
+          <PrimaryButton>Withdraw {formatUsd(view.payout!, 0)} to wallet</PrimaryButton>
         )}
 
         <Muted>

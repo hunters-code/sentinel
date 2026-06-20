@@ -15,7 +15,7 @@ export const sentinelDappKitTheme: Theme = {
     iconButton: "rgba(255, 255, 255, 0.08)",
     iconButtonHover: "rgba(255, 255, 255, 0.14)",
     dropdownMenu: "#111111",
-    dropdownMenuSeparator: "rgba(255, 255, 255, 0.12)",
+    dropdownMenuSeparator: "rgba(77, 162, 255, 0.42)",
     walletItemSelected: "rgba(41, 141, 255, 0.18)",
     walletItemHover: "rgba(255, 255, 255, 0.06)",
   },

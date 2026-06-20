@@ -1,12 +1,12 @@
 type ChipTone = "active" | "paid" | "expired" | "neutral" | "live" | "offline";
 
 const toneStyles: Record<ChipTone, { color: string; border: string }> = {
-  active: { color: "var(--sui-blue-bright)", border: "rgba(92, 169, 255, 0.35)" },
-  paid: { color: "#7df752", border: "rgba(125, 247, 82, 0.35)" },
-  expired: { color: "var(--sui-steel)", border: "var(--sui-line)" },
-  neutral: { color: "var(--sui-steel)", border: "var(--sui-line)" },
-  live: { color: "#7df752", border: "rgba(125, 247, 82, 0.35)" },
-  offline: { color: "var(--sui-steel-dark)", border: "var(--sui-line)" },
+  active: { color: "var(--color-background-accent, var(--sui-blue-bright))", border: "var(--color-border-neutral)" },
+  paid: { color: "var(--color-content-positive, #7df752)", border: "var(--color-border-positive-weak)" },
+  expired: { color: "var(--color-content-secondary, var(--sui-steel))", border: "var(--sui-line)" },
+  neutral: { color: "var(--color-content-secondary, var(--sui-steel))", border: "var(--sui-line)" },
+  live: { color: "var(--color-content-positive, #7df752)", border: "var(--color-border-positive-weak)" },
+  offline: { color: "var(--color-content-tertiary, var(--sui-steel-dark))", border: "var(--sui-line)" },
 };
 
 export function StatusChip({

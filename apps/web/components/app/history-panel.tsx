@@ -1,9 +1,9 @@
 "use client";
 
 import Link from "next/link";
-import { DEMO_POLICIES } from "@/lib/demo-policies";
+import { cn } from "@/lib/cn";
 import { usd } from "@/lib/format";
-import { formatExpiryUtc } from "@/lib/use-cover-quote";
+import { formatExpiry } from "@/lib/use-cover-quote";
 import { useManagerId } from "@/lib/use-manager";
 import { useKeeperHealth, useManagerPolicies, type KeeperPolicy } from "@/lib/keeper";
 import { Panel } from "@/components/app/ui/panel";
@@ -38,8 +38,10 @@ function PolicyRow({
   return (
     <Link
       href={href}
-      className="flex flex-wrap items-center justify-between gap-3 px-6 py-4 no-underline transition-colors hover:bg-white/[0.03] md:px-8"
-      style={bordered ? { borderTop: "1px solid var(--sui-line)" } : undefined}
+      className={cn(
+        "flex flex-wrap items-center justify-between gap-3 px-6 py-4 no-underline transition-colors hover:bg-white/[0.03] md:px-8",
+        bordered && "app-divider-top",
+      )}
     >
       <span className="text-sm" style={{ color: "var(--sui-white)" }}>
         {label}
@@ -58,13 +60,18 @@ export function HistoryPanel() {
 
   if (managerLoading || (managerId && isLoading)) {
     return (
-      <Panel aria-busy="true">
-        <div className="space-y-3">
-          <div className="h-4 w-2/3 animate-pulse rounded bg-white/10" />
-          <div className="h-12 animate-pulse rounded-xl bg-white/5" />
-          <div className="h-12 animate-pulse rounded-xl bg-white/5" />
-        </div>
-      </Panel>
+      <div className="app-skeleton-list" aria-busy="true" aria-label="Loading policies">
+        {[0, 1, 2].map((i) => (
+          <div key={i} className="app-skeleton-row">
+            <div className="app-skeleton-circle" />
+            <div className="app-skeleton-lines">
+              <div className="app-skeleton-line app-skeleton-line-lg" />
+              <div className="app-skeleton-line app-skeleton-line-sm" />
+            </div>
+            <div className="app-skeleton-line app-skeleton-line-xs" />
+          </div>
+        ))}
+      </div>
     );
   }
 
@@ -76,7 +83,7 @@ export function HistoryPanel() {
         </Muted>
         <Panel className="overflow-hidden p-0">
           {keeperPolicies!.map((p: KeeperPolicy, i) => {
-            const { date, time } = formatExpiryUtc(p.expiryMs);
+            const { date, time } = formatExpiry(p.expiryMs);
             return (
               <PolicyRow
                 key={p.id}
@@ -107,25 +114,28 @@ export function HistoryPanel() {
     );
   }
 
-  return (
-    <div className="space-y-4">
-      <Muted>
-        {managerId && isError
-          ? "Keeper offline — sample policies shown below"
-          : "Sample policies — connect and buy cover to see yours"}
-      </Muted>
-      <Panel className="overflow-hidden p-0">
-        {DEMO_POLICIES.map((item, i) => (
-          <PolicyRow
-            key={item.id}
-            href={`/app/receipt/${item.id}`}
-            label={`#${item.id} · ${item.date} — ${usd(item.coverage, 0)} · paid ${usd(item.premium)}`}
-            status={item.status}
-            payout={item.payout}
-            bordered={i > 0}
-          />
-        ))}
+  if (managerId && isError) {
+    return (
+      <Panel>
+        <h2 className="mb-2 text-lg" style={{ fontFamily: "var(--font-display)" }}>
+          History unavailable
+        </h2>
+        <Muted>
+          Keeper is offline — policy history couldn&apos;t be loaded. Try again shortly.
+        </Muted>
       </Panel>
-    </div>
+    );
+  }
+
+  return (
+    <Panel>
+      <h2 className="mb-2 text-lg" style={{ fontFamily: "var(--font-display)" }}>
+        No policies yet
+      </h2>
+      <Muted>
+        Connect your wallet and buy cover on the Cover tab. After your purchase confirms,
+        policies appear here with live settlement status.
+      </Muted>
+    </Panel>
   );
 }

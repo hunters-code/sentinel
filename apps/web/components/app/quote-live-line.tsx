@@ -1,5 +1,5 @@
-import { formatExpiryUtc } from "@/lib/use-cover-quote";
-import { usdAuto } from "@/lib/format";
+import { formatExpiry } from "@/lib/use-cover-quote";
+import { usd } from "@/lib/format";
 
 export function QuoteLiveLine({
   strike,
@@ -12,7 +12,7 @@ export function QuoteLiveLine({
   coverage: number;
   symbol?: string;
 }) {
-  const { time } = formatExpiryUtc(expiryMs);
+  const { time } = formatExpiry(expiryMs);
 
   return (
     <p
@@ -20,9 +20,9 @@ export function QuoteLiveLine({
       style={{ fontFamily: "var(--font-display)" }}
     >
       If {symbol} drops below{" "}
-      <strong style={{ color: "var(--sui-blue-bright)" }}>{usdAuto(strike)}</strong> before{" "}
+      <strong style={{ color: "var(--sui-blue-bright)" }}>{usd(strike)}</strong> before{" "}
       <strong style={{ color: "var(--sui-blue-bright)" }}>{time}</strong>, you get{" "}
-      <strong style={{ color: "var(--sui-blue-bright)" }}>{usdAuto(coverage)}</strong>.
+      <strong style={{ color: "var(--sui-blue-bright)" }}>{usd(coverage)}</strong>.
     </p>
   );
 }
