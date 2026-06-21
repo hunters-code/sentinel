@@ -28,18 +28,18 @@ const COVERAGE_POINTS = [
   },
 ] as const;
 
-const BUILDER_DETAILS = [
+const TECH_STACK = [
   {
-    term: "Pricing source",
-    detail: "Live oracle and vol-surface data from DeepBook Predict on Sui testnet.",
+    term: "DeepBook Predict",
+    detail: "Live SVI pricing, market-derived.",
   },
   {
-    term: "Settlement asset",
-    detail: "Premiums and payouts in dUSDC on testnet.",
+    term: "On-chain settlement",
+    detail: "Payouts run without us.",
   },
   {
-    term: "Payout path",
-    detail: "Permissionless keeper claims after oracle settlement — verifiable on-chain.",
+    term: "Keeper network",
+    detail: "Permissionless payout claims.",
   },
 ] as const;
 
@@ -95,37 +95,19 @@ export function LandingStackSection() {
         )}
 
         <LandingReveal className="mt-8" delay={0.12}>
-          <details className="group rounded-2xl border border-border-neutral bg-black/55 px-6 py-5 backdrop-blur-sm open:pb-6">
-            <summary className="cursor-pointer list-none font-display text-base font-normal leading-snug text-content-primary marker:content-none [&::-webkit-details-marker]:hidden">
-              <span className="inline-flex items-center gap-2.5">
-                <span className="landing-sui-type-label text-sui-blue">For builders</span>
-                <svg
-                  width="12"
-                  height="12"
-                  viewBox="0 0 12 12"
-                  fill="none"
-                  aria-hidden
-                  className="opacity-60 transition-transform duration-200 group-open:rotate-180"
-                >
-                  <path
-                    d="M2 4L6 8L10 4"
-                    stroke="currentColor"
-                    strokeWidth="1.5"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  />
-                </svg>
-              </span>
-            </summary>
+          <div className="rounded-2xl border border-border-neutral bg-black/55 px-6 py-6 backdrop-blur-sm md:px-7 md:py-7">
+            <p className="landing-sui-type-label text-sui-blue">Tech</p>
             <dl className="mt-6 grid gap-6 sm:grid-cols-3 sm:gap-8">
-              {BUILDER_DETAILS.map((item) => (
+              {TECH_STACK.map((item) => (
                 <div key={item.term}>
-                  <dt className="landing-sui-type-label text-sui-steel-dark">{item.term}</dt>
-                  <dd className="landing-sui-type-body mt-2.5 leading-[1.55] text-content-primary">{item.detail}</dd>
+                  <dt className="font-display text-base font-normal leading-snug text-content-primary md:text-[1.0625rem]">
+                    {item.term}
+                  </dt>
+                  <dd className="landing-sui-type-body mt-2.5 leading-[1.55] text-content-secondary">{item.detail}</dd>
                 </div>
               ))}
             </dl>
-          </details>
+          </div>
         </LandingReveal>
       </div>
     </section>
