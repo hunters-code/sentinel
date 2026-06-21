@@ -1,0 +1,29 @@
+services:
+  sentinel:
+    build:
+      context: .
+      dockerfile: apps/keeper/Dockerfile
+    container_name: sentinel
+    restart: unless-stopped
+    env_file: .env
+    labels:
+      - traefik.enable=true
+      - traefik.docker.network=traefik
+      - traefik.http.routers.sentinel.rule=Host(`${DOMAIN:-sentinel-api.nashir.tech}`)
+      - traefik.http.routers.sentinel.entrypoints=websecure
+      - traefik.http.routers.sentinel.tls=true
+      - traefik.http.routers.sentinel.tls.certresolver=letsencrypt
+      - traefik.http.routers.sentinel.service=sentinel
+      - traefik.http.routers.sentinel-http.rule=Host(`${DOMAIN:-sentinel-api.nashir.tech}`)
+      - traefik.http.routers.sentinel-http.entrypoints=web
+      - traefik.http.routers.sentinel-http.middlewares=sentinel-redirect
+      - traefik.http.routers.sentinel-http.service=sentinel
+      - traefik.http.middlewares.sentinel-redirect.redirectscheme.scheme=https
+      - traefik.http.middlewares.sentinel-redirect.redirectscheme.permanent=true
+      - traefik.http.services.sentinel.loadbalancer.server.port=8787
+    networks:
+      - traefik
+
+networks:
+  traefik:
+    external: true
