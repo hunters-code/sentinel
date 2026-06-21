@@ -1,8 +1,9 @@
 import type { Metadata } from "next";
+import Script from "next/script";
 import { Geologica, Manrope } from "next/font/google";
 import "./globals.css";
 import { Providers } from "./providers";
-import { ThemeScript } from "@/components/theme-script";
+import { THEME_INIT_SCRIPT } from "@/lib/theme-init-script";
 
 const geologica = Geologica({
   subsets: ["latin"],
@@ -33,15 +34,14 @@ export const viewport = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" suppressHydrationWarning data-theme="dark" className={`${geologica.variable} ${manrope.variable}`}>
-      <head>
-        <ThemeScript />
-      </head>
       <body suppressHydrationWarning>
+        {/* eslint-disable-next-line @next/next/no-sync-scripts */}
+        <script suppressHydrationWarning dangerouslySetInnerHTML={{ __html: THEME_INIT_SCRIPT }} />
         <Providers>{children}</Providers>
-      {/* impeccable-live-start */}
-<script src="http://localhost:8400/live.js"></script>
-{/* impeccable-live-end */}
-</body>
+        {/* impeccable-live-start */}
+        <Script src="http://localhost:8400/live.js" strategy="afterInteractive" />
+        {/* impeccable-live-end */}
+      </body>
     </html>
   );
 }
