@@ -4,6 +4,7 @@ import { Geologica, Manrope } from "next/font/google";
 import "./globals.css";
 import { Providers } from "./providers";
 import { THEME_INIT_SCRIPT } from "@/lib/theme-init-script";
+import { suiDmMono, suiInter } from "@/lib/sui-fonts";
 
 const geologica = Geologica({
   subsets: ["latin"],
@@ -33,7 +34,12 @@ export const viewport = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" suppressHydrationWarning data-theme="dark" className={`${geologica.variable} ${manrope.variable}`}>
+    <html
+      lang="en"
+      suppressHydrationWarning
+      data-theme="dark"
+      className={`${geologica.variable} ${manrope.variable} ${suiInter.variable} ${suiDmMono.variable}`}
+    >
       <body suppressHydrationWarning>
         {/* eslint-disable-next-line @next/next/no-sync-scripts */}
         <script suppressHydrationWarning dangerouslySetInnerHTML={{ __html: THEME_INIT_SCRIPT }} />

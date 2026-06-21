@@ -5,11 +5,11 @@ const LINES = [
 
 export function HeroHeadline() {
   return (
-    <h1 className="text-center font-display text-[clamp(2.75rem,7vw,5.5rem)] font-medium leading-[1.02] tracking-[-0.03em] text-balance">
+    <h1 className="landing-sui-type-h1 text-center font-display font-normal text-balance">
       {LINES.map((line) => (
         <span
           key={line.text}
-          className={`block ${line.accent ? "text-sui-blue-bright" : "text-content-primary"}`}
+          className={`block ${line.accent ? "text-sui-blue" : "text-content-primary"}`}
         >
           {line.text}
         </span>

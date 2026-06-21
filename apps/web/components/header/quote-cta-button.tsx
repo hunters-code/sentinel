@@ -40,7 +40,7 @@ export function QuoteCtaButton({
       <Link
         href={href}
         className={cn(
-          "group inline-flex min-h-11 items-center justify-center gap-2.5 rounded-[26px] border border-white/22 bg-sui-black px-7 py-3 font-display text-[0.9375rem] font-medium leading-none tracking-[0.045em] text-white no-underline outline-none transition-[border-color,color] duration-200 ease-out hover:border-sui-blue-bright/35 hover:text-sui-blue-bright focus-visible:ring-2 focus-visible:ring-sui-blue-bright focus-visible:ring-offset-2 focus-visible:ring-offset-sui-black active:opacity-90",
+          "group inline-flex min-h-11 items-center justify-center gap-2.5 rounded-[26px] border border-white/12 bg-sui-black px-7 py-3 font-display text-[0.9375rem] font-normal leading-none tracking-[-0.012em] text-white no-underline outline-none transition-[border-color,color] duration-200 ease-out hover:border-sui-blue/35 hover:text-sui-blue focus-visible:ring-2 focus-visible:ring-sui-blue focus-visible:ring-offset-2 focus-visible:ring-offset-sui-black active:opacity-90",
           className,
         )}
         onClick={onClick}
@@ -55,19 +55,19 @@ export function QuoteCtaButton({
     <Link
       href={href}
       className={cn(
-        "group relative inline-flex min-h-11 items-center justify-center overflow-hidden rounded-[26px] border border-white/20 p-px no-underline outline-none transition-transform duration-200 ease-out hover:-translate-y-0.5 active:translate-y-0 focus-visible:ring-2 focus-visible:ring-sui-blue-bright focus-visible:ring-offset-2 focus-visible:ring-offset-sui-black",
+        "group relative inline-flex min-h-11 items-center justify-center overflow-hidden rounded-[26px] border border-white/12 p-px no-underline outline-none transition-transform duration-200 ease-out hover:-translate-y-0.5 active:translate-y-0 focus-visible:ring-2 focus-visible:ring-sui-blue focus-visible:ring-offset-2 focus-visible:ring-offset-sui-black",
         className,
       )}
       onClick={onClick}
     >
       <span className="pointer-events-none absolute inset-0 overflow-hidden rounded-[inherit]" aria-hidden>
-        <span className="absolute -inset-[42%] motion-safe:animate-[spin_4s_linear_infinite] motion-reduce:animate-none bg-[conic-gradient(from_0deg,rgba(92,169,255,0),rgba(92,169,255,0.85),rgba(92,169,255,0.25),rgba(92,169,255,0))]" />
+        <span className="absolute -inset-[42%] motion-safe:animate-[spin_4s_linear_infinite] motion-reduce:animate-none bg-[conic-gradient(from_0deg,rgba(41,141,255,0),rgba(41,141,255,0.85),rgba(41,141,255,0.25),rgba(41,141,255,0))]" />
       </span>
       <span
         className="pointer-events-none absolute inset-px rounded-[calc(26px-1px)] border border-white/35 opacity-70 transition-opacity duration-200 group-hover:opacity-100"
         aria-hidden
       />
-      <span className="relative z-[1] inline-flex min-h-[calc(44px-2px)] w-full items-center justify-center gap-2.5 rounded-[calc(26px-1px)] bg-sui-black px-7 py-3 font-display text-[0.9375rem] font-medium leading-none tracking-[0.045em] text-white transition-colors duration-200 group-hover:text-sui-blue-bright">
+      <span className="relative z-[1] inline-flex min-h-[calc(44px-2px)] w-full items-center justify-center gap-2.5 rounded-[calc(26px-1px)] bg-sui-black px-7 py-3 font-display text-[0.9375rem] font-normal leading-none tracking-[-0.012em] text-white transition-colors duration-200 group-hover:text-sui-blue">
         <span>{label}</span>
         <LaunchArrowIcon />
       </span>
