@@ -60,8 +60,10 @@ module.exports = {
         },
       },
       fontFamily: {
-        display: ["var(--font-geologica)", "system-ui", "sans-serif"],
-        body: ["var(--font-manrope)", "system-ui", "sans-serif"],
+        display: ["var(--font-display)", "system-ui", "sans-serif"],
+        body: ["var(--font-body)", "system-ui", "sans-serif"],
+        "sui-inter": ["var(--font-sui-inter)", "Inter", "system-ui", "sans-serif"],
+        "sui-mono": ["var(--font-sui-mono)", "DM Mono", "ui-monospace", "monospace"],
       },
       maxWidth: {
         container: "1140px",

@@ -5,19 +5,19 @@ const COINS = [
     id: "btc",
     src: "/illustrations/btc-3d-glass.svg",
     className:
-      "absolute bottom-0 left-1/2 z-[4] w-[46%] max-w-[280px] -translate-x-1/2 md:w-[42%] md:max-w-[320px] lg:w-[38%] lg:max-w-[360px]",
+      "landing-coin-float-center absolute bottom-0 left-1/2 z-[4] w-[46%] max-w-[280px] md:w-[42%] md:max-w-[320px] lg:w-[38%] lg:max-w-[360px]",
   },
   {
     id: "sui",
     src: "/illustrations/sui-3d-glass.svg",
     className:
-      "absolute bottom-[6%] left-[4%] z-[2] w-[30%] max-w-[196px] md:bottom-[8%] md:left-[6%] md:w-[28%] md:max-w-[228px] lg:w-[24%] lg:max-w-[260px]",
+      "landing-coin-float--sui absolute bottom-[6%] left-[4%] z-[2] w-[30%] max-w-[196px] md:bottom-[8%] md:left-[6%] md:w-[28%] md:max-w-[228px] lg:w-[24%] lg:max-w-[260px]",
   },
   {
     id: "usdc",
     src: "/illustrations/usdc-3d-glass.svg",
     className:
-      "absolute bottom-[4%] right-[4%] z-[3] w-[28%] max-w-[188px] md:bottom-[6%] md:right-[6%] md:w-[26%] md:max-w-[220px] lg:w-[22%] lg:max-w-[248px]",
+      "landing-coin-float--usdc absolute bottom-[4%] right-[4%] z-[3] w-[28%] max-w-[188px] md:bottom-[6%] md:right-[6%] md:w-[26%] md:max-w-[220px] lg:w-[22%] lg:max-w-[248px]",
   },
 ] as const;
 

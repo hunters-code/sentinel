@@ -1,3 +1,10 @@
+"use client";
+
+import { motion, useReducedMotion } from "framer-motion";
+import { SuiGradientBackdrop } from "@/components/landing/sui-gradient-backdrop";
+import { LandingReveal } from "@/components/landing/landing-reveal";
+import { LANDING_EASE, LANDING_VIEWPORT, landingFadeUp, landingStaggerContainer } from "@/lib/landing-motion";
+
 const COVERAGE_POINTS = [
   {
     label: "What you buy",
@@ -37,69 +44,110 @@ const BUILDER_DETAILS = [
 ] as const;
 
 export function LandingStackSection() {
+  const reduce = useReducedMotion();
+
   return (
-    <section id="stack" className="border-t border-[var(--color-chrome-border)] bg-sui-navy px-6 py-20 md:px-10 md:py-28">
-      <div className="mx-auto w-full max-w-container">
-        <div className="grid gap-10 lg:grid-cols-[1fr_1.1fr] lg:items-end">
+    <section id="stack" className="relative overflow-hidden border-t border-[var(--color-chrome-border)] px-5 py-20 md:px-10 md:py-28">
+      <SuiGradientBackdrop
+        variant="secondaryStack"
+        overlay="section"
+        imageClassName="object-cover object-center opacity-50"
+      />
+      <div className="relative z-[1] mx-auto w-full max-w-container">
+        <LandingReveal className="grid gap-10 lg:grid-cols-[1fr_1.1fr] lg:items-end">
           <div>
-            <p className="text-sm font-medium text-sui-blue-bright">Built on Sui</p>
-            <h2 className="mt-3 max-w-[16ch] text-[clamp(2rem,5vw,3.1rem)] font-medium leading-[1.04] tracking-[-0.03em] text-balance">
+            <p className="landing-sui-type-label font-medium text-sui-blue">Built on Sui</p>
+            <h2 className="landing-sui-type-h2 mt-3 max-w-[16ch] text-balance">
               Priced from live markets, settled on-chain.
             </h2>
           </div>
-          <p className="max-w-[62ch] text-[1.02rem] leading-[1.7] text-sui-steel text-pretty">
+          <p className="landing-sui-type-body max-w-[62ch] text-sui-steel text-pretty">
             Quotes refresh before you sign. Settlement follows the oracle expiry on your receipt — not a
             fixed duration from purchase.
           </p>
-        </div>
+        </LandingReveal>
 
-        <dl className="mt-10 grid gap-px overflow-hidden rounded-2xl border border-sui-blue-bright/25 bg-sui-blue-bright/25 sm:grid-cols-2">
-          {COVERAGE_POINTS.map((item, index) => (
-            <div
-              key={item.label}
-              className={`bg-black/40 p-6 md:p-7 ${index === 0 ? "sm:col-span-2 sm:bg-black/55" : ""}`}
-            >
-              <dt className="text-sm font-medium text-sui-steel">{item.label}</dt>
-              <dd className="mt-2 font-display text-[1.05rem] font-medium leading-[1.4] text-content-primary">
-                {item.value}
-              </dd>
-              <dd className="mt-2 max-w-[48ch] text-[0.9rem] leading-[1.55] text-sui-steel">{item.detail}</dd>
-            </div>
-          ))}
-        </dl>
-
-        <details className="group mt-8 rounded-2xl border border-border-neutral bg-[var(--color-background-inverse-bleedthrough-weak)] px-6 py-5 open:pb-6">
-          <summary className="cursor-pointer list-none font-display text-base font-medium text-content-primary marker:content-none [&::-webkit-details-marker]:hidden">
-            <span className="inline-flex items-center gap-2">
-              For builders
-              <svg
-                width="12"
-                height="12"
-                viewBox="0 0 12 12"
-                fill="none"
-                aria-hidden
-                className="opacity-60 transition-transform duration-200 group-open:rotate-180"
-              >
-                <path
-                  d="M2 4L6 8L10 4"
-                  stroke="currentColor"
-                  strokeWidth="1.5"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-              </svg>
-            </span>
-          </summary>
-          <dl className="mt-5 grid gap-4 sm:grid-cols-3">
-            {BUILDER_DETAILS.map((item) => (
-              <div key={item.term}>
-                <dt className="text-sm font-medium text-sui-steel">{item.term}</dt>
-                <dd className="mt-2 text-[0.9rem] leading-[1.55] text-content-secondary">{item.detail}</dd>
+        {reduce ? (
+          <div className="mt-10 grid gap-px overflow-hidden rounded-2xl border border-sui-blue/25 bg-sui-blue/25 sm:grid-cols-2">
+            {COVERAGE_POINTS.map((item, index) => (
+              <div key={item.label} className={index === 0 ? "sm:col-span-2" : undefined}>
+                <CoverageCell item={item} index={index} />
               </div>
             ))}
-          </dl>
-        </details>
+          </div>
+        ) : (
+          <motion.div
+            className="mt-10 grid gap-px overflow-hidden rounded-2xl border border-sui-blue/25 bg-sui-blue/25 sm:grid-cols-2"
+            initial="hidden"
+            whileInView="visible"
+            viewport={LANDING_VIEWPORT}
+            variants={landingStaggerContainer}
+          >
+            {COVERAGE_POINTS.map((item, index) => (
+              <motion.div
+                key={item.label}
+                variants={landingFadeUp}
+                transition={{ ease: LANDING_EASE }}
+                className={index === 0 ? "sm:col-span-2" : undefined}
+              >
+                <CoverageCell item={item} index={index} />
+              </motion.div>
+            ))}
+          </motion.div>
+        )}
+
+        <LandingReveal className="mt-8" delay={0.12}>
+          <details className="group rounded-2xl border border-border-neutral bg-[var(--color-background-inverse-bleedthrough-weak)] px-6 py-5 open:pb-6">
+            <summary className="cursor-pointer list-none font-display text-base font-normal text-content-primary marker:content-none [&::-webkit-details-marker]:hidden">
+              <span className="inline-flex items-center gap-2">
+                For builders
+                <svg
+                  width="12"
+                  height="12"
+                  viewBox="0 0 12 12"
+                  fill="none"
+                  aria-hidden
+                  className="opacity-60 transition-transform duration-200 group-open:rotate-180"
+                >
+                  <path
+                    d="M2 4L6 8L10 4"
+                    stroke="currentColor"
+                    strokeWidth="1.5"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                </svg>
+              </span>
+            </summary>
+            <dl className="mt-5 grid gap-4 sm:grid-cols-3">
+              {BUILDER_DETAILS.map((item) => (
+                <div key={item.term}>
+                  <dt className="landing-sui-type-body font-medium text-sui-steel">{item.term}</dt>
+                  <dd className="landing-sui-type-body mt-2 text-content-secondary">{item.detail}</dd>
+                </div>
+              ))}
+            </dl>
+          </details>
+        </LandingReveal>
       </div>
     </section>
+  );
+}
+
+function CoverageCell({
+  item,
+  index,
+}: {
+  item: (typeof COVERAGE_POINTS)[number];
+  index: number;
+}) {
+  return (
+    <dl className={`m-0 bg-black/40 p-6 md:p-7 ${index === 0 ? "sm:bg-black/55" : ""}`}>
+      <dt className="landing-sui-type-body font-medium text-sui-steel">{item.label}</dt>
+      <dd className="mt-2 font-display text-[1.05rem] font-normal leading-[1.4] text-content-primary">
+        {item.value}
+      </dd>
+      <dd className="landing-sui-type-body mt-2 max-w-[48ch] text-sui-steel">{item.detail}</dd>
+    </dl>
   );
 }

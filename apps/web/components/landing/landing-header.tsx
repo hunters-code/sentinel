@@ -2,10 +2,12 @@
 
 import Link from "next/link";
 import { useEffect, useRef, useState, useCallback } from "react";
+import { motion, useReducedMotion } from "framer-motion";
 import { cn } from "@/lib/cn";
 import { QuoteCtaButton } from "@/components/header/quote-cta-button";
 import { SentinelLogo } from "@/components/sentinel-logo";
 import { ThemeToggle } from "@/components/theme-toggle";
+import { LANDING_EASE } from "@/lib/landing-motion";
 
 const NAV_ITEMS = [
   {
@@ -35,6 +37,7 @@ const NAV_ITEMS = [
 type NavItemId = (typeof NAV_ITEMS)[number]["id"];
 
 export function LandingHeader() {
+  const reduce = useReducedMotion();
   const dialogRef = useRef<HTMLDialogElement>(null);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [activeSection, setActiveSection] = useState<string | null>(null);
@@ -95,11 +98,16 @@ export function LandingHeader() {
   }));
 
   return (
-    <header className="fixed inset-x-0 top-0 z-50 bg-sui-black">
-      <div className="relative mx-auto hidden max-w-container items-center gap-6 px-8 py-4 lg:grid lg:grid-cols-[1fr_auto_1fr]">
+    <motion.header
+      className="fixed inset-x-0 top-0 z-50 bg-sui-black"
+      initial={reduce ? false : { opacity: 1, y: -12 }}
+      animate={reduce ? undefined : { opacity: 1, y: 0 }}
+      transition={{ duration: 0.65, ease: LANDING_EASE }}
+    >
+      <div className="relative mx-auto hidden max-w-container items-center gap-6 px-5 py-4 md:px-10 lg:grid lg:grid-cols-[1fr_auto_1fr]">
         <Link href="/" className="flex items-center gap-3 justify-self-start text-content-primary no-underline">
           <SentinelLogo size={38} />
-          <span className="font-display text-[1.25rem] font-medium leading-none tracking-[-0.02em]">
+          <span className="font-display text-[1.25rem] font-normal leading-none tracking-[-0.02em]">
             Sentinel
           </span>
         </Link>
@@ -121,10 +129,10 @@ export function LandingHeader() {
                 <a
                   href={item.href}
                   className={cn(
-                    "inline-flex min-h-11 items-center gap-2 rounded-full px-4 py-2 font-display text-base font-medium leading-none tracking-[-0.015em] no-underline transition-colors duration-200",
+                    "inline-flex min-h-11 items-center gap-2 rounded-full px-4 py-2 font-display text-[0.9375rem] font-normal leading-none tracking-[-0.012em] no-underline transition-colors duration-200",
                     isOpen
-                      ? "bg-[var(--color-background-inverse-bleedthrough-weak)] text-sui-blue-bright"
-                      : "text-content-primary/86 hover:bg-[var(--color-background-inverse-bleedthrough-weak)] hover:text-sui-blue-bright",
+                      ? "bg-[var(--color-background-inverse-bleedthrough-weak)] text-sui-blue"
+                      : "text-content-primary/86 hover:bg-[var(--color-background-inverse-bleedthrough-weak)] hover:text-sui-blue",
                   )}
                   aria-expanded={isOpen}
                   aria-haspopup="true"
@@ -157,7 +165,7 @@ export function LandingHeader() {
 
                 <div
                   className={cn(
-                    "pointer-events-none absolute left-1/2 top-[calc(100%+0.85rem)] z-[60] grid w-[min(92vw,560px)] -translate-x-1/2 grid-cols-[1fr_auto] gap-3 rounded-[1.25rem] border border-white/15 bg-[rgba(0,20,44,0.86)] p-3 text-white opacity-0 shadow-[0_24px_60px_rgba(0,0,0,0.5)] backdrop-blur-[26px] transition-all duration-200",
+                    "pointer-events-none absolute left-1/2 top-[calc(100%+0.85rem)] z-[60] grid w-[min(92vw,560px)] -translate-x-1/2 grid-cols-[1fr_auto] gap-3 rounded-[1.25rem] border border-white/12 bg-[rgba(0,18,41,0.92)] p-3 text-white opacity-0 shadow-[0_24px_60px_rgba(0,0,0,0.5)] backdrop-blur-[26px] transition-all duration-200",
                     isOpen
                       ? "pointer-events-auto translate-y-0 opacity-100"
                       : "translate-y-1.5",
@@ -176,27 +184,27 @@ export function LandingHeader() {
                           className="flex min-h-[52px] flex-col justify-center gap-0.5 rounded-xl px-3 py-2.5 no-underline transition-colors duration-150 hover:bg-white/[0.06]"
                           onClick={() => setOpenDropdown(null)}
                         >
-                          <span className="font-display text-[0.9375rem] font-medium leading-tight text-white">
+                          <span className="font-display text-[0.9375rem] font-normal leading-tight text-white">
                             {link.label}
                           </span>
-                          <span className="text-[0.8125rem] leading-[1.35] text-sui-steel">{link.desc}</span>
+                          <span className="landing-sui-type-body leading-[1.35] text-sui-steel">{link.desc}</span>
                         </a>
                       </li>
                     ))}
                   </ul>
 
-                  <div className="relative min-w-[180px] rounded-2xl border border-sui-blue-bright/35 bg-[linear-gradient(180deg,rgba(5,37,84,0.88)_0%,rgba(1,17,42,0.88)_100%)] p-3.5">
+                  <div className="relative min-w-[180px] rounded-2xl border border-sui-blue/35 bg-[linear-gradient(180deg,rgba(0,46,106,0.88)_0%,rgba(0,17,42,0.92)_100%)] p-3.5">
                     <div
-                      className="pointer-events-none absolute inset-0 rounded-[inherit] bg-[radial-gradient(ellipse_at_top,rgba(92,169,255,0.24)_0%,rgba(92,169,255,0)_72%)]"
+                      className="pointer-events-none absolute inset-0 rounded-[inherit] bg-[radial-gradient(ellipse_at_top,rgba(41,141,255,0.24)_0%,rgba(41,141,255,0)_72%)]"
                       aria-hidden
                     />
-                    <p className="relative font-display text-sm font-medium leading-tight text-white">
+                    <p className="relative font-display text-[0.9375rem] font-normal leading-tight text-white">
                       {item.card.label}
                     </p>
-                    <p className="relative mt-1 text-[0.75rem] leading-[1.4] text-sui-steel">{item.card.hint}</p>
+                    <p className="landing-sui-type-body relative mt-1 leading-[1.4] text-sui-steel">{item.card.hint}</p>
                     <a
                       href="/app"
-                      className="relative mt-3 inline-flex text-[0.8125rem] font-medium text-sui-blue-bright no-underline transition-colors duration-150 hover:text-white"
+                      className="landing-sui-type-body relative mt-3 inline-flex font-medium text-sui-blue no-underline transition-colors duration-150 hover:text-white"
                       onClick={() => setOpenDropdown(null)}
                     >
                       Get a quote →
@@ -217,7 +225,7 @@ export function LandingHeader() {
       <div className="flex items-center justify-between px-5 py-4 lg:hidden">
         <Link href="/" className="flex items-center gap-3 text-content-primary no-underline">
           <SentinelLogo size={34} />
-          <span className="font-display text-[1.125rem] font-medium leading-none tracking-[-0.02em]">
+          <span className="font-display text-[1.125rem] font-normal leading-none tracking-[-0.02em]">
             Sentinel
           </span>
         </Link>
@@ -289,6 +297,6 @@ export function LandingHeader() {
           </div>
         </div>
       </dialog>
-    </header>
+    </motion.header>
   );
 }
