@@ -5,6 +5,7 @@ import { useEffect, useRef, useState, useCallback } from "react";
 import { cn } from "@/lib/cn";
 import { QuoteCtaButton } from "@/components/header/quote-cta-button";
 import { SentinelLogo } from "@/components/sentinel-logo";
+import { ThemeToggle } from "@/components/theme-toggle";
 
 const NAV_ITEMS = [
   {
@@ -96,7 +97,7 @@ export function LandingHeader() {
   return (
     <header className="fixed inset-x-0 top-0 z-50 bg-sui-black">
       <div className="relative mx-auto hidden max-w-container items-center gap-6 px-8 py-4 lg:grid lg:grid-cols-[1fr_auto_1fr]">
-        <Link href="/" className="flex items-center gap-3 justify-self-start text-white no-underline">
+        <Link href="/" className="flex items-center gap-3 justify-self-start text-content-primary no-underline">
           <SentinelLogo size={38} />
           <span className="font-display text-[1.25rem] font-medium leading-none tracking-[-0.02em]">
             Sentinel
@@ -122,8 +123,8 @@ export function LandingHeader() {
                   className={cn(
                     "inline-flex min-h-11 items-center gap-2 rounded-full px-4 py-2 font-display text-base font-medium leading-none tracking-[-0.015em] no-underline transition-colors duration-200",
                     isOpen
-                      ? "bg-white/[0.06] text-sui-blue-bright"
-                      : "text-white/86 hover:bg-white/[0.04] hover:text-sui-blue-bright",
+                      ? "bg-[var(--color-background-inverse-bleedthrough-weak)] text-sui-blue-bright"
+                      : "text-content-primary/86 hover:bg-[var(--color-background-inverse-bleedthrough-weak)] hover:text-sui-blue-bright",
                   )}
                   aria-expanded={isOpen}
                   aria-haspopup="true"
@@ -207,20 +208,23 @@ export function LandingHeader() {
           })}
         </nav>
 
-        <div className="hidden justify-end text-base md:flex lg:text-lg">
+        <div className="hidden items-center justify-end gap-3 text-base md:flex lg:text-lg">
+          <ThemeToggle />
           <QuoteCtaButton href="/app" quiet />
         </div>
       </div>
 
       <div className="flex items-center justify-between px-5 py-4 lg:hidden">
-        <Link href="/" className="flex items-center gap-3 text-white no-underline">
+        <Link href="/" className="flex items-center gap-3 text-content-primary no-underline">
           <SentinelLogo size={34} />
           <span className="font-display text-[1.125rem] font-medium leading-none tracking-[-0.02em]">
             Sentinel
           </span>
         </Link>
 
-        <button
+        <div className="flex items-center gap-2">
+          <ThemeToggle />
+          <button
           type="button"
           className="flex min-h-11 min-w-11 items-center justify-center rounded-lg border border-sui-line text-sui-white"
           aria-expanded={mobileOpen}
@@ -246,12 +250,13 @@ export function LandingHeader() {
             )}
           </svg>
         </button>
+        </div>
       </div>
 
       <dialog
         ref={dialogRef}
         id="mobile-nav"
-        className="m-0 h-full w-full max-w-none border-0 bg-sui-black p-0 text-white lg:hidden [&::backdrop]:bg-black/80 [&::backdrop]:backdrop-blur-sm"
+        className="m-0 h-full w-full max-w-none border-0 bg-sui-black p-0 text-content-primary lg:hidden [&::backdrop]:bg-black/80 [&::backdrop]:backdrop-blur-sm"
         onClose={() => setMobileOpen(false)}
         onClick={(event) => {
           if (event.target === dialogRef.current) setMobileOpen(false);
@@ -267,8 +272,8 @@ export function LandingHeader() {
                     className={cn(
                       "inline-flex min-h-11 w-full items-center rounded-xl px-4 py-2 text-base no-underline transition-colors duration-150",
                       item.active
-                        ? "bg-white/[0.08] text-white"
-                        : "text-sui-steel hover:bg-white/[0.05] hover:text-white",
+                        ? "bg-[var(--color-background-inverse-bleedthrough-medium)] text-content-primary"
+                        : "text-sui-steel hover:bg-[var(--color-background-inverse-bleedthrough-weak)] hover:text-content-primary",
                     )}
                     onClick={() => setMobileOpen(false)}
                     aria-current={item.active ? "true" : undefined}

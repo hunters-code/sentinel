@@ -40,7 +40,7 @@ export default function AppPageClient() {
         <AppEmptyState />
       ) : (
         <>
-          <div className="px-4 py-5 md:px-6 md:py-6 bg-sui-root">
+          <div className="min-h-full bg-sui-root px-4 py-5 md:px-6 md:py-6">
             {nav === "cover" && <CoverPanel onViewHistory={() => handleNavChange("history")} />}
             {nav === "history" && <HistoryPanel />}
             {nav === "wallet" && <WalletPanel managerId={managerId} />}

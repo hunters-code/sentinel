@@ -15,13 +15,13 @@ const STEPS = [
 
 export function LandingHowSection() {
   return (
-    <section id="how" className="border-t border-white/10 bg-sui-black px-6 py-20 md:px-10 md:py-28">
+    <section id="how" className="border-t border-[var(--color-chrome-border)] bg-sui-black px-6 py-20 md:px-10 md:py-28">
       <div className="mx-auto w-full max-w-container">
         <div className="max-w-[40rem]">
           <h2 className="max-w-[18ch] text-[clamp(2rem,5vw,3.25rem)] font-medium leading-[1.04] tracking-[-0.03em] text-balance">
             Buy coverage in one tap, settle automatically on expiry.
           </h2>
-          <p className="mt-6 max-w-[62ch] text-[1.0625rem] leading-[1.65] text-white/84 text-pretty">
+          <p className="mt-6 max-w-[62ch] text-[1.0625rem] leading-[1.65] text-content-secondary text-pretty">
             Enter how much crypto you hold, review your trigger and premium, then sign once. If the
             settlement price lands at or below your trigger, payout is sent to your wallet automatically.
           </p>
@@ -29,14 +29,14 @@ export function LandingHowSection() {
             <li className="rounded-full border border-sui-blue-bright/45 bg-sui-blue-bright/10 px-3 py-1 text-sui-blue-bright">
               Parametric payout
             </li>
-            <li className="rounded-full border border-white/15 px-3 py-1">One signature</li>
-            <li className="rounded-full border border-white/15 px-3 py-1">No claims paperwork</li>
+            <li className="rounded-full border border-border-neutral px-3 py-1">One signature</li>
+            <li className="rounded-full border border-border-neutral px-3 py-1">No claims paperwork</li>
           </ul>
         </div>
 
         <ol className="relative m-0 mt-16 list-none p-0 md:mt-20 lg:mt-24">
           <div
-            className="pointer-events-none absolute inset-x-0 top-4 hidden h-px bg-white/12 md:block"
+            className="pointer-events-none absolute inset-x-0 top-4 hidden h-px bg-[var(--color-chrome-border)] md:block"
             aria-hidden
           />
           <div className="grid gap-10 md:grid-cols-3 md:gap-8 lg:gap-12">
@@ -47,7 +47,7 @@ export function LandingHowSection() {
                     {index + 1}
                   </span>
                   <div className="min-w-0 flex-1 pt-0.5 md:pt-0">
-                    <h3 className="font-display text-lg font-medium tracking-[-0.02em] text-white md:text-xl">
+                    <h3 className="font-display text-lg font-medium tracking-[-0.02em] text-content-primary md:text-xl">
                       {step.title}
                     </h3>
                     <p className="mt-2 max-w-[34ch] text-[0.98rem] leading-[1.6] text-sui-steel md:mt-3">

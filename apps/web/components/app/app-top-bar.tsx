@@ -8,6 +8,7 @@ import { cn } from "@/lib/cn";
 import { shortAddr } from "@/lib/format";
 import { SentinelLogo } from "@/components/sentinel-logo";
 import { SentinelConnectButton } from "@/components/app/sentinel-connect-button";
+import { ThemeToggle } from "@/components/theme-toggle";
 
 function AccountMenu({ address }: { address: string }) {
   const [open, setOpen] = useState(false);
@@ -34,7 +35,7 @@ function AccountMenu({ address }: { address: string }) {
     <div ref={rootRef} className="relative">
       <button
         type="button"
-        className="inline-flex min-h-9 cursor-pointer items-center gap-1.5 rounded-full border border-border-neutral bg-black/30 py-1.5 pl-3 pr-2.5 text-[0.8125rem] font-medium tabular-nums text-content-primary transition-colors hover:bg-white/[0.06]"
+        className="inline-flex min-h-9 cursor-pointer items-center gap-1.5 rounded-full border border-border-neutral bg-[var(--color-background-inverse-bleedthrough-weak)] py-1.5 pl-3 pr-2.5 text-[0.8125rem] font-medium tabular-nums text-content-primary transition-colors hover:bg-[var(--color-background-inverse-bleedthrough-medium)]"
         title={address}
         aria-expanded={open}
         aria-haspopup="menu"
@@ -57,7 +58,7 @@ function AccountMenu({ address }: { address: string }) {
           <button
             type="button"
             role="menuitem"
-            className="block w-full cursor-pointer rounded-lg border-none bg-transparent px-2.5 py-2 text-left text-sm font-medium text-content-persistent-white transition-colors duration-150 hover:bg-white/[0.08]"
+            className="block w-full cursor-pointer rounded-lg border-none bg-transparent px-2.5 py-2 text-left text-sm font-medium text-content-primary transition-colors duration-150 hover:bg-[var(--color-background-inverse-bleedthrough-medium)]"
             onClick={() => {
               disconnect();
               setOpen(false);
@@ -75,7 +76,7 @@ export function AppTopBar({ connected }: { connected?: boolean }) {
   const account = useCurrentAccount();
 
   return (
-    <header className="sticky top-0 z-[2] flex shrink-0 items-center justify-between gap-3 border-b border-white/[0.07] bg-sui-black px-4 py-3 md:px-6">
+    <header className="sticky top-0 z-[2] flex shrink-0 items-center justify-between gap-3 border-b border-[var(--color-chrome-border)] bg-sui-black px-4 py-3 md:px-6">
       <Link
         href="/app"
         aria-label="Sentinel"
@@ -84,11 +85,14 @@ export function AppTopBar({ connected }: { connected?: boolean }) {
         <SentinelLogo size={30} />
       </Link>
 
-      {connected && account?.address ? (
-        <AccountMenu address={account.address} />
-      ) : (
-        <SentinelConnectButton label="Connect" className="!min-h-9 !py-1.5 !text-[0.8125rem]" />
-      )}
+      <div className="flex items-center gap-2">
+        <ThemeToggle />
+        {connected && account?.address ? (
+          <AccountMenu address={account.address} />
+        ) : (
+          <SentinelConnectButton label="Connect" className="!min-h-9 !py-1.5 !text-[0.8125rem]" />
+        )}
+      </div>
     </header>
   );
 }

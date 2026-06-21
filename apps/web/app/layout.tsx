@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geologica, Manrope } from "next/font/google";
 import "./globals.css";
 import { Providers } from "./providers";
+import { ThemeScript } from "@/components/theme-script";
 
 const geologica = Geologica({
   subsets: ["latin"],
@@ -23,12 +24,18 @@ export const metadata: Metadata = {
 };
 
 export const viewport = {
-  themeColor: "#082d57",
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "#eef4fb" },
+    { media: "(prefers-color-scheme: dark)", color: "#000000" },
+  ],
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" suppressHydrationWarning className={`${geologica.variable} ${manrope.variable}`}>
+    <html lang="en" suppressHydrationWarning data-theme="dark" className={`${geologica.variable} ${manrope.variable}`}>
+      <head>
+        <ThemeScript />
+      </head>
       <body suppressHydrationWarning>
         <Providers>{children}</Providers>
       {/* impeccable-live-start */}

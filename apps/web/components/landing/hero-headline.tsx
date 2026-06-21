@@ -9,7 +9,7 @@ export function HeroHeadline() {
       {LINES.map((line) => (
         <span
           key={line.text}
-          className={`block ${line.accent ? "text-sui-blue-bright" : "text-sui-white"}`}
+          className={`block ${line.accent ? "text-sui-blue-bright" : "text-content-primary"}`}
         >
           {line.text}
         </span>

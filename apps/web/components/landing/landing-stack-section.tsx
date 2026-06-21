@@ -38,7 +38,7 @@ const BUILDER_DETAILS = [
 
 export function LandingStackSection() {
   return (
-    <section id="stack" className="border-t border-white/10 bg-sui-navy px-6 py-20 md:px-10 md:py-28">
+    <section id="stack" className="border-t border-[var(--color-chrome-border)] bg-sui-navy px-6 py-20 md:px-10 md:py-28">
       <div className="mx-auto w-full max-w-container">
         <div className="grid gap-10 lg:grid-cols-[1fr_1.1fr] lg:items-end">
           <div>
@@ -60,7 +60,7 @@ export function LandingStackSection() {
               className={`bg-black/40 p-6 md:p-7 ${index === 0 ? "sm:col-span-2 sm:bg-black/55" : ""}`}
             >
               <dt className="text-sm font-medium text-sui-steel">{item.label}</dt>
-              <dd className="mt-2 font-display text-[1.05rem] font-medium leading-[1.4] text-white">
+              <dd className="mt-2 font-display text-[1.05rem] font-medium leading-[1.4] text-content-primary">
                 {item.value}
               </dd>
               <dd className="mt-2 max-w-[48ch] text-[0.9rem] leading-[1.55] text-sui-steel">{item.detail}</dd>
@@ -68,8 +68,8 @@ export function LandingStackSection() {
           ))}
         </dl>
 
-        <details className="group mt-8 rounded-2xl border border-white/10 bg-black/30 px-6 py-5 open:pb-6">
-          <summary className="cursor-pointer list-none font-display text-base font-medium text-white/90 marker:content-none [&::-webkit-details-marker]:hidden">
+        <details className="group mt-8 rounded-2xl border border-border-neutral bg-[var(--color-background-inverse-bleedthrough-weak)] px-6 py-5 open:pb-6">
+          <summary className="cursor-pointer list-none font-display text-base font-medium text-content-primary marker:content-none [&::-webkit-details-marker]:hidden">
             <span className="inline-flex items-center gap-2">
               For builders
               <svg
@@ -94,7 +94,7 @@ export function LandingStackSection() {
             {BUILDER_DETAILS.map((item) => (
               <div key={item.term}>
                 <dt className="text-sm font-medium text-sui-steel">{item.term}</dt>
-                <dd className="mt-2 text-[0.9rem] leading-[1.55] text-white/82">{item.detail}</dd>
+                <dd className="mt-2 text-[0.9rem] leading-[1.55] text-content-secondary">{item.detail}</dd>
               </div>
             ))}
           </dl>
