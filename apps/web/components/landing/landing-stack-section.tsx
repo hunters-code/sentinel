@@ -54,14 +54,12 @@ export function LandingStackSection() {
         imageClassName="object-cover object-center opacity-50"
       />
       <div className="relative z-[1] mx-auto w-full max-w-container">
-        <LandingReveal className="grid gap-10 lg:grid-cols-[1fr_1.1fr] lg:items-end">
-          <div>
-            <p className="landing-sui-type-label font-medium text-sui-blue">Built on Sui</p>
-            <h2 className="landing-sui-type-h2 mt-3 max-w-[16ch] text-balance">
-              Priced from live markets, settled on-chain.
-            </h2>
-          </div>
-          <p className="landing-sui-type-body max-w-[62ch] text-sui-steel text-pretty">
+        <LandingReveal className="max-w-[44rem]">
+          <p className="landing-sui-type-label font-medium text-sui-blue">Built on Sui</p>
+          <h2 className="landing-sui-type-h2 mt-3 max-w-[20ch] text-balance text-content-primary">
+            Priced from live markets, settled on-chain.
+          </h2>
+          <p className="landing-sui-type-lead mt-5 max-w-[62ch] text-content-secondary text-pretty">
             Quotes refresh before you sign. Settlement follows the oracle expiry on your receipt — not a
             fixed duration from purchase.
           </p>
@@ -97,10 +95,10 @@ export function LandingStackSection() {
         )}
 
         <LandingReveal className="mt-8" delay={0.12}>
-          <details className="group rounded-2xl border border-border-neutral bg-[var(--color-background-inverse-bleedthrough-weak)] px-6 py-5 open:pb-6">
-            <summary className="cursor-pointer list-none font-display text-base font-normal text-content-primary marker:content-none [&::-webkit-details-marker]:hidden">
-              <span className="inline-flex items-center gap-2">
-                For builders
+          <details className="group rounded-2xl border border-border-neutral bg-black/55 px-6 py-5 backdrop-blur-sm open:pb-6">
+            <summary className="cursor-pointer list-none font-display text-base font-normal leading-snug text-content-primary marker:content-none [&::-webkit-details-marker]:hidden">
+              <span className="inline-flex items-center gap-2.5">
+                <span className="landing-sui-type-label text-sui-blue">For builders</span>
                 <svg
                   width="12"
                   height="12"
@@ -119,11 +117,11 @@ export function LandingStackSection() {
                 </svg>
               </span>
             </summary>
-            <dl className="mt-5 grid gap-4 sm:grid-cols-3">
+            <dl className="mt-6 grid gap-6 sm:grid-cols-3 sm:gap-8">
               {BUILDER_DETAILS.map((item) => (
                 <div key={item.term}>
-                  <dt className="landing-sui-type-body font-medium text-sui-steel">{item.term}</dt>
-                  <dd className="landing-sui-type-body mt-2 text-content-secondary">{item.detail}</dd>
+                  <dt className="landing-sui-type-label text-sui-steel-dark">{item.term}</dt>
+                  <dd className="landing-sui-type-body mt-2.5 leading-[1.55] text-content-primary">{item.detail}</dd>
                 </div>
               ))}
             </dl>
@@ -142,12 +140,18 @@ function CoverageCell({
   index: number;
 }) {
   return (
-    <dl className={`m-0 bg-black/40 p-6 md:p-7 ${index === 0 ? "sm:bg-black/55" : ""}`}>
-      <dt className="landing-sui-type-body font-medium text-sui-steel">{item.label}</dt>
-      <dd className="mt-2 font-display text-[1.05rem] font-normal leading-[1.4] text-content-primary">
+    <dl
+      className={`m-0 h-full p-6 backdrop-blur-sm md:p-7 ${
+        index === 0 ? "bg-black/80 sm:bg-black/85" : "bg-black/70"
+      }`}
+    >
+      <dt className="landing-sui-type-label text-sui-blue">{item.label}</dt>
+      <dd className="mt-3 font-display text-lg font-normal leading-[1.35] tracking-[-0.02em] text-content-primary md:text-xl">
         {item.value}
       </dd>
-      <dd className="landing-sui-type-body mt-2 max-w-[48ch] text-sui-steel">{item.detail}</dd>
+      <dd className="landing-sui-type-body mt-3 max-w-[42ch] leading-[1.55] text-content-secondary">
+        {item.detail}
+      </dd>
     </dl>
   );
 }

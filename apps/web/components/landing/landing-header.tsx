@@ -6,7 +6,6 @@ import { motion, useReducedMotion } from "framer-motion";
 import { cn } from "@/lib/cn";
 import { QuoteCtaButton } from "@/components/header/quote-cta-button";
 import { SentinelLogo } from "@/components/sentinel-logo";
-import { ThemeToggle } from "@/components/theme-toggle";
 import { LANDING_EASE } from "@/lib/landing-motion";
 
 const NAV_ITEMS = [
@@ -217,7 +216,6 @@ export function LandingHeader() {
         </nav>
 
         <div className="hidden items-center justify-end gap-3 text-base md:flex lg:text-lg">
-          <ThemeToggle />
           <QuoteCtaButton href="/app" quiet />
         </div>
       </div>
@@ -231,7 +229,6 @@ export function LandingHeader() {
         </Link>
 
         <div className="flex items-center gap-2">
-          <ThemeToggle />
           <button
           type="button"
           className="flex min-h-11 min-w-11 items-center justify-center rounded-lg border border-sui-line text-sui-white"
