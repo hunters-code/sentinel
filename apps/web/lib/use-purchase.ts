@@ -12,7 +12,6 @@ import {
 import {
   buildCreateManagerPtb,
   buildPurchasePtb,
-  buildWithdrawPtb,
 } from "@/lib/web-ptb";
 import { fetchTradeCostUsd } from "@/lib/trade-cost";
 import { cacheManagerId } from "@/lib/use-manager";
@@ -179,35 +178,4 @@ export function usePurchase() {
   );
 
   return { purchase, status, error, txDigest };
-}
-
-export function useWithdraw() {
-  const account = useCurrentAccount();
-  const queryClient = useQueryClient();
-  const { mutateAsync: signAndExecute } = useSignAndExecuteTransaction();
-
-  const [withdrawing, setWithdrawing] = useState(false);
-  const [done, setDone] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-
-  const withdraw = useCallback(
-    async (managerId: string, amountUsd: number) => {
-      if (!account?.address || amountUsd <= 0) return;
-      setWithdrawing(true);
-      setError(null);
-      try {
-        const tx = buildWithdrawPtb(account.address, managerId, amountUsd);
-        await signAndExecute({ transaction: tx });
-        setDone(true);
-        queryClient.invalidateQueries({ queryKey: ["manager-balance", managerId] });
-      } catch (err) {
-        setError(err instanceof Error ? err.message : "Withdraw failed");
-      } finally {
-        setWithdrawing(false);
-      }
-    },
-    [account, queryClient, signAndExecute],
-  );
-
-  return { withdraw, withdrawing, done, error };
 }

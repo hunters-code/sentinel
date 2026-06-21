@@ -40,11 +40,11 @@ export default function AppPageClient() {
         <AppEmptyState />
       ) : (
         <>
-          <div className="min-h-full bg-sui-root px-4 py-5 md:px-6 md:py-6">
-            {nav === "cover" && <CoverPanel onViewHistory={() => handleNavChange("history")} />}
-            {nav === "history" && <HistoryPanel />}
-            {nav === "wallet" && <WalletPanel managerId={managerId} />}
-          </div>
+          {nav === "cover" && <CoverPanel />}
+          {nav === "history" && (
+            <HistoryPanel expandedPolicyId={searchParams.get("policy")} />
+          )}
+          {nav === "wallet" && <WalletPanel managerId={managerId} />}
         </>
       )}
     </AppShell>

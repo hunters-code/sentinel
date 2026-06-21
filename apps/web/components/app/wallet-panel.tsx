@@ -2,14 +2,12 @@
 
 import { usd } from "@/lib/format";
 import { useManagerBalance } from "@/lib/use-manager-balance";
-import { useWithdraw } from "@/lib/use-purchase";
+import { WalletPayoutActions } from "@/components/app/policy-payout-actions";
 import { Panel } from "@/components/app/ui/panel";
 import { Muted } from "@/components/app/ui/muted";
-import { PrimaryButton } from "@/components/app/ui/primary-button";
 
 export function WalletPanel({ managerId }: { managerId: string | null }) {
-  const { balance, loading: balanceLoading, refetch } = useManagerBalance(managerId);
-  const { withdraw, withdrawing, done, error } = useWithdraw();
+  const { balance, loading: balanceLoading } = useManagerBalance(managerId);
 
   if (!managerId) {
     return (
@@ -33,28 +31,7 @@ export function WalletPanel({ managerId }: { managerId: string | null }) {
         <Muted className="mt-2">Stablecoin balance from settled cover payouts</Muted>
       </div>
 
-      {error && (
-        <p className="text-sm text-signal-orange" role="alert">
-          {error}
-        </p>
-      )}
-
-      {done ? (
-        <p className="text-sm font-medium text-content-positive" role="status">
-          Sent to your wallet
-        </p>
-      ) : (
-        <PrimaryButton
-          disabled={balance <= 0 || withdrawing || balanceLoading}
-          onClick={() => {
-            if (managerId) {
-              withdraw(managerId, balance).then(() => refetch());
-            }
-          }}
-        >
-          {withdrawing ? "Withdrawing…" : "Withdraw to wallet"}
-        </PrimaryButton>
-      )}
+      <WalletPayoutActions managerId={managerId} />
     </Panel>
   );
 }

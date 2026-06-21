@@ -2,12 +2,8 @@
 
 import { useSuiClient } from "@mysten/dapp-kit";
 import { useQuery } from "@tanstack/react-query";
-import { DUSDC_UNIT } from "@sentinel/shared";
+import { fetchManagerBalanceUsd } from "@/lib/fetch-manager-balance";
 
-/**
- * Reads the PredictManager object directly from chain to get the dUSDC balance.
- * Falls back to 0 on any error (object may not have a `balance` field we can parse).
- */
 export function useManagerBalance(managerId: string | null) {
   const client = useSuiClient();
 
@@ -17,19 +13,11 @@ export function useManagerBalance(managerId: string | null) {
     staleTime: 15_000,
     refetchInterval: 30_000,
     queryFn: async (): Promise<number> => {
-      const obj = await client.getObject({
-        id: managerId!,
-        options: { showContent: true },
-      });
-      const fields = (obj.data?.content as { fields?: Record<string, unknown> } | undefined)?.fields;
-      if (!fields) return 0;
-      // The manager's balance is a Balance<DUSDC> struct; try common field names.
-      const raw =
-        (fields.balance as { value?: string } | undefined)?.value ??
-        fields.balance_value ??
-        fields.balance;
-      if (raw == null) return 0;
-      return Number(raw) / DUSDC_UNIT;
+      try {
+        return await fetchManagerBalanceUsd(client, managerId!);
+      } catch {
+        return 0;
+      }
     },
   });
 

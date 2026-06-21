@@ -10,7 +10,7 @@ export function HeroIntro() {
   if (reduce) {
     return (
       <>
-        <p className="landing-sui-type-lead mx-auto mt-6 max-w-[65ch] text-center text-content-secondary text-pretty">
+        <p className="text-landing-lead mx-auto mt-6 max-w-[65ch] text-center text-content-secondary text-pretty">
           Cover your crypto against a sharp drop. Cross the{" "}
           <strong className="font-medium text-content-primary">2%</strong> trigger and you&apos;re{" "}
           <strong className="font-medium text-content-primary">paid automatically</strong> —{" "}
@@ -26,7 +26,7 @@ export function HeroIntro() {
   return (
     <>
       <motion.p
-        className="landing-sui-type-lead mx-auto mt-6 max-w-[65ch] text-center text-content-secondary text-pretty"
+        className="text-landing-lead mx-auto mt-6 max-w-[65ch] text-center text-content-secondary text-pretty"
         initial={{ opacity: 1, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.75, delay: 0.38, ease: LANDING_EASE }}

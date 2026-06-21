@@ -4,10 +4,10 @@ type ChipTone = "active" | "paid" | "expired" | "neutral" | "live" | "offline";
 
 const toneClasses: Record<ChipTone, string> = {
   active: "text-bg-accent border-border-neutral",
-  paid: "text-content-positive border-[#063d23]",
+  paid: "text-bg-secondary-selected border-[rgba(77,162,255,0.35)]",
   expired: "text-content-secondary border-border-neutral",
   neutral: "text-content-secondary border-border-neutral",
-  live: "text-content-positive border-[#063d23]",
+  live: "text-bg-secondary-selected border-[rgba(77,162,255,0.35)]",
   offline: "text-content-tertiary border-border-neutral",
 };
 

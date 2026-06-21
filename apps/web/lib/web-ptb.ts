@@ -142,3 +142,41 @@ export function buildWithdrawPtb(
   tx.transferObjects([coin], address);
   return tx;
 }
+
+export interface ClaimPayoutParams {
+  oracleId: string;
+  expiryRaw: number;
+  strikeRaw: number;
+  quantityUnits: bigint;
+  managerId: string;
+}
+
+/** Claim a settled in-the-money DOWN payout into the PredictManager balance. */
+export function buildClaimPtb(params: ClaimPayoutParams): Transaction {
+  const { oracleId, expiryRaw, strikeRaw, quantityUnits, managerId } = params;
+  const tx = new Transaction();
+
+  const marketKey = tx.moveCall({
+    target: `${PREDICT_PACKAGE_ID}::market_key::down`,
+    arguments: [
+      tx.pure.id(oracleId),
+      tx.pure.u64(expiryRaw),
+      tx.pure.u64(strikeRaw),
+    ],
+  });
+
+  tx.moveCall({
+    target: `${PREDICT_PACKAGE_ID}::predict::redeem_permissionless`,
+    typeArguments: [DUSDC_TYPE],
+    arguments: [
+      tx.object(PREDICT_OBJECT_ID),
+      tx.object(managerId),
+      tx.object(oracleId),
+      marketKey,
+      tx.pure.u64(quantityUnits),
+      tx.object(SUI_CLOCK_OBJECT_ID),
+    ],
+  });
+
+  return tx;
+}

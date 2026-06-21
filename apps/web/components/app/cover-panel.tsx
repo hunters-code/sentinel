@@ -27,12 +27,10 @@ import { QuoteLiveLine } from "@/components/app/quote-live-line";
 import { PricingBreakdown } from "@/components/app/pricing-breakdown";
 import { QuoteDisclosures } from "@/components/app/quote-disclosures";
 import { SettlementWindowsLoading } from "@/components/app/settlement-windows-loading";
+import { buildPolicyReceiptId } from "@/lib/policy-id";
+import Link from "next/link";
 
-type CoverPanelProps = {
-  onViewHistory: () => void;
-};
-
-export function CoverPanel({ onViewHistory }: CoverPanelProps) {
+export function CoverPanel() {
   const [btcInput, setBtcInput] = useState("");
   const [btcTouched, setBtcTouched] = useState(false);
   const [termId, setTermId] = useState<string>(COVER_TERMS[0]!.id);
@@ -125,12 +123,20 @@ export function CoverPanel({ onViewHistory }: CoverPanelProps) {
         </div>
       ) : status === "success" && quoteReady ? (
         <div className="space-y-4">
-          <p className="font-display text-[clamp(1.25rem,3vw,1.5rem)] font-medium leading-snug text-content-positive">
-            Cover purchased — receipt is in History.
+          <p className="font-display text-[clamp(1.25rem,3vw,1.5rem)] font-medium leading-snug text-content-primary">
+            Cover purchased.
           </p>
+          {selectedOracle && (
+            <Link
+              href={`/app?tab=history&policy=${encodeURIComponent(buildPolicyReceiptId(selectedOracle.oracleId, quote.strike))}`}
+              className="inline-flex min-h-11 items-center gap-1.5 font-medium text-sui-blue-bright no-underline transition-opacity hover:opacity-90"
+            >
+              View in History
+              <span aria-hidden>→</span>
+            </Link>
+          )}
           {txDigest && (
             <Muted>
-              Transaction{" "}
               <a
                 href={`https://suiscan.xyz/testnet/tx/${txDigest}`}
                 target="_blank"
@@ -141,7 +147,6 @@ export function CoverPanel({ onViewHistory }: CoverPanelProps) {
               </a>
             </Muted>
           )}
-          <PrimaryButton onClick={onViewHistory}>View History</PrimaryButton>
         </div>
       ) : (
         <>

@@ -10,7 +10,7 @@ export function SettlementWindowsLoading() {
     >
       <div className="flex items-start gap-3">
         <span
-          className="mt-0.5 size-[1.125rem] shrink-0 animate-spin rounded-full border-2 border-white/[0.14] border-t-action-primary"
+          className="mt-0.5 size-[1.125rem] shrink-0 animate-spin rounded-full border-2 border-white/[0.14] border-t-bg-accent"
           aria-hidden
         />
         <div className="min-w-0 flex-1">
@@ -23,7 +23,7 @@ export function SettlementWindowsLoading() {
         </div>
       </div>
       <div className="mt-3.5 h-[0.1875rem] overflow-hidden rounded-full bg-white/[0.08]" aria-hidden>
-        <span className="block h-full w-[40%] animate-settlement-bar rounded-[inherit] bg-gradient-to-r from-transparent via-action-primary to-transparent" />
+        <span className="block h-full w-[40%] animate-settlement-bar rounded-[inherit] bg-gradient-to-r from-transparent via-bg-accent to-transparent" />
       </div>
     </div>
   );

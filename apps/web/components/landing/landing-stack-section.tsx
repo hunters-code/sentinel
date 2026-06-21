@@ -55,11 +55,11 @@ export function LandingStackSection() {
       />
       <div className="relative z-[1] mx-auto w-full max-w-container">
         <LandingReveal className="max-w-[44rem]">
-          <p className="landing-sui-type-label font-medium text-sui-blue">Built on Sui</p>
-          <h2 className="landing-sui-type-h2 mt-3 max-w-[20ch] text-balance text-content-primary">
+          <p className="text-landing-label font-sui-mono uppercase font-medium text-sui-blue">Built on Sui</p>
+          <h2 className="text-landing-h2 mt-3 max-w-[20ch] text-balance text-content-primary">
             Priced from live markets, settled on-chain.
           </h2>
-          <p className="landing-sui-type-lead mt-5 max-w-[62ch] text-content-secondary text-pretty">
+          <p className="text-landing-lead mt-5 max-w-[62ch] text-content-secondary text-pretty">
             Quotes refresh before you sign. Settlement follows the oracle expiry on your receipt — not a
             fixed duration from purchase.
           </p>
@@ -96,14 +96,14 @@ export function LandingStackSection() {
 
         <LandingReveal className="mt-8" delay={0.12}>
           <div className="rounded-2xl border border-border-neutral bg-black/55 px-6 py-6 backdrop-blur-sm md:px-7 md:py-7">
-            <p className="landing-sui-type-label text-sui-blue">Tech</p>
+            <p className="text-landing-label font-sui-mono uppercase text-sui-blue">Tech</p>
             <dl className="mt-6 grid gap-6 sm:grid-cols-3 sm:gap-8">
               {TECH_STACK.map((item) => (
                 <div key={item.term}>
                   <dt className="font-display text-base font-normal leading-snug text-content-primary md:text-[1.0625rem]">
                     {item.term}
                   </dt>
-                  <dd className="landing-sui-type-body mt-2.5 leading-[1.55] text-content-secondary">{item.detail}</dd>
+                  <dd className="text-landing-body mt-2.5 leading-[1.55] text-content-secondary">{item.detail}</dd>
                 </div>
               ))}
             </dl>
@@ -127,11 +127,11 @@ function CoverageCell({
         index === 0 ? "bg-black/80 sm:bg-black/85" : "bg-black/70"
       }`}
     >
-      <dt className="landing-sui-type-label text-sui-blue">{item.label}</dt>
+      <dt className="text-landing-label font-sui-mono uppercase text-sui-blue">{item.label}</dt>
       <dd className="mt-3 font-display text-lg font-normal leading-[1.35] tracking-[-0.02em] text-content-primary md:text-xl">
         {item.value}
       </dd>
-      <dd className="landing-sui-type-body mt-3 max-w-[42ch] leading-[1.55] text-content-secondary">
+      <dd className="text-landing-body mt-3 max-w-[42ch] leading-[1.55] text-content-secondary">
         {item.detail}
       </dd>
     </dl>

@@ -20,10 +20,10 @@ export function LandingCtaSection() {
             imageClassName="object-cover object-[center_55%]"
           />
           <div className="relative z-[1]">
-            <h2 className="landing-sui-type-h2 max-w-[16ch] text-balance">
+            <h2 className="text-landing-h2 max-w-[16ch] text-balance">
               Insure the next move before it happens.
             </h2>
-            <p className="landing-sui-type-body mt-4 max-w-[58ch] text-content-secondary text-pretty">
+            <p className="text-landing-body mt-4 max-w-[58ch] text-content-secondary text-pretty">
               Parametric, all-or-nothing payout at oracle settlement. Coverage window follows expiry on
               your quote — not a regulated insurance product.
             </p>

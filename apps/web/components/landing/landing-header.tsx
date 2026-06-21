@@ -186,7 +186,7 @@ export function LandingHeader() {
                           <span className="font-display text-[0.9375rem] font-normal leading-tight text-white">
                             {link.label}
                           </span>
-                          <span className="landing-sui-type-body leading-[1.35] text-sui-steel">{link.desc}</span>
+                          <span className="text-landing-body leading-[1.35] text-sui-steel">{link.desc}</span>
                         </a>
                       </li>
                     ))}
@@ -200,10 +200,10 @@ export function LandingHeader() {
                     <p className="relative font-display text-[0.9375rem] font-normal leading-tight text-white">
                       {item.card.label}
                     </p>
-                    <p className="landing-sui-type-body relative mt-1 leading-[1.4] text-sui-steel">{item.card.hint}</p>
+                    <p className="text-landing-body relative mt-1 leading-[1.4] text-sui-steel">{item.card.hint}</p>
                     <a
                       href="/app"
-                      className="landing-sui-type-body relative mt-3 inline-flex font-medium text-sui-blue no-underline transition-colors duration-150 hover:text-white"
+                      className="text-landing-body relative mt-3 inline-flex font-medium text-sui-blue no-underline transition-colors duration-150 hover:text-white"
                       onClick={() => setOpenDropdown(null)}
                     >
                       Get a quote →

@@ -28,7 +28,7 @@ export function SuiGradientBackdrop({
 }: SuiGradientBackdropProps) {
   return (
     <div className={cn("pointer-events-none absolute inset-0 overflow-hidden", className)} aria-hidden>
-      <div className={cn("relative h-full w-full", drift && "landing-gradient-drift")}>
+      <div className={cn("relative h-full w-full", drift && "animate-landing-gradient-drift motion-reduce:animate-none")}>
         <Image
           src={GRADIENTS[variant]}
           alt=""
@@ -39,9 +39,9 @@ export function SuiGradientBackdrop({
           className={cn("object-cover", imageClassName)}
         />
       </div>
-      {overlay === "hero" ? <div className="absolute inset-0 landing-sui-gradient-hero-overlay" /> : null}
-      {overlay === "panel" ? <div className="absolute inset-0 landing-sui-gradient-panel-overlay" /> : null}
-      {overlay === "section" ? <div className="absolute inset-0 landing-sui-gradient-section-overlay" /> : null}
+      {overlay === "hero" ? <div className="absolute inset-0 bg-landing-sui-hero-overlay" /> : null}
+      {overlay === "panel" ? <div className="absolute inset-0 bg-landing-sui-panel-overlay" /> : null}
+      {overlay === "section" ? <div className="absolute inset-0 bg-landing-sui-section-overlay" /> : null}
     </div>
   );
 }

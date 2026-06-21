@@ -28,15 +28,15 @@ export function LandingHowSection() {
     <section id="how" className="border-t border-[var(--color-chrome-border)] bg-sui-black px-5 py-20 md:px-10 md:py-28">
       <div className="mx-auto w-full max-w-container">
         <LandingReveal className="max-w-[40rem]">
-          <h2 className="landing-sui-type-h2 max-w-[18ch] text-balance">
+          <h2 className="text-landing-h2 max-w-[18ch] text-balance">
             Buy coverage in one tap, settle automatically on expiry.
           </h2>
-          <p className="landing-sui-type-body mt-6 max-w-[62ch] text-content-secondary text-pretty">
+          <p className="text-landing-body mt-6 max-w-[62ch] text-content-secondary text-pretty">
             Enter how much crypto you hold, review your trigger and premium, then sign once. If the
             settlement price lands at or below your trigger, payout is sent to your wallet automatically.
           </p>
           {reduce ? (
-            <ul className="mt-8 flex flex-wrap gap-2.5 landing-sui-type-body text-sui-steel-dark">
+            <ul className="mt-8 flex flex-wrap gap-2.5 text-landing-body text-sui-steel-dark">
               <li className="rounded-full border border-sui-blue/45 bg-sui-blue/10 px-3 py-1 text-sui-blue">
                 Parametric payout
               </li>
@@ -45,7 +45,7 @@ export function LandingHowSection() {
             </ul>
           ) : (
             <motion.ul
-              className="mt-8 flex flex-wrap gap-2.5 landing-sui-type-body text-sui-steel-dark"
+              className="mt-8 flex flex-wrap gap-2.5 text-landing-body text-sui-steel-dark"
               initial="hidden"
               whileInView="visible"
               viewport={LANDING_VIEWPORT}
@@ -71,7 +71,7 @@ export function LandingHowSection() {
 
         <div className="relative mt-16 md:mt-20 lg:mt-24">
           <div
-            className="pointer-events-none absolute inset-x-0 top-4 hidden h-px origin-left bg-[var(--color-chrome-border)] landing-shimmer-line md:block"
+            className="pointer-events-none absolute inset-x-0 top-4 hidden h-px origin-left bg-[var(--color-chrome-border)] animate-landing-shimmer-line motion-reduce:animate-none md:block"
             aria-hidden
           />
           {reduce ? (
@@ -119,7 +119,7 @@ function StepContent({
         <h3 className="font-display text-lg font-normal tracking-[-0.02em] text-content-primary md:text-xl">
           {step.title}
         </h3>
-        <p className="landing-sui-type-body mt-2 max-w-[34ch] text-sui-steel md:mt-3">{step.body}</p>
+        <p className="text-landing-body mt-2 max-w-[34ch] text-sui-steel md:mt-3">{step.body}</p>
       </div>
     </div>
   );

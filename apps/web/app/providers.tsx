@@ -6,7 +6,6 @@ import { getFullnodeUrl } from "@mysten/sui/client";
 import { useState } from "react";
 import "@mysten/dapp-kit/dist/index.css";
 import { sentinelDappKitTheme } from "@/lib/dapp-kit-theme";
-import { ThemeProvider } from "@/components/theme-provider";
 
 const networks = {
   testnet: { url: getFullnodeUrl("testnet") },
@@ -20,7 +19,7 @@ export function Providers({ children }: { children: React.ReactNode }) {
     <QueryClientProvider client={queryClient}>
       <SuiClientProvider networks={networks} defaultNetwork="testnet">
         <WalletProvider autoConnect theme={sentinelDappKitTheme}>
-          <ThemeProvider>{children}</ThemeProvider>
+          {children}
         </WalletProvider>
       </SuiClientProvider>
     </QueryClientProvider>
