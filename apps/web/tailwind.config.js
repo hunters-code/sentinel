@@ -8,87 +8,60 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        background: "var(--background)",
-        "secondary-background": "var(--secondary-background)",
-        foreground: "var(--foreground)",
-        "main-foreground": "var(--main-foreground)",
-        main: "var(--main)",
-        border: "var(--border)",
-        ring: "var(--ring)",
-        violet: {
-          100: "#A5B4FB",
-          200: "#A8A6FF",
-          300: "#918efa",
-          400: "#807dfa",
+        sui: {
+          blue: "#298dff",
+          "blue-bright": "var(--sui-blue-bright, #5ca9ff)",
+          "blue-light": "#ddf2ff",
+          "blue-dark": "#1759c4",
+          "blue-darker": "#002e6a",
+          root: "var(--sui-root, #041e3a)",
+          black: "var(--sui-black, #000000)",
+          steel: "var(--sui-steel, #89919f)",
+          "steel-dark": "var(--sui-steel-dark, #6c7584)",
+          white: "var(--sui-white, #ffffff)",
+          line: "var(--sui-line, rgba(255, 255, 255, 0.12))",
+          separator: "rgba(255, 255, 255, 0.22)",
+          navy: "#001428",
+          "mesh-navy": "#042848",
         },
-        pink: {
-          200: "#FFA6F6",
-          300: "#fa8cef",
-          400: "#fa7fee",
+        content: {
+          primary: "var(--color-content-primary)",
+          secondary: "var(--color-content-secondary)",
+          tertiary: "var(--color-content-tertiary)",
+          positive: "var(--color-content-positive)",
+          warning: "var(--color-content-warning)",
+          negative: "var(--color-content-negative)",
+          "persistent-white": "var(--color-content-persistent-white)",
+          "persistent-black": "var(--color-content-persistent-black)",
         },
-        red: {
-          200: "#FF9F9F",
-          300: "#fa7a7a",
-          400: "#f76363",
+        bg: {
+          primary: "var(--color-background-primary)",
+          accent: "var(--color-background-accent)",
+          "secondary-selected": "var(--color-background-secondary-selected)",
         },
-        orange: {
-          200: "#FFC29F",
-          300: "#FF965B",
-          400: "#fa8543",
+        action: {
+          primary: "var(--color-action-primary)",
+          "secondary-selected": "var(--color-action-secondary-selected)",
         },
-        yellow: {
-          200: "#FFF59F",
-          300: "#FFF066",
-          400: "#FFE500",
+        page: {
+          fill: "var(--color-page-fill)",
+          "tab-bar": "var(--color-page-tab-bar)",
         },
-        lime: {
-          100: "#c6fab4",
-          200: "#B8FF9F",
-          300: "#9dfc7c",
-          400: "#7df752",
+        card: {
+          fill: "var(--color-card-fill)",
+          border: "var(--color-card-border)",
+          accent: "var(--color-card-accent)",
         },
-        cyan: {
-          200: "#A6FAFF",
-          300: "#79F7FF",
-          400: "#53f2fc",
-        },
-        chart: {
-          1: "var(--chart-1)",
-          2: "var(--chart-2)",
-          3: "var(--chart-3)",
-          4: "var(--chart-4)",
-          5: "var(--chart-5)",
-        },
-        surface: {
-          lime: "var(--surface-lime)",
-          yellow: "var(--surface-yellow)",
-          cyan: "var(--surface-cyan)",
-          pink: "var(--surface-pink)",
+        separator: "var(--color-separator)",
+        "border-neutral": "var(--color-border-neutral)",
+        signal: {
+          lime: "#7df752",
+          orange: "#fa8543",
         },
       },
       fontFamily: {
-        base: ["var(--font-dm-sans)", "system-ui", "sans-serif"],
-        heading: ["var(--font-dm-sans)", "system-ui", "sans-serif"],
-      },
-      fontWeight: {
-        base: "var(--base-font-weight)",
-        heading: "var(--heading-font-weight)",
-      },
-      borderRadius: {
-        base: "var(--border-radius)",
-      },
-      boxShadow: {
-        shadow: "var(--shadow)",
-        nav: "4px 4px 0px rgba(0,0,0,1)",
-        brutal: "4px 4px 0px rgba(0,0,0,1)",
-        "brutal-hover": "8px 8px 0px rgba(0,0,0,1)",
-        "brutal-btn": "2px 2px 0px rgba(0,0,0,1)",
-      },
-      spacing: {
-        boxShadowX: "var(--box-shadow-x)",
-        boxShadowY: "var(--box-shadow-y)",
-        reverseBoxShadowX: "var(--reverse-box-shadow-x)",
-        reverseBoxShadowY: "var(--reverse-box-shadow-y)",
+        display: ["var(--font-geologica)", "system-ui", "sans-serif"],
+        body: ["var(--font-manrope)", "system-ui", "sans-serif"],
       },
       maxWidth: {
         container: "1140px",
@@ -98,9 +71,49 @@ module.exports = {
           "0%": { transform: "translateX(0)" },
           "100%": { transform: "translateX(-50%)" },
         },
+        "sentinel-rise": {
+          from: { opacity: "1", transform: "translateY(1.25rem)", filter: "blur(8px)" },
+          to: { opacity: "1", transform: "translateY(0)", filter: "blur(0)" },
+        },
+        "hero-mesh-a": {
+          from: { transform: "translate(0, 0) scale(1)" },
+          to: { transform: "translate(10%, 8%) scale(1.1)" },
+        },
+        "hero-mesh-b": {
+          from: { transform: "translate(0, 0) scale(1)" },
+          to: { transform: "translate(-12%, 14%) scale(1.08)" },
+        },
+        "hero-mesh-c": {
+          from: { transform: "translate(0, 0) scale(1)" },
+          to: { transform: "translate(8%, -10%) scale(1.12)" },
+        },
+        "hero-mesh-d": {
+          from: { transform: "translate(0, 0) scale(1)" },
+          to: { transform: "translate(-8%, -12%) scale(1.06)" },
+        },
+        "hero-mesh-e": {
+          from: { transform: "translate(0, 0) scale(1)" },
+          to: { transform: "translate(-6%, 6%) scale(1.15)" },
+        },
+        "settlement-bar": {
+          "0%": { transform: "translateX(-120%)" },
+          "100%": { transform: "translateX(280%)" },
+        },
+        "skeleton-pulse": {
+          "0%, 100%": { opacity: "0.45" },
+          "50%": { opacity: "1" },
+        },
       },
       animation: {
         marquee: "marquee 18s linear infinite",
+        "sentinel-rise": "sentinel-rise 760ms cubic-bezier(0.22, 1, 0.36, 1) both",
+        "hero-mesh-a": "hero-mesh-a 24s ease-in-out infinite alternate",
+        "hero-mesh-b": "hero-mesh-b 28s ease-in-out infinite alternate",
+        "hero-mesh-c": "hero-mesh-c 32s ease-in-out infinite alternate",
+        "hero-mesh-d": "hero-mesh-d 26s ease-in-out infinite alternate",
+        "hero-mesh-e": "hero-mesh-e 20s ease-in-out infinite alternate",
+        "settlement-bar": "settlement-bar 1.4s ease-in-out infinite",
+        "skeleton-pulse": "skeleton-pulse 1.6s ease-in-out infinite",
       },
     },
   },

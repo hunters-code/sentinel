@@ -1,28 +1,15 @@
 const LINES = [
-  { text: "Protect your", accent: false },
-  { text: "crypto before", accent: false },
-  { text: "the next drop.", accent: true },
+  { text: "When the market drops", accent: false },
+  { text: "you're covered.", accent: true },
 ] as const;
 
-/**
- * Hero headline. The entrance is pure CSS (see `.hero-line` /
- * `@keyframes sentinel-rise` in globals.css) so the text is fully visible even
- * if JavaScript never hydrates — the animation only runs as an enhancement.
- */
 export function HeroHeadline() {
   return (
-    <h1
-      className="text-[clamp(2.75rem,8vw,5.5rem)] leading-[1.02]"
-      style={{ fontFamily: "var(--font-display)" }}
-    >
-      {LINES.map((line, i) => (
+    <h1 className="text-center font-display text-[clamp(2.75rem,7vw,5.5rem)] font-medium leading-[1.02] tracking-[-0.03em] text-balance">
+      {LINES.map((line) => (
         <span
           key={line.text}
-          className="hero-line"
-          style={{
-            animationDelay: `${0.05 + i * 0.09}s`,
-            color: line.accent ? "var(--sui-blue-bright)" : undefined,
-          }}
+          className={`block ${line.accent ? "text-sui-blue-bright" : "text-content-primary"}`}
         >
           {line.text}
         </span>

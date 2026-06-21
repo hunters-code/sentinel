@@ -14,12 +14,10 @@ export function WalletPanel({ managerId }: { managerId: string | null }) {
   if (!managerId) {
     return (
       <Panel>
-        <h2 className="mb-2 text-lg" style={{ fontFamily: "var(--font-display)" }}>
-          No manager yet
-        </h2>
+        <h2 className="mb-2 font-display text-lg font-medium">Nothing to withdraw yet</h2>
         <Muted>
-          Your first cover purchase creates a manager account to hold payouts until you withdraw to
-          your wallet.
+          Your first cover purchase opens a payout balance here. Settled winnings land automatically —
+          then you can send them to your wallet.
         </Muted>
       </Panel>
     );
@@ -27,24 +25,22 @@ export function WalletPanel({ managerId }: { managerId: string | null }) {
 
   return (
     <Panel className="space-y-4">
-      <Muted>Manager balance</Muted>
-      <p
-        className="text-3xl font-medium tabular-nums"
-        style={{ fontFamily: "var(--font-display)" }}
-        aria-live="polite"
-      >
-        {balanceLoading ? "…" : usd(balance)}
-      </p>
-      <Muted>dUSDC ready to withdraw to your connected wallet</Muted>
+      <div>
+        <p className="text-sm font-medium text-content-secondary">Available to withdraw</p>
+        <p className="mt-2 font-display text-3xl font-medium tabular-nums text-content-primary" aria-live="polite">
+          {balanceLoading ? "…" : usd(balance)}
+        </p>
+        <Muted className="mt-2">Stablecoin balance from settled cover payouts</Muted>
+      </div>
 
       {error && (
-        <p className="text-sm" role="alert" style={{ color: "#fa8543" }}>
+        <p className="text-sm text-signal-orange" role="alert">
           {error}
         </p>
       )}
 
       {done ? (
-        <p className="text-sm font-medium" style={{ color: "#7df752" }}>
+        <p className="text-sm font-medium text-content-positive" role="status">
           Sent to your wallet
         </p>
       ) : (

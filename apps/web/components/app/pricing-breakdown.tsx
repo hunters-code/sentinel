@@ -16,24 +16,32 @@ export function PricingBreakdown({
   const effectivePct = quote.coverage > 0 ? (quote.premium / quote.coverage) * 100 : 0;
 
   return (
-    <details
-      className="rounded-xl border p-5"
-      style={{
-        borderColor: "var(--color-card-border, rgba(77, 162, 255, 0.3))",
-        background: "var(--color-card-fill, #000000)",
-        boxShadow: "inset 0 1px 0 var(--color-card-accent, rgba(77, 162, 255, 0.14))",
-      }}
-    >
-      <summary
-        className="cursor-pointer text-sm font-medium list-none [&::-webkit-details-marker]:hidden"
-        style={{ color: "var(--sui-white)" }}
-      >
-        How is this priced?
+    <details className="group border-t border-separator pt-4">
+      <summary className="cursor-pointer list-none text-sm font-medium text-content-primary [&::-webkit-details-marker]:hidden">
+        <span className="inline-flex items-center gap-2">
+          How is this priced?
+          <svg
+            width="12"
+            height="12"
+            viewBox="0 0 12 12"
+            fill="none"
+            aria-hidden
+            className="opacity-50 transition-transform duration-200 group-open:rotate-180"
+          >
+            <path
+              d="M2 4L6 8L10 4"
+              stroke="currentColor"
+              strokeWidth="1.5"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+          </svg>
+        </span>
       </summary>
       <div className="mt-4 space-y-3">
         <div className="flex items-center justify-between gap-4 text-sm">
-          <span style={{ color: "var(--sui-steel)" }}>{live ? "Premium" : "Estimated premium"}</span>
-          <strong style={{ color: "var(--sui-white)" }}>{usd(quote.premium)}</strong>
+          <span className="text-content-secondary">{live ? "Premium" : "Estimated premium"}</span>
+          <strong className="text-content-primary">{usd(quote.premium)}</strong>
         </div>
 
         {loading && !live ? (
@@ -42,21 +50,21 @@ export function PricingBreakdown({
           <>
             <div className="space-y-2 text-sm">
               <div className="flex items-center justify-between gap-4">
-                <span style={{ color: "var(--sui-steel)" }}>Fair value</span>
-                <span style={{ color: "var(--sui-white)" }}>{fairCents.toFixed(2)}¢ per $1 payout</span>
+                <span className="text-content-secondary">Fair value</span>
+                <span className="text-content-primary">{fairCents.toFixed(2)}¢ per $1 payout</span>
               </div>
               <div className="flex items-center justify-between gap-4">
-                <span style={{ color: "var(--sui-steel)" }}>Spread</span>
-                <span style={{ color: "var(--sui-white)" }}>{spreadCents.toFixed(2)}¢ per $1 payout</span>
+                <span className="text-content-secondary">Spread</span>
+                <span className="text-content-primary">{spreadCents.toFixed(2)}¢ per $1 payout</span>
               </div>
               <div className="flex items-center justify-between gap-4">
-                <span style={{ color: "var(--sui-steel)" }}>Effective rate</span>
-                <span style={{ color: "var(--sui-white)" }}>{effectivePct.toFixed(2)}% of coverage</span>
+                <span className="text-content-secondary">Effective rate</span>
+                <span className="text-content-primary">{effectivePct.toFixed(2)}% of coverage</span>
               </div>
               {quote.floorBinds && (
                 <div className="flex items-center justify-between gap-4">
-                  <span style={{ color: "var(--sui-steel)" }}>Protocol minimum</span>
-                  <span style={{ color: "var(--sui-white)" }}>1.00¢ per $1 payout</span>
+                  <span className="text-content-secondary">Protocol minimum</span>
+                  <span className="text-content-primary">1.00¢ per $1 payout</span>
                 </div>
               )}
             </div>

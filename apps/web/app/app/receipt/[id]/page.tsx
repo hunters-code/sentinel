@@ -10,7 +10,7 @@ import { useLiveBtcPrice } from "@/lib/use-oracle-data";
 import { usd as formatUsd } from "@/lib/format";
 import { AppShell } from "@/components/app/app-shell";
 import { AppContentCard } from "@/components/app/app-content-card";
-import type { AppNavId } from "@/components/app/app-tabs";
+import { DEFAULT_NAV, type AppNavId } from "@/components/app/app-tabs";
 import { Panel } from "@/components/app/ui/panel";
 import { Muted } from "@/components/app/ui/muted";
 import { PrimaryButton } from "@/components/app/ui/primary-button";
@@ -45,17 +45,16 @@ function Frame({ children }: { children: React.ReactNode }) {
   const connected = Boolean(account?.address);
 
   const navigateNav = (id: AppNavId) => {
-    router.push(id === "home" ? "/app" : `/app?tab=${id}`);
+    router.push(id === DEFAULT_NAV ? "/app" : `/app?tab=${id}`);
   };
 
   return (
     <AppShell nav="history" onNavChange={navigateNav} connected={connected}>
-      <div className="app-main-body">
-        <div className="mb-4 px-1">
+      <div className="px-4 py-5 md:px-6 md:py-6">
+        <div className="mb-4">
           <Link
             href="/app?tab=history"
-            className="inline-flex min-h-11 items-center gap-2 text-sm no-underline transition-colors hover:text-white"
-            style={{ color: "var(--sui-steel)" }}
+            className="inline-flex min-h-11 items-center gap-2 text-sm text-content-secondary no-underline transition-colors hover:text-content-primary"
           >
             <span aria-hidden>←</span> Back to history
           </Link>
@@ -68,13 +67,10 @@ function Frame({ children }: { children: React.ReactNode }) {
 
 function DetailRow({ label, value, accent }: { label: string; value: string; accent?: boolean }) {
   return (
-    <div className="app-divider-top flex items-center justify-between gap-4 py-3">
-      <span className="text-sm" style={{ color: "var(--sui-steel)" }}>
-        {label}
-      </span>
+    <div className="flex items-center justify-between gap-4 border-t border-separator py-3">
+      <span className="text-sm text-content-secondary">{label}</span>
       <span
-        className="text-sm font-medium"
-        style={{ color: accent ? "#7df752" : "var(--sui-white)" }}
+        className={accent ? "text-sm font-medium text-signal-lime" : "text-sm font-medium text-content-primary"}
       >
         {value}
       </span>
@@ -89,7 +85,6 @@ export default function ReceiptPage() {
   const { managerId } = useManagerId();
   const { data: keeperPolicies, isLoading } = useManagerPolicies(managerId);
 
-  // Live spot for the price line — tracks the real BTC market.
   const spotQuery = useLiveBtcPrice();
 
   let view: ReceiptView | null = null;
@@ -123,16 +118,13 @@ export default function ReceiptPage() {
           </Panel>
         ) : (
           <Panel className="text-center">
-            <h1 className="mb-2 text-lg" style={{ fontFamily: "var(--font-display)" }}>
-              Receipt not found
-            </h1>
+            <h1 className="mb-2 font-display text-lg">Receipt not found</h1>
             <Muted className="mb-6">
               This policy isn&apos;t on record for the connected wallet.
             </Muted>
             <Link
               href="/app"
-              className="inline-flex min-h-11 items-center gap-2 rounded-full border px-6 py-2.5 text-sm font-medium no-underline transition-colors hover:bg-white/5"
-              style={{ borderColor: "var(--sui-line)", color: "var(--sui-white)" }}
+              className="inline-flex min-h-11 items-center gap-2 rounded-full border border-border-neutral px-6 py-2.5 text-sm font-medium text-content-primary no-underline transition-colors hover:bg-white/5"
             >
               Back to app
             </Link>
@@ -147,57 +139,38 @@ export default function ReceiptPage() {
   return (
     <Frame>
       <div className="mb-8">
-        <p className="mb-2 text-sm" style={{ color: "var(--sui-blue-bright)" }}>
-          Receipt
-        </p>
-        <h1 className="text-balance text-[clamp(1.75rem,5vw,2.25rem)] leading-tight">
-          Your cover
-        </h1>
+        <p className="mb-2 text-sm text-sui-blue-bright">Receipt</p>
+        <h1 className="text-balance text-[clamp(1.75rem,5vw,2.25rem)] leading-tight">Your cover</h1>
       </div>
 
       <div className="space-y-6">
-        {/* Coverage summary */}
         <Panel>
           <div className="mb-4 flex items-center justify-between gap-3">
             <Muted>Coverage</Muted>
             <StatusChip tone={STATUS_TONE[view.status]}>{STATUS_LABELS[view.status]}</StatusChip>
           </div>
-          <p
-            className="text-[clamp(2rem,8vw,2.75rem)] leading-none"
-            style={{ fontFamily: "var(--font-display)", color: "var(--sui-white)" }}
-          >
+          <p className="font-display text-[clamp(2rem,8vw,2.75rem)] leading-none text-content-primary">
             {formatUsd(view.coverage, 0)}
           </p>
           <Muted className="mt-3">{view.subtitle}</Muted>
         </Panel>
 
-        {/* Live price line — only while the policy is open */}
         {view.status === "active" && (
           <Panel>
             <Muted className="mb-4">Live price · settlement at trigger</Muted>
             <div className="flex items-center justify-between gap-4">
               <div>
-                <p className="text-xs" style={{ color: "var(--sui-steel)" }}>
-                  BTC now
-                </p>
-                <p
-                  className="text-2xl"
-                  style={{ fontFamily: "var(--font-display)", color: "var(--sui-white)" }}
-                >
+                <p className="text-xs text-content-secondary">BTC now</p>
+                <p className="font-display text-2xl text-content-primary">
                   {spotQuery.data != null ? formatUsd(spotQuery.data, 0) : "—"}
                 </p>
               </div>
-              <span aria-hidden style={{ color: "var(--sui-steel-dark)" }}>
+              <span className="text-sui-steel-dark" aria-hidden>
                 →
               </span>
               <div className="text-right">
-                <p className="text-xs" style={{ color: "var(--sui-steel)" }}>
-                  Trigger
-                </p>
-                <p
-                  className="text-2xl"
-                  style={{ fontFamily: "var(--font-display)", color: "var(--sui-blue-bright)" }}
-                >
+                <p className="text-xs text-content-secondary">Trigger</p>
+                <p className="font-display text-2xl text-sui-blue-bright">
                   {formatUsd(view.trigger, 0)}
                 </p>
               </div>
@@ -205,11 +178,8 @@ export default function ReceiptPage() {
           </Panel>
         )}
 
-        {/* Detail breakdown */}
         <Panel>
-          <h2 className="mb-1 text-lg" style={{ fontFamily: "var(--font-display)" }}>
-            Policy details
-          </h2>
+          <h2 className="mb-1 font-display text-lg">Policy details</h2>
           <div className="mt-3">
             <DetailRow label="Premium paid" value={formatUsd(view.premium)} />
             <DetailRow label="Coverage" value={formatUsd(view.coverage, 0)} />

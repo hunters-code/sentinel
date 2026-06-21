@@ -8,20 +8,69 @@ type QuoteCtaButtonProps = {
   label?: string;
   className?: string;
   onClick?: () => void;
+  quiet?: boolean;
 };
+
+function LaunchArrowIcon() {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      viewBox="0 0 13 13"
+      fill="none"
+      className="h-[14.73px] w-[12.31px] shrink-0"
+      aria-hidden
+    >
+      <path
+        d="M11.52 5.66L5.86 0L5.16 0.71L10.31 5.86H0V6.86H10.31L5.16 12.02L5.86 12.73L11.52 7.07L12.23 6.36L11.52 5.66Z"
+        fill="currentColor"
+      />
+    </svg>
+  );
+}
 
 export function QuoteCtaButton({
   href,
   label = "Get a quote",
   className,
   onClick,
+  quiet = false,
 }: QuoteCtaButtonProps) {
-  return (
-    <span className={cn("sentinel-quote-cta-wrap", className)}>
-      <span className="sentinel-quote-cta-ring" aria-hidden />
-      <Link href={href} className="sentinel-quote-cta" onClick={onClick}>
-        {label}
+  if (quiet) {
+    return (
+      <Link
+        href={href}
+        className={cn(
+          "group inline-flex min-h-11 items-center justify-center gap-2.5 rounded-[26px] border border-white/22 bg-sui-black px-7 py-3 font-display text-[0.9375rem] font-medium leading-none tracking-[0.045em] text-white no-underline outline-none transition-[border-color,color] duration-200 ease-out hover:border-sui-blue-bright/35 hover:text-sui-blue-bright focus-visible:ring-2 focus-visible:ring-sui-blue-bright focus-visible:ring-offset-2 focus-visible:ring-offset-sui-black active:opacity-90",
+          className,
+        )}
+        onClick={onClick}
+      >
+        <span>{label}</span>
+        <LaunchArrowIcon />
       </Link>
-    </span>
+    );
+  }
+
+  return (
+    <Link
+      href={href}
+      className={cn(
+        "group relative inline-flex min-h-11 items-center justify-center overflow-hidden rounded-[26px] border border-white/20 p-px no-underline outline-none transition-transform duration-200 ease-out hover:-translate-y-0.5 active:translate-y-0 focus-visible:ring-2 focus-visible:ring-sui-blue-bright focus-visible:ring-offset-2 focus-visible:ring-offset-sui-black",
+        className,
+      )}
+      onClick={onClick}
+    >
+      <span className="pointer-events-none absolute inset-0 overflow-hidden rounded-[inherit]" aria-hidden>
+        <span className="absolute -inset-[42%] motion-safe:animate-[spin_4s_linear_infinite] motion-reduce:animate-none bg-[conic-gradient(from_0deg,rgba(92,169,255,0),rgba(92,169,255,0.85),rgba(92,169,255,0.25),rgba(92,169,255,0))]" />
+      </span>
+      <span
+        className="pointer-events-none absolute inset-px rounded-[calc(26px-1px)] border border-white/35 opacity-70 transition-opacity duration-200 group-hover:opacity-100"
+        aria-hidden
+      />
+      <span className="relative z-[1] inline-flex min-h-[calc(44px-2px)] w-full items-center justify-center gap-2.5 rounded-[calc(26px-1px)] bg-sui-black px-7 py-3 font-display text-[0.9375rem] font-medium leading-none tracking-[0.045em] text-white transition-colors duration-200 group-hover:text-sui-blue-bright">
+        <span>{label}</span>
+        <LaunchArrowIcon />
+      </span>
+    </Link>
   );
 }

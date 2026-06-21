@@ -49,7 +49,16 @@ export function Reveal({
   }, []);
 
   return (
-    <div ref={ref} className={["reveal", className].filter(Boolean).join(" ")} style={style}>
+    <div
+      ref={ref}
+      className={[
+        "data-[armed=true]:translate-y-6 data-[armed=true]:opacity-0 data-[armed=true][data-visible=true]:translate-y-0 data-[armed=true][data-visible=true]:opacity-100 data-[armed=true][data-visible=true]:transition-all data-[armed=true][data-visible=true]:duration-700 data-[armed=true][data-visible=true]:ease-[cubic-bezier(0.22,1,0.36,1)] motion-reduce:translate-y-0 motion-reduce:opacity-100 motion-reduce:transition-none",
+        className,
+      ]
+        .filter(Boolean)
+        .join(" ")}
+      style={style}
+    >
       {children}
     </div>
   );
