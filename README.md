@@ -1,8 +1,10 @@
 # Sentinel
 
-Short-term parametric crash insurance for BTC, built on [DeepBook Predict](https://deepbook.tech) (Sui). Coverage runs until the selected oracle expiry — not a fixed duration from purchase.
+Short-window parametric crash insurance for BTC, built on [DeepBook Predict](https://deepbook.tech) (Sui). Coverage runs until the selected oracle expiry — not a fixed duration from purchase.
 
-Enter how much BTC you hold → get one premium quote → sign one transaction → receive automatic payout if BTC settles at or below your trigger price before the chosen oracle expiry.
+Enter how much BTC you hold → get one premium quote, priced off the live SVI volatility surface → sign one transaction → receive a receipt. If BTC settles at or below your trigger price before the chosen oracle expiry, a keeper pays you out automatically in dUSDC — no claims, no counterparty chase.
+
+Under the hood, each policy is a single well-priced `predict::mint` of a deep out-of-the-money DOWN binary. Payouts are all-or-nothing and the coverage window equals the oracle expiry — this is parametric crash protection, not regulated insurance.
 
 > **Current scope:** Sui testnet only · BTC + dUSDC · single default trigger (−2%) · nearest valid oracle expiry.
 
